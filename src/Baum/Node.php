@@ -73,7 +73,7 @@ abstract class Node extends Model {
   * @return string
   */
   public function getQualifiedParentColumnName() {
-    return $this->getTable(). '.'.$this->getParentColumnName();
+    return $this->getTable(). '.' .$this->getParentColumnName();
   }
 
   /**
@@ -206,7 +206,7 @@ abstract class Node extends Model {
       $node->setAttribute($node->getRightColumnName(), $maxRightValue + 2);
     });
 
-    // // Before save, check if parent_id changed
+    // Before save, check if parent_id changed
     static::saving(function($node) {
       $dirty = $node->getDirty();
 
@@ -234,21 +234,18 @@ abstract class Node extends Model {
     static::deleting(function($node) {
       if ( !is_null($node->getRight()) && !is_null($node->getLeft()) ) {
         $this->connection->transaction(function() use ($node) {
-          $leftColumnName = $node->getLeftColumnName();
-          $rightColumnName = $node->getRightColumnName();
-          $left = $node->getLeft();
-          $right = $node->getRight();
+          $leftColumn   = $node->getLeftColumnName();
+          $rightColumn  = $node->getRightColumnName();
+          $left         = $node->getLeft();
+          $right        = $node->getRight();
 
           // prune branch off
-          $node->newQuery()
-            ->where($leftColumnName, '>', $left)
-            ->where($rightColumnName, '<', $right)
-            ->delete();
+          $node->newQuery()->where($leftColumn, '>', $left)->where($rightColumn, '<', $right)->delete();
 
           // update lefts & rights for remaining nodes
           $diff = $right - $left + 1;
-          $node->newQuery()->where($leftColumnName, '>', $right)->decrement($leftColumnName, $diff);
-          $node->newQuery()->where($rightColumnName, '>', $right)->decrement($rightColumnName, $diff);
+          $node->newQuery()->where($leftColumn, '>', $right)->decrement($leftColumn, $diff);
+          $node->newQuery()->where($rightColumn, '>', $right)->decrement($rightColumn, $diff);
         });
       }
     });
@@ -630,5 +627,92 @@ abstract class Node extends Model {
    */
   protected function withoutSelf($scope) {
     return $scope->where($this->getKeyName(), '!=', $this->getKey());
+  }
+
+  public function moveTo($target, $position) {
+    if ( !$this->exists )
+      throw new MoveNotPossibleException('Cannot move a new node');
+
+    $this->getConnection()->transaction(function() use ($target, $position) {
+      if ( !($position == 'root' || $this->isMovePossible($target)) )
+        throw new MoveNotPossibleException('Impossible move, target node cannot be inside moved tree.');
+
+      $bound = 0;
+      switch ($position) {
+        case 'child':
+          $bound = $target->getRight();
+          break;
+
+        case 'left':
+          $bound = $target->getLeft();
+          break;
+
+        case 'right':
+          $bound = $target->getRight() + 1;
+          break;
+
+        default:
+          throw new MoveNotPossibleException("Unrecognized movemente position: $position");
+          break;
+      }
+
+      if ( $bound > $this->getRight() ) {
+        $bound = $bound - 1;
+        $other_bound = $this->getRight() + 1;
+      } else {
+        $other_bound = $this->getLeft() - 1;
+      }
+
+      if ( $bound == $this->getRight() || $bound == $this->getLeft() )
+        return;
+
+      $boundaries = array($this->getLeft(), $this->getRight(), $bound, $other_bound);
+      sort($boundaries);
+      list($a, $b, $c, $d) = $boundaries;
+
+      $newParent = $target->getParentId();
+      if ( $position == 'child' )
+        $newParent = $target->id;
+
+      // Update
+      // $grammar = $this->getGrammar();
+      $grammar = $this->getConnection()->getQueryGrammar();
+      $currentId      = $this->id;
+      $leftColumn     = $this->getLeftColumnName();
+      $rightColumn    = $this->getRightColumnName();
+      $parentColumn   = $this->getParentColumnName();
+      $wrappedLeft    = $grammar->wrap($leftColumn);
+      $wrappedRight   = $grammar->wrap($rightColumn);
+      $wrappedParent  = $grammar->wrap($parentColumn);
+      $wrappedId      = $grammar->wrap($this->getKeyName());
+
+      $lftSql = "CASE
+        WHEN $wrappedLeft BETWEEN $a AND $b THEN $wrappedLeft + $d - $b
+        WHEN $wrappedLeft BETWEEN $c AND $d THEN $wrappedLeft + $a - $c
+        ELSE $wrappedLeft END";
+
+      $rgtSql = "CASE
+        WHEN $wrappedRight BETWEEN $a AND $b THEN $wrappedRight + $d - $b
+        WHEN $wrappedRight BETWEEN $c AND $d THEN $wrappedRight + $a - $c
+        ELSE $wrappedRight END";
+
+      $parentSql = "CASE
+        WHEN $wrappedId = $currentId THEN $newParent
+        ELSE $wrappedParent END";
+
+      $this->newQuery()
+            ->whereBetween($this->getLeftColumnName(), array($a, $d))
+            ->orWhereBetween($this->getRightColumnName(), array($a, $d))
+            ->update(array(
+              $leftColumn => $this->raw($lftSql),
+              $rightColumn => $this->raw($rgtSql),
+              $parentColunm = $this->raw($parentSql)
+            ));
+    });
+
+    // TODO:
+    // 1. set depth
+    // 2. save descendants
+    // 3. reload
   }
 }
