@@ -185,6 +185,19 @@ abstract class Node extends Model {
   }
 
   /**
+   * Reloads the model from the database
+   *
+   * @return \Baum\Node
+   */
+  public function reload() {
+    $fresh = $this->newQuery()->find($this->getKey());
+
+    $this->setRawAttributes($fresh->getAttributes(), true);
+
+    return $this;
+  }
+
+  /**
    * The "booting" method of the model. We'll use this to attach some handlers
    * on model events.
    *
