@@ -1,4 +1,4 @@
 <?php
 namespace Baum;
 
-class MoveNotPossible extends \RuntimeException {}
+class MoveNotPossibleException extends \RuntimeException {}

@@ -621,19 +621,20 @@ abstract class Node extends Model {
   }
 
   /**
-   * Return a new QueryBuilder (scope) object without the current node.
+   * Main move method. Here we handle all node movements with the corresponding
+   * lft/rgt index updates.
    *
-   * @return \Illuminate\Database\Query\Builder
+   * TODO: reduce/split/extract/refactor/whatever this monstrosity...
+   *
+   * @param Baum\Node $target
+   * @param int       $position
+   * @return int
    */
-  protected function withoutSelf($scope) {
-    return $scope->where($this->getKeyName(), '!=', $this->getKey());
-  }
-
   public function moveTo($target, $position) {
     if ( !$this->exists )
       throw new MoveNotPossibleException('Cannot move a new node');
 
-    $this->getConnection()->transaction(function() use ($target, $position) {
+    $this->getConnection()->transaction(function($connection) use ($target, $position) {
       if ( !($position == 'root' || $this->isMovePossible($target)) )
         throw new MoveNotPossibleException('Impossible move, target node cannot be inside moved tree.');
 
@@ -663,9 +664,12 @@ abstract class Node extends Model {
         $other_bound = $this->getLeft() - 1;
       }
 
+      // return early if there's no change to be made
       if ( $bound == $this->getRight() || $bound == $this->getLeft() )
         return;
 
+      // we have defined the boundaries of two non-overlapping intervals,
+      // so sorting puts both the intervals and their boundaries in order
       $boundaries = array($this->getLeft(), $this->getRight(), $bound, $other_bound);
       sort($boundaries);
       list($a, $b, $c, $d) = $boundaries;
@@ -675,8 +679,10 @@ abstract class Node extends Model {
         $newParent = $target->id;
 
       // Update
-      // $grammar = $this->getGrammar();
-      $grammar = $this->getConnection()->getQueryGrammar();
+      $builder  = $this->newQuery();
+      $query    = $builder->getQuery();
+      $grammar  = $query->getGrammar();
+
       $currentId      = $this->id;
       $leftColumn     = $this->getLeftColumnName();
       $rightColumn    = $this->getRightColumnName();
@@ -700,19 +706,43 @@ abstract class Node extends Model {
         WHEN $wrappedId = $currentId THEN $newParent
         ELSE $wrappedParent END";
 
-      $this->newQuery()
-            ->whereBetween($this->getLeftColumnName(), array($a, $d))
-            ->orWhereBetween($this->getRightColumnName(), array($a, $d))
-            ->update(array(
-              $leftColumn => $this->raw($lftSql),
-              $rightColumn => $this->raw($rgtSql),
-              $parentColunm = $this->raw($parentSql)
-            ));
+      return $builder->whereBetween($leftColumn, [$a, $d])
+              ->orWhereBetween($rightColumn, [$a, $d])
+              ->update([
+                  $leftColumn   => $connection->raw($lftSql),
+                  $rightColumn  => $connection->raw($rgtSql),
+                  $parentColumn => $connection->raw($parentSql)
+                ]);
     });
 
     // TODO:
     // 1. set depth
     // 2. save descendants
     // 3. reload
+  }
+
+  /**
+   * Return a new QueryBuilder (scope) object without the current node.
+   *
+   * @return \Illuminate\Database\Query\Builder
+   */
+  protected function withoutSelf($scope) {
+    return $scope->where($this->getKeyName(), '!=', $this->getKey());
+  }
+
+  // -- DEBUG
+
+  // for debugging purposes only...
+  public function toText() {
+    $text = [];
+
+    foreach($this->getDescendantsAndSelf() as $node) {
+      $nesting  = str_repeat('*', $node->getLevel());
+      $parentId = is_null($node->getParentId()) ? 'NULL' : $node->getParentId();
+
+      $text[] = "$nesting {$node->getKey()} (pid:$parentId, lft:{$node->getLeft()}, rgt:{$node->getRight()}, dpth:{$node->getDepth()})";
+    }
+
+    return implode("\n", $text);
   }
 }
