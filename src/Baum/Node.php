@@ -185,7 +185,7 @@ abstract class Node extends Model {
   }
 
   /**
-   * Reloads the model from the database
+   * Reloads the model from the database.
    *
    * @return \Baum\Node
    */
@@ -278,8 +278,7 @@ abstract class Node extends Model {
    *
    * @return \Illuminate\Database\Query\Builder
    */
-  // public static function roots() {
-  public static function allRoots() {
+  public static function roots() {
     $instance = new static;
 
     return $instance->newQuery()
@@ -293,7 +292,6 @@ abstract class Node extends Model {
    *
    * @return \Illuminate\Database\Query\Builder
    */
-  // public static function leaves() {
   public static function allLeaves() {
     $instance = new static;
 
