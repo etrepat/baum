@@ -207,17 +207,20 @@ abstract class Node extends Model {
     parent::boot();
 
     // On creation, compute default left and right to be at the end of the tree.
-    static::creating(function($node) {
-      $highestRightNode = $node->newQuery()->orderBy($node->getRightColumnName(), 'desc')->take(1)->first();
-
-      $maxRightValue = 0;
-      if ( !is_null($highestRightNode) )
-        $maxRightValue = $highestRightNode->getAttribute($node->getRightColumnName());
-
-      // Add the new node to the right of all existing nodes.
-      $node->setAttribute($node->getLeftColumnName(), $maxRightValue + 1);
-      $node->setAttribute($node->getRightColumnName(), $maxRightValue + 2);
+    static::creating(function() {
+      $this->setDefaultLeftAndRight();
     });
+    // static::creating(function($node) {
+    //   $highestRightNode = $node->newQuery()->orderBy($node->getRightColumnName(), 'desc')->take(1)->first();
+
+    //   $maxRightValue = 0;
+    //   if ( !is_null($highestRightNode) )
+    //     $maxRightValue = $highestRightNode->getAttribute($node->getRightColumnName());
+
+    //   // Add the new node to the right of all existing nodes.
+    //   $node->setAttribute($node->getLeftColumnName(), $maxRightValue + 1);
+    //   $node->setAttribute($node->getRightColumnName(), $maxRightValue + 2);
+    // });
 
     // Before save, check if parent_id changed
     static::saving(function($node) {
@@ -642,6 +645,21 @@ abstract class Node extends Model {
       $node->getRight() >= $this->getLeft()   &&
       $node->getRight() <= $this->getRight()
     );
+  }
+
+  /**
+   * Sets default values for left and right fields.
+   *
+   * @return void
+   */
+  protected function setDefaultLeftAndRight() {
+    $withHighestRight = $this->newQUery()->orderBy($this->getRightColumnName(), 'desc')->take(1)->first();
+
+    $maxRgt = 0;
+    if ( !is_null($withHighestRight) ) $maxRgt = $withHighestRight->getRight();
+
+    $this->setAttribute($this->getLeftColumnName()  , $maxRgt + 1);
+    $this->setAttribute($this->getRightColumnName() , $maxRgt + 2);
   }
 
   /**
