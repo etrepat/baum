@@ -619,17 +619,42 @@ abstract class Node extends Model {
   }
 
   /**
-   * Is moving to the node possible?
+   * Equals?
    *
-   * @param   Baum\Node
+   * @param \Baum\Node
    * @return boolean
    */
-  public function isMovePossible($node) {
-    return ($this != $node && !(
-      ($this->getLeft() <= $node->getLeft() && $this->getRight() >= $node->getRight()) ||
-      ($this->getLeft() <= $node->getRight() && $this->getRight() >= $node->getRight())
-    ));
+  public function equals($node) {
+    return ($this == $node);
   }
+
+  /**
+   * Checks wether the given node is a descendant of itself. Basically, whether
+   * its in the subtree defined by the left and right indices.
+   *
+   * @param \Baum\Node
+   * @return boolean
+   */
+  public function insideSubtree($node) {
+    return (
+      $node->getLeft()  >= $this->getLeft()   &&
+      $node->getLeft()  <= $this->getRight()  &&
+      $node->getRight() >= $this->getLeft()   &&
+      $node->getRight() <= $this->getRight()
+    );
+  }
+
+  /**
+   * Return a new QueryBuilder (scope) object without the current node.
+   *
+   * @return \Illuminate\Database\Query\Builder
+   */
+  protected function withoutSelf($scope) {
+    return $scope->where($this->getKeyName(), '!=', $this->getKey());
+  }
+
+  // const VALID_MOVE_POSITIONS = ['child', 'left', 'right', 'root'];
+  const VALID_MOVE_POSITIONS = ['child', 'left', 'right'];
 
   /**
    * Main move method. Here we handle all node movements with the corresponding
@@ -639,17 +664,23 @@ abstract class Node extends Model {
    *
    * @param Baum\Node $target
    * @param int       $position
-   * @return int
+   * @return \Baum\Node
    */
-  public function moveTo($target, $position) {
+  protected function moveTo($target, $position) {
     if ( !$this->exists )
-      throw new MoveNotPossibleException('Cannot move a new node');
+      throw new MoveNotPossibleException('A new node cannot be moved.');
+
+    if ( array_search($position, VALID_MOVE_POSITIONS) === FALSE )
+      throw new MoveNotPossibleException("Position should be one of {self::VALID_MOVE_POSITIONS} but is $position.");
+
+    if ( $this->equals($target) )
+      throw new MoveNotPossibleException('A node cannot be moved to itself.');
+
+    if ( $this->insideSubtree($target) )
+      throw new MoveNotPossibleException('A node cannot be moved to a descendant of itself (inside moved tree).');
 
     $this->getConnection()->transaction(function($connection) use ($target, $position) {
-      if ( !($position == 'root' || $this->isMovePossible($target)) )
-        throw new MoveNotPossibleException('Impossible move, target node cannot be inside moved tree.');
-
-      $bound = 0;
+      $bound = 1;
       switch ($position) {
         case 'child':
           $bound = $target->getRight();
@@ -662,26 +693,18 @@ abstract class Node extends Model {
         case 'right':
           $bound = $target->getRight() + 1;
           break;
-
-        default:
-          throw new MoveNotPossibleException("Unrecognized movemente position: $position");
-          break;
       }
+      $bound = $bound > $this->getRight() ? $bound - 1 : $bound;
 
-      if ( $bound > $this->getRight() ) {
-        $bound = $bound - 1;
-        $other_bound = $this->getRight() + 1;
-      } else {
-        $other_bound = $this->getLeft() - 1;
-      }
+      $otherBound = $bound > $this->getRight() ? $this->getRight() + 1 : $this->getleft() - 1;
 
       // return early if there's no change to be made
       if ( $bound == $this->getRight() || $bound == $this->getLeft() )
-        return;
+        return 0;
 
       // we have defined the boundaries of two non-overlapping intervals,
       // so sorting puts both the intervals and their boundaries in order
-      $boundaries = array($this->getLeft(), $this->getRight(), $bound, $other_bound);
+      $boundaries = array($this->getLeft(), $this->getRight(), $bound, $otherBound);
       sort($boundaries);
       list($a, $b, $c, $d) = $boundaries;
 
@@ -726,19 +749,16 @@ abstract class Node extends Model {
                 ]);
     });
 
+    $target->reload();
+
     // TODO:
     // 1. set depth
-    // 2. save descendants
-    // 3. reload
-  }
 
-  /**
-   * Return a new QueryBuilder (scope) object without the current node.
-   *
-   * @return \Illuminate\Database\Query\Builder
-   */
-  protected function withoutSelf($scope) {
-    return $scope->where($this->getKeyName(), '!=', $this->getKey());
+    foreach ($this->getDescendants() as $descendant) {
+      $descendant->save();
+    }
+
+    return $this->reload();
   }
 
   // -- DEBUG
