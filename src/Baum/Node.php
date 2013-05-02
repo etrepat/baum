@@ -589,6 +589,33 @@ abstract class Node extends Model {
   }
 
   /**
+   * Alias for moveToRightOf
+   *
+   * @return \Baum\Node
+   */
+  public function makeNextSiblingOf($node) {
+    return $this->moveToRightOf($node);
+  }
+
+  /**
+   * Alias for moveToRightOf
+   *
+   * @return \Baum\Node
+   */
+  public function makeSiblingOf($node) {
+    return $this->moveToRightOf($node);
+  }
+
+  /**
+   * Alias for moveToLeftOf
+   *
+   * @return \Baum\Node
+   */
+  public function makePreviousSiblingOf($node) {
+    return $this->moveToLeftOf($node);
+  }
+
+  /**
    * Make the node a child of ...
    *
    * @return \Baum\Node
