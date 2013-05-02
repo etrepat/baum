@@ -743,20 +743,4 @@ abstract class Node extends Model {
   protected function moveTo($target, $position) {
     return Move::to($this, $target, $position);
   }
-
-  // -- DEBUG
-
-  // for debugging purposes only...
-  public function toText() {
-    $text = [];
-
-    foreach($this->getDescendantsAndSelf() as $node) {
-      $nesting  = str_repeat('*', $node->getLevel());
-      $parentId = is_null($node->getParentId()) ? 'NULL' : $node->getParentId();
-
-      $text[] = "$nesting {$node->getKey()} (pid:$parentId, lft:{$node->getLeft()}, rgt:{$node->getRight()}, dpth:{$node->getDepth()})";
-    }
-
-    return implode("\n", $text);
-  }
 }
