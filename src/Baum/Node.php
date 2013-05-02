@@ -660,7 +660,7 @@ abstract class Node extends Model {
    * @return void
    */
   protected function moveToNewParent() {
-    $pid = static::$moveToNewparentId;
+    $pid = static::$moveToNewParentId;
 
     if ( is_null($pid) )
       $this->makeRoot();
