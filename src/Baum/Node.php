@@ -729,8 +729,8 @@ abstract class Node extends Model {
    *
    * TODO: reduce/split/extract/refactor/whatever this monstrosity...
    *
-   * @param Baum\Node $target
-   * @param int       $position
+   * @param Baum\Node|int $target
+   * @param string        $position
    * @return \Baum\Node
    */
   protected function moveTo($target, $position) {
@@ -745,6 +745,11 @@ abstract class Node extends Model {
 
     if ( $this->insideSubtree($target) )
       throw new MoveNotPossibleException('A node cannot be moved to a descendant of itself (inside moved tree).');
+
+    if ( $target instanceof \Baum\Node )
+      $target = $target->reload();
+    else
+      $target = static::find($target->getKey());
 
     $this->getConnection()->transaction(function($connection) use ($target, $position) {
       $bound = 1;
@@ -818,12 +823,10 @@ abstract class Node extends Model {
 
     $target->reload();
 
-    // TODO:
-    // 1. set depth
+    $this->setDepth();
 
-    foreach ($this->getDescendants() as $descendant) {
+    foreach ($this->getDescendants() as $descendant)
       $descendant->save();
-    }
 
     return $this->reload();
   }
