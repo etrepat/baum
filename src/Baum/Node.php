@@ -673,7 +673,7 @@ abstract class Node extends Model {
    *
    * @return \Baum\Node
    */
-  protected function setDepth() {
+  public function setDepth() {
     $this->getConnection()->transaction(function() {
       $this->reload();
 
