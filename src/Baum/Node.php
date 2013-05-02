@@ -59,6 +59,18 @@ abstract class Node extends Model {
   protected $guarded = array('id', 'parent_id', 'lft', 'rgt', 'depth');
 
   /**
+   * Create a new Node model instance.
+   *
+   * @param  array  $attributes
+   * @return void
+   */
+  public function __construct(array $attributes = array()) {
+    parent::__construct($attributes);
+
+    $this->registerEventListeners();
+  }
+
+  /**
   * Get the parent column name.
   *
   * @return string
@@ -195,76 +207,6 @@ abstract class Node extends Model {
     $this->setRawAttributes($fresh->getAttributes(), true);
 
     return $this;
-  }
-
-  /**
-   * The "booting" method of the model. We'll use this to attach some handlers
-   * on model events.
-   *
-   * @return void
-   */
-  protected static function boot() {
-    parent::boot();
-
-    // On creation, compute default left and right to be at the end of the tree.
-    static::creating(function() {
-      $this->setDefaultLeftAndRight();
-    });
-    // static::creating(function($node) {
-    //   $highestRightNode = $node->newQuery()->orderBy($node->getRightColumnName(), 'desc')->take(1)->first();
-
-    //   $maxRightValue = 0;
-    //   if ( !is_null($highestRightNode) )
-    //     $maxRightValue = $highestRightNode->getAttribute($node->getRightColumnName());
-
-    //   // Add the new node to the right of all existing nodes.
-    //   $node->setAttribute($node->getLeftColumnName(), $maxRightValue + 1);
-    //   $node->setAttribute($node->getRightColumnName(), $maxRightValue + 2);
-    // });
-
-    // Before save, check if parent_id changed
-    static::saving(function($node) {
-      $dirty = $node->getDirty();
-
-      if ( isset($dirty[$node->getParentColumnName()]) )
-        $node::$moveToNewParentId = $node->getParentId();
-      else
-        $node::$moveToNewParentId = FALSE;
-    });
-
-    // After save, move to new parent if needed & set depth
-    static::saved(function($node) {
-      // Move to new parent if needed
-      if ( is_null($node::$moveToNewParentId) )
-        $node->moveToRoot();
-      else if ( $node::$moveToNewParentId !== FALSE )
-        $node->moveToChildOf($node::$moveToNewParentId);
-
-      // Update depth
-      $level = $node->getLevel();
-      $node->newQuery()->where($node->getKeyName(), '=', $node->getKey())->update(array($node->getDepthColumnName() => $level));
-      $node->setAttribute($node->getDepthColumnName(), $level);
-    });
-
-    // Before delete, prune children
-    static::deleting(function($node) {
-      if ( !is_null($node->getRight()) && !is_null($node->getLeft()) ) {
-        $this->connection->transaction(function() use ($node) {
-          $leftColumn   = $node->getLeftColumnName();
-          $rightColumn  = $node->getRightColumnName();
-          $left         = $node->getLeft();
-          $right        = $node->getRight();
-
-          // prune branch off
-          $node->newQuery()->where($leftColumn, '>', $left)->where($rightColumn, '<', $right)->delete();
-
-          // update lefts & rights for remaining nodes
-          $diff = $right - $left + 1;
-          $node->newQuery()->where($leftColumn, '>', $right)->decrement($leftColumn, $diff);
-          $node->newQuery()->where($rightColumn, '>', $right)->decrement($rightColumn, $diff);
-        });
-      }
-    });
   }
 
   /**
@@ -648,6 +590,41 @@ abstract class Node extends Model {
   }
 
   /**
+   * Registers event listeners on a Node instance.
+   *
+   * 1. "creating": Before creating a new Node we'll assign a default value for
+   * the left and right indexes.
+   *
+   * 2. "saving": Before saving, we'll perform a check to see if we have to move
+   * to another parent.
+   *
+   * 3. "saved": Move to the new parent after saving if needed and re-set depth.
+   *
+   * 4. "deleting": Before delete we should prune all children and update
+   * the left and right indexes for the remaining nodes.
+   *
+   * @return void
+   */
+  protected function registerEventListeners() {
+    static::creating(function() {
+      $this->setDefaultLeftAndRight();
+    });
+
+    static::saving(function() {
+      $this->storeNewParent();
+    });
+
+    static::saved(function() {
+      $this->moveToNewParent();
+      $this->setDepth();
+    });
+
+    static::deleting(function() {
+      $this->destroyDescendants();
+    });
+  }
+
+  /**
    * Sets default values for left and right fields.
    *
    * @return void
@@ -660,6 +637,81 @@ abstract class Node extends Model {
 
     $this->setAttribute($this->getLeftColumnName()  , $maxRgt + 1);
     $this->setAttribute($this->getRightColumnName() , $maxRgt + 2);
+  }
+
+  /**
+   * Store the parent_id if the attribute is modified so as we are able to move
+   * the node to this new parent after saving.
+   *
+   * @return void
+   */
+  protected function storeNewParent() {
+    $dirty = $this->getDirty();
+
+    if ( isset($dirty[$this->getParentColumnName()]) )
+      static::$moveToNewParentId = $this->getParentId();
+    else
+      static::$moveToNewParentId = FALSE;
+  }
+
+  /**
+   * Move to the new parent if appropiate.
+   *
+   * @return void
+   */
+  protected function moveToNewParent() {
+    $pid = static::$moveToNewparentId;
+
+    if ( is_null($pid) )
+      $this->makeRoot();
+    else if ( $pid !== FALSE )
+      $this->moveToChildOf($pid);
+  }
+
+  /**
+   * Sets the depth attribute
+   *
+   * @return \Baum\Node
+   */
+  protected function setDepth() {
+    $this->getConnection()->transaction(function() {
+      $this->reload();
+
+      $level = $this->getLevel();
+
+      $this->newQuery()->where($this->getKeyName(), '=', $this->getKey())->update(array($this->getDepthColumnName() => $level));
+      $this->setAttribute($this->getDepthColumnName(), $level);
+    });
+
+    return $this;
+  }
+
+  /**
+   * Prunes a branch off the tree, shifting all the elements on the right
+   * back to the left so the counts work.
+   *
+   * @return void;
+   */
+  protected function destroyDescendants() {
+    if ( is_null($this->getRight()) || is_null($this->getLeft()) ) return;
+
+    $this->getConnection()->transaction(function() {
+      $this->reload();
+
+      $lftCol = $this->getLeftColumnName();
+      $rgtCol = $this->getRightColumnName();
+      $lft    = $this->getLeft();
+      $rgt    = $this->getRight();
+
+      // Prune children
+      $this->newQuery()->where($lftCol, '>', $lft)->where($rgtCol, '<', $rgt)->delete();
+
+      // Update left and right indexes for the remaining nodes
+      $diff = $rgt - $lft + 1;
+
+      $this->newQuery()->where($lftCol, '>', $rgt)->decrement($lftCol, $diff);
+      $this->newQuery()->where($rgtCol, '>', $rgt)->decrement($rgtCol, $diff);
+    });
   }
 
   /**
