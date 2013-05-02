@@ -1,6 +1,8 @@
 <?php
 namespace Baum;
 
+use \Illuminate\Events\Dispatcher;
+
 /**
 * Move
 */
@@ -56,6 +58,13 @@ class Move {
   protected $_parentId = NULL;
 
   /**
+   * The event dispatcher instance.
+   *
+   * @var \Illuminate\Events\Dispatcher
+   */
+  protected static $dispatcher;
+
+  /**
    * Create a new Move class instance.
    *
    * @param   \Baum\Node      $node
@@ -67,6 +76,8 @@ class Move {
     $this->node     = $node;
     $this->target   = $this->resolveNode($target);
     $this->position = $position;
+
+    $this->setEventDispatcher($node->getEventDispatcher());
   }
 
   /**
@@ -91,7 +102,8 @@ class Move {
   public function perform() {
     $this->guardAgainstImpossibleMove();
 
-    // TODO: Fire "moving" event
+    if ( $this->fireMoveEvent('moving') === false )
+      return $this->node;
 
     if ( $this->hasChange() ) {
       $this->node->getConnection()->transaction(function() {
@@ -108,7 +120,7 @@ class Move {
       $this->node->reload();
     }
 
-    // TODO: Fire "moved" event
+    $this->fireMoveEvent('moved', false);
 
     return $this->node;
   }
@@ -274,5 +286,43 @@ class Move {
    */
   protected function hasChange() {
     return !( $this->bound1() == $this->node->getRight() || $this->bound1() == $this->node->getLeft() );
+  }
+
+  /**
+   * Get the event dispatcher instance.
+   *
+   * @return \Illuminate\Events\Dispatcher
+   */
+  public static function getEventDispatcher() {
+    return static::$dispatcher;
+  }
+
+  /**
+   * Set the event dispatcher instance.
+   *
+   * @param  \Illuminate\Events\Dispatcher
+   * @return void
+   */
+  public static function setEventDispatcher(Dispatcher $dispatcher) {
+    static::$dispatcher = $dispatcher;
+  }
+
+  /**
+   * Fire the given move event for the model.
+   *
+   * @param  string $event
+   * @param  bool   $halt
+   * @return mixed
+   */
+  protected function fireMoveEvent($event, $halt = true) {
+    if ( !isset(static::$dispatcher) ) return true;
+
+    // Basically the same as \Illuminate\Database\Eloquent\Model->fireModelEvent
+    // but we relay the event into the node instance.
+    $event = "eloquent.{$event}: ".get_class($this->node);
+
+    $method = $halt ? 'until' : 'fire';
+
+    return static::$dispatcher->$method($event, $this->node);
   }
 }

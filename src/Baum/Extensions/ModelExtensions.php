@@ -42,4 +42,24 @@ trait ModelExtensions {
     return $instance->newQuery()->orderBy($instance->getKeyName(), 'desc')->first();
   }
 
+  /**
+   * Register a moving model event with the dispatcher.
+   *
+   * @param  Closure|string  $callback
+   * @return void
+   */
+  public static function moving($callback) {
+    static::registerModelEvent('moving', $callback);
+  }
+
+  /**
+   * Register a moved model event with the dispatcher.
+   *
+   * @param  Closure|string  $callback
+   * @return void
+   */
+  public static function moved($callback) {
+    static::registerModelEvent('moved', $callback);
+  }
+
 }
