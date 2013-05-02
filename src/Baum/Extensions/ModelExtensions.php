@@ -9,16 +9,13 @@ trait ModelExtensions {
    * @return \Baum\Node
    */
   public function reload() {
-    if ( !$this->exists )
-      return $this;
+    if ( !$this->exists ) {
+      $this->syncOriginal();
+    } else {
+      $fresh = static::find($this->getKey());
 
-    $dirty = $this->getDirty();
-    if ( count($dirty) === 0 )
-      return $this;
-
-    $fresh = static::find($this->getKey());
-
-    $this->setRawAttributes($fresh->getAttributes(), true);
+      $this->setRawAttributes($fresh->getAttributes(), true);
+    }
 
     return $this;
   }
