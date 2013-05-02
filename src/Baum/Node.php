@@ -67,8 +67,63 @@ abstract class Node extends Model {
    */
   public function __construct(array $attributes = array()) {
     parent::__construct($attributes);
+  }
 
-    $this->registerEventListeners();
+  /**
+   * The "booting" method of the model.
+   *
+   * We'll use this method to register event listeners on a Node instance as
+   * suggested in the beta documentation...
+   *
+   * TODO:
+   *
+   *    - Find a way to avoid needing to declare the called methods "public"
+   *    as registering the event listeners *inside* this methods does not give
+   *    us an object context.
+   *
+   * Events:
+   *
+   *    1. "creating": Before creating a new Node we'll assign a default value
+   *    for the left and right indexes.
+   *
+   *    2. "saving": Before saving, we'll perform a check to see if we have to
+   *    move to another parent.
+   *
+   *    3. "saved": Move to the new parent after saving if needed and re-set
+   *    depth.
+   *
+   *    4. "deleting": Before delete we should prune all children and update
+   *    the left and right indexes for the remaining nodes.
+   *
+   * @return void
+   */
+  protected static function boot() {
+    parent::boot();
+
+    static::creating(function($node) {
+      $node->setDefaultLeftAndRight();
+
+      return true;
+    });
+
+    static::saving(function($node) {
+      $node->storeNewParent();
+
+      return true;
+    });
+
+    static::saved(function($node) {
+      $node->moveToNewParent();
+      $node->setDepth();
+
+      return true;
+    });
+
+    static::deleting(function($node) {
+      $node->destroyDescendants();
+
+      return true;
+    });
   }
 
   /**
@@ -578,46 +633,12 @@ abstract class Node extends Model {
   }
 
   /**
-   * Registers event listeners on a Node instance.
-   *
-   * 1. "creating": Before creating a new Node we'll assign a default value for
-   * the left and right indexes.
-   *
-   * 2. "saving": Before saving, we'll perform a check to see if we have to move
-   * to another parent.
-   *
-   * 3. "saved": Move to the new parent after saving if needed and re-set depth.
-   *
-   * 4. "deleting": Before delete we should prune all children and update
-   * the left and right indexes for the remaining nodes.
-   *
-   * @return void
-   */
-  protected function registerEventListeners() {
-    static::creating(function() {
-      $this->setDefaultLeftAndRight();
-    });
-
-    static::saving(function() {
-      $this->storeNewParent();
-    });
-
-    static::saved(function() {
-      $this->moveToNewParent();
-      $this->setDepth();
-    });
-
-    static::deleting(function() {
-      $this->destroyDescendants();
-    });
-  }
-
-  /**
    * Sets default values for left and right fields.
    *
    * @return void
    */
-  protected function setDefaultLeftAndRight() {
+  // protected function setDefaultLeftAndRight() {
+  public function setDefaultLeftAndRight() {
     $withHighestRight = $this->newQUery()->orderBy($this->getRightColumnName(), 'desc')->take(1)->first();
 
     $maxRgt = 0;
@@ -633,7 +654,7 @@ abstract class Node extends Model {
    *
    * @return void
    */
-  protected function storeNewParent() {
+  public function storeNewParent() {
     $dirty = $this->getDirty();
 
     if ( isset($dirty[$this->getParentColumnName()]) )
@@ -647,13 +668,13 @@ abstract class Node extends Model {
    *
    * @return void
    */
-  protected function moveToNewParent() {
+  public function moveToNewParent() {
     $pid = static::$moveToNewParentId;
 
     if ( is_null($pid) )
       $this->makeRoot();
     else if ( $pid !== FALSE )
-      $this->moveToChildOf($pid);
+      $this->makeChildOf($pid);
   }
 
   /**
@@ -680,7 +701,7 @@ abstract class Node extends Model {
    *
    * @return void;
    */
-  protected function destroyDescendants() {
+  public function destroyDescendants() {
     if ( is_null($this->getRight()) || is_null($this->getLeft()) ) return;
 
     $this->getConnection()->transaction(function() {
