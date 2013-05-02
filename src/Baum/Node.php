@@ -727,108 +727,12 @@ abstract class Node extends Model {
    * Main move method. Here we handle all node movements with the corresponding
    * lft/rgt index updates.
    *
-   * TODO: reduce/split/extract/refactor/whatever this monstrosity...
-   *
    * @param Baum\Node|int $target
    * @param string        $position
    * @return \Baum\Node
    */
   protected function moveTo($target, $position) {
-    if ( !$this->exists )
-      throw new MoveNotPossibleException('A new node cannot be moved.');
-
-    if ( array_search($position, ['child', 'left', 'right']) === FALSE )
-      throw new MoveNotPossibleException("Position should be one of ['child', 'left', 'right'] but is $position.");
-
-    if ( $this->equals($target) )
-      throw new MoveNotPossibleException('A node cannot be moved to itself.');
-
-    if ( $this->insideSubtree($target) )
-      throw new MoveNotPossibleException('A node cannot be moved to a descendant of itself (inside moved tree).');
-
-    if ( $target instanceof \Baum\Node )
-      $target = $target->reload();
-    else
-      $target = static::find($target->getKey());
-
-    $this->getConnection()->transaction(function($connection) use ($target, $position) {
-      $bound = 1;
-      switch ($position) {
-        case 'child':
-          $bound = $target->getRight();
-          break;
-
-        case 'left':
-          $bound = $target->getLeft();
-          break;
-
-        case 'right':
-          $bound = $target->getRight() + 1;
-          break;
-      }
-      $bound = $bound > $this->getRight() ? $bound - 1 : $bound;
-
-      $otherBound = $bound > $this->getRight() ? $this->getRight() + 1 : $this->getleft() - 1;
-
-      // return early if there's no change to be made
-      if ( $bound == $this->getRight() || $bound == $this->getLeft() )
-        return 0;
-
-      // we have defined the boundaries of two non-overlapping intervals,
-      // so sorting puts both the intervals and their boundaries in order
-      $boundaries = array($this->getLeft(), $this->getRight(), $bound, $otherBound);
-      sort($boundaries);
-      list($a, $b, $c, $d) = $boundaries;
-
-      $newParent = $target->getParentId();
-      if ( $position == 'child' )
-        $newParent = $target->id;
-
-      // Update
-      $builder  = $this->newQuery();
-      $query    = $builder->getQuery();
-      $grammar  = $query->getGrammar();
-
-      $currentId      = $this->id;
-      $leftColumn     = $this->getLeftColumnName();
-      $rightColumn    = $this->getRightColumnName();
-      $parentColumn   = $this->getParentColumnName();
-      $wrappedLeft    = $grammar->wrap($leftColumn);
-      $wrappedRight   = $grammar->wrap($rightColumn);
-      $wrappedParent  = $grammar->wrap($parentColumn);
-      $wrappedId      = $grammar->wrap($this->getKeyName());
-
-      $lftSql = "CASE
-        WHEN $wrappedLeft BETWEEN $a AND $b THEN $wrappedLeft + $d - $b
-        WHEN $wrappedLeft BETWEEN $c AND $d THEN $wrappedLeft + $a - $c
-        ELSE $wrappedLeft END";
-
-      $rgtSql = "CASE
-        WHEN $wrappedRight BETWEEN $a AND $b THEN $wrappedRight + $d - $b
-        WHEN $wrappedRight BETWEEN $c AND $d THEN $wrappedRight + $a - $c
-        ELSE $wrappedRight END";
-
-      $parentSql = "CASE
-        WHEN $wrappedId = $currentId THEN $newParent
-        ELSE $wrappedParent END";
-
-      return $builder->whereBetween($leftColumn, [$a, $d])
-              ->orWhereBetween($rightColumn, [$a, $d])
-              ->update([
-                  $leftColumn   => $connection->raw($lftSql),
-                  $rightColumn  => $connection->raw($rgtSql),
-                  $parentColumn => $connection->raw($parentSql)
-                ]);
-    });
-
-    $target->reload();
-
-    $this->setDepth();
-
-    foreach ($this->getDescendants() as $descendant)
-      $descendant->save();
-
-    return $this->reload();
+    return Move::to($this, $target, $position);
   }
 
   // -- DEBUG
