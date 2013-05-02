@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * commercial categories, etc.) or an efficient way of querying big trees.
  */
 abstract class Node extends Model {
+  use Extensions\ModelExtensions;
 
   /**
   * Column name to store the reference to parent's node.
@@ -194,19 +195,6 @@ abstract class Node extends Model {
   */
   public function children() {
     return $this->hasMany(get_class($this), $this->getParentColumnName());
-  }
-
-  /**
-   * Reloads the model from the database.
-   *
-   * @return \Baum\Node
-   */
-  public function reload() {
-    $fresh = $this->newQuery()->find($this->getKey());
-
-    $this->setRawAttributes($fresh->getAttributes(), true);
-
-    return $this;
   }
 
   /**
