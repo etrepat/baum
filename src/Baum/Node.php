@@ -49,7 +49,7 @@ abstract class Node extends Model {
    *
    * @var int
    */
-  protected static $moveToNewParentId = FALSE;
+  protected static $moveToNewParentId = NULL;
 
   /**
   * Guard NestedSet fields from mass-assignment.
@@ -570,7 +570,7 @@ abstract class Node extends Model {
   /**
    * Find the left sibling and move to left of it.
    *
-   * @return Node
+   * @return \Baum\Node
    */
   public function moveLeft() {
     return $this->moveToLeftOf($this->getLeftSibling());
@@ -579,7 +579,7 @@ abstract class Node extends Model {
   /**
    * Find the right sibling and move to the right of it.
    *
-   * @return Node
+   * @return \Baum\Node
    */
   public function moveRight() {
     return $this->moveToRightOf($this->getRightSibling());
@@ -588,7 +588,7 @@ abstract class Node extends Model {
   /**
    * Move to the node to the left of ...
    *
-   * @return Node
+   * @return \Baum\Node
    */
   public function moveToLeftOf($node) {
     return $this->moveTo($node, 'left');
@@ -597,7 +597,7 @@ abstract class Node extends Model {
   /**
    * Move to the node to the right of ...
    *
-   * @return Node
+   * @return \Baum\Node
    */
   public function moveToRightOf($node) {
     return $this->moveTo($node, 'right');
@@ -606,7 +606,7 @@ abstract class Node extends Model {
   /**
    * Make the node a child of ...
    *
-   * @return Node
+   * @return \Baum\Node
    */
   public function makeChildOf($node) {
     return $this->moveTo($node, 'child');
@@ -615,7 +615,7 @@ abstract class Node extends Model {
   /**
    * Make current node a root node.
    *
-   * @return Node
+   * @return \Baum\Node
    */
   public function makeRoot() {
     return $this->moveToRight($this->getRoot());
@@ -671,9 +671,6 @@ abstract class Node extends Model {
     return $scope->where($this->getKeyName(), '!=', $this->getKey());
   }
 
-  // const VALID_MOVE_POSITIONS = ['child', 'left', 'right', 'root'];
-  const VALID_MOVE_POSITIONS = ['child', 'left', 'right'];
-
   /**
    * Main move method. Here we handle all node movements with the corresponding
    * lft/rgt index updates.
@@ -688,8 +685,8 @@ abstract class Node extends Model {
     if ( !$this->exists )
       throw new MoveNotPossibleException('A new node cannot be moved.');
 
-    if ( array_search($position, VALID_MOVE_POSITIONS) === FALSE )
-      throw new MoveNotPossibleException("Position should be one of {self::VALID_MOVE_POSITIONS} but is $position.");
+    if ( array_search($position, ['child', 'left', 'right']) === FALSE )
+      throw new MoveNotPossibleException("Position should be one of ['child', 'left', 'right'] but is $position.");
 
     if ( $this->equals($target) )
       throw new MoveNotPossibleException('A node cannot be moved to itself.');
