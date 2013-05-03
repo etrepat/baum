@@ -3,6 +3,15 @@
 Baum is an implementation of the [Nested Set](http://en.wikipedia.org/wiki/Nested_set_model)
 pattern for [Laravel 4's](http://laravel.com/) Eloquent ORM.
 
+## Documentation
+
+* [About Nested Sets](#about)
+* [The theory behind, a TL;DR version](#theory)
+* [Installation](#installation)
+* [Configuration](#configuration)
+* [Usage](#usage)
+
+<a name="about"></a>
 ## About Nested Sets
 
 A nested set is a smart way to implement an _ordered_ tree that allows for fast,
@@ -17,6 +26,7 @@ See the [wikipedia entry for nested sets](http://en.wikipedia.org/wiki/Nested_se
 for more info. Also, this is a good introductory tutorial:
 [http://www.evanpetersen.com/item/nested-sets.html](http://www.evanpetersen.com/item/nested-sets.html)
 
+<a name="theory"></a>
 ## The theory behind, a TL;DR version
 
 An easy way to visualize how a nested set works is to think of a parent entity surrounding all
@@ -70,6 +80,7 @@ To get a node and all its ancestors going back to the root, you
 As you can see, queries that would be recursive and prohibitively slow on
 ordinary trees are suddenly quite fast. Nifty, isn't it?
 
+<a name="installation"></a>
 ## Installation
 
 To get the latest version of Baum, simply require it in your `composer.json` file.
@@ -85,10 +96,12 @@ the following line into the `providers` array:
 
     'Baum\BaumServiceProvider',
 
-## Laravel & Eloquent Node configuration
+<a name="configuration"></a>
+## Configuration
 
 TODO
 
+<a name="usage"></a>
 ## Usage
 
 As a basic rule of thumb, when calling `save()` on a `Baum\Node` instance,
