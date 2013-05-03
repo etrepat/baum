@@ -46,13 +46,6 @@ abstract class Node extends Model {
   protected $depthColumn = 'depth';
 
   /**
-   * Indicates whether we should move to a new parent.
-   *
-   * @var int
-   */
-  protected static $moveToNewParentId = NULL;
-
-  /**
   * Guard NestedSet fields from mass-assignment.
   *
   * @var array
@@ -60,14 +53,11 @@ abstract class Node extends Model {
   protected $guarded = array('id', 'parent_id', 'lft', 'rgt', 'depth');
 
   /**
-   * Create a new Node model instance.
+   * Indicates whether we should move to a new parent.
    *
-   * @param  array  $attributes
-   * @return void
+   * @var int
    */
-  public function __construct(array $attributes = array()) {
-    parent::__construct($attributes);
-  }
+  protected static $moveToNewParentId = NULL;
 
   /**
    * The "booting" method of the model.
