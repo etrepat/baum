@@ -39,7 +39,6 @@ class BaumServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		// return array();
 		return array('node');
 	}
 
