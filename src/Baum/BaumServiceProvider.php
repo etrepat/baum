@@ -1,8 +1,10 @@
 <?php
 namespace Baum;
 
-use \Baum\Console\BaumCommand;
-use \Baum\Console\InstallCommand;
+use Baum\Generators\MigrationGenerator;
+use Baum\Generators\ModelGenerator;
+use Baum\Console\BaumCommand;
+use Baum\Console\InstallCommand;
 use Illuminate\Support\ServiceProvider;
 
 class BaumServiceProvider extends ServiceProvider {
@@ -73,7 +75,6 @@ class BaumServiceProvider extends ServiceProvider {
     });
   }
 
-
   /**
    * Register the 'baum:install' command.
    *
@@ -81,7 +82,10 @@ class BaumServiceProvider extends ServiceProvider {
    */
   protected function registerInstallCommand() {
     $this->app['command.baum.install'] = $this->app->share(function($app) {
-      return new InstallCommand();
+      $migrator = new MigrationGenerator($app['files']);
+      $modeler  = new ModelGenerator($app['files']);
+
+      return new InstallCommand($migrator, $modeler);
     });
   }
 

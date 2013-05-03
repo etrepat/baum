@@ -26,9 +26,9 @@ class BaumCommand extends Command {
    * @return void
    */
   public function fire() {
-      $this->line('<info>Baum</info> v.<comment>' . Baum::VERSION . '</comment>');
+      $this->line('<info>Baum</info> version <comment>' . Baum::VERSION . '</comment>');
       $this->line('A Nested Set pattern implementation for the Eloquent ORM.');
-      $this->line('Copyright (c) 2013 <comment>Estanislau Trepat</comment>');
+      $this->line('<comment>Copyright (c) 2013 Estanislau Trepat</comment>');
   }
 
 }
