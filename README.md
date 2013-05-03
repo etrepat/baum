@@ -72,7 +72,18 @@ ordinary trees are suddenly quite fast. Nifty, isn't it?
 
 ## Installation
 
-TODO
+To get the latest version of Baum, simply require it in your `composer.json` file.
+
+    "etrepat/baum": "dev-master"
+
+You'll then need to run `composer install` to download it and have the autoloader
+updated.
+
+As with most Laravel 4 packages you'll then need to register the Baum
+*service provider*. To do that, head over your `app/config/app.php` file and add
+the following line into the `providers` array:
+
+    'Baum\BaumServiceProvider',
 
 ## Laravel & Eloquent Node configuration
 
