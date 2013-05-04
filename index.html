@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>Baum by etrepat</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Baum</h1>
+        <h2>Baum is an implementation of the Nested Set pattern for Laravel 4's Eloquent ORM.</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/etrepat/baum/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/etrepat/baum/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/etrepat/baum" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h1>Baum</h1>
+
+<p>Baum is an implementation of the <a href="http://en.wikipedia.org/wiki/Nested_set_model">Nested Set</a>
+pattern for <a href="http://laravel.com/">Laravel 4's</a> Eloquent ORM.</p>
+
+<h2>Documentation</h2>
+
+<ul>
+<li><a href="#about">About Nested Sets</a></li>
+<li><a href="#theory">The theory behind, a TL;DR version</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#getting-started">Getting started</a></li>
+<li><a href="#usage">Usage</a></li>
+</ul><p><a name="about"></a></p>
+
+<h2>About Nested Sets</h2>
+
+<p>A nested set is a smart way to implement an <em>ordered</em> tree that allows for fast,
+non-recursive queries. For example, you can fetch all descendants of a node in a
+single query, no matter how deep the tree. The drawback is that insertions/moves/deletes
+require complex SQL, but that is handled behind the curtains by this package!</p>
+
+<p>Nested sets are appropriate for ordered trees (e.g. menus, commercial categories)
+and big trees that must be queried efficiently (e.g. threaded posts).</p>
+
+<p>See the <a href="http://en.wikipedia.org/wiki/Nested_set_model">wikipedia entry for nested sets</a>
+for more info. Also, this is a good introductory tutorial:
+<a href="http://www.evanpetersen.com/item/nested-sets.html">http://www.evanpetersen.com/item/nested-sets.html</a></p>
+
+<p><a name="theory"></a></p>
+
+<h2>The theory behind, a TL;DR version</h2>
+
+<p>An easy way to visualize how a nested set works is to think of a parent entity surrounding all
+of its children, and its parent surrounding it, etc. So this tree:</p>
+
+<pre><code>root
+  |_ Child 1
+    |_ Child 1.1
+    |_ Child 1.2
+  |_ Child 2
+    |_ Child 2.1
+    |_ Child 2.2
+</code></pre>
+
+<p>Could be visualized like this:</p>
+
+<pre><code> ___________________________________________________________________
+|  Root                                                             |
+|    ____________________________    ____________________________   |
+|   |  Child 1                  |   |  Child 2                  |   |
+|   |   __________   _________  |   |   __________   _________  |   |
+|   |  |  C 1.1  |  |  C 1.2 |  |   |  |  C 2.1  |  |  C 2.2 |  |   |
+1   2  3_________4  5________6  7   8  9_________10 11_______12 13  14
+|   |___________________________|   |___________________________|   |
+|___________________________________________________________________|
+</code></pre>
+
+<p>The numbers represent the left and right boundaries.  The table then might
+look like this:</p>
+
+<pre><code>id | parent_id | lft  | rgt  | depth | data
+ 1 |           |    1 |   14 |     0 |root
+ 2 |         1 |    2 |    7 |     1 | Child 1
+ 3 |         2 |    3 |    4 |     2 | Child 1.1
+ 4 |         2 |    5 |    6 |     2 | Child 1.2
+ 5 |         1 |    8 |   13 |     1 | Child 2
+ 6 |         5 |    9 |   10 |     2 | Child 2.1
+ 7 |         5 |   11 |   12 |     2 | Child 2.2
+</code></pre>
+
+<p>To get all children of a <em>parent</em> node, you</p>
+
+<pre><code>SELECT * WHERE lft IS BETWEEN parent.lft AND parent.rgt
+</code></pre>
+
+<p>To get the number of children, it's</p>
+
+<pre><code>(right - left - 1)/2
+</code></pre>
+
+<p>To get a node and all its ancestors going back to the root, you</p>
+
+<pre><code>SELECT * WHERE node.lft IS BETWEEN lft AND rgt
+</code></pre>
+
+<p>As you can see, queries that would be recursive and prohibitively slow on
+ordinary trees are suddenly quite fast. Nifty, isn't it?</p>
+
+<p><a name="installation"></a></p>
+
+<h2>Installation</h2>
+
+<p>Baum works with Laravel 4 beta 4 and, hopefully, onwards. You can add it to your
+<code>composer.json</code> file with:</p>
+
+<pre><code>"baum/baum": "~1.0"
+</code></pre>
+
+<p>Run <code>composer install</code> to install it.</p>
+
+<p>As with most Laravel 4 packages you'll then need to register the Baum
+<em>service provider</em>. To do that, head over your <code>app/config/app.php</code> file and add
+the following line into the <code>providers</code> array:</p>
+
+<pre><code>'Baum\BaumServiceProvider',
+</code></pre>
+
+<p><a name="getting-started"></a></p>
+
+<h2>Getting started</h2>
+
+<p>After the package is correctly installed the easiest way to get started is to
+run the provided generator:</p>
+
+<pre><code>php artisan baum:install MODEL
+</code></pre>
+
+<p>Replace model by the class name you plan to use for your Nested Set model.</p>
+
+<p>The generator will install a migration and a model file into your application
+configured to work with the Nested Set behaviour provided by Baum. You SHOULD
+take a look at those files, as each of them describes how they can be customized.</p>
+
+<p>Next, you would probably run <code>artisan migrate</code> to apply the migration.</p>
+
+<h3>Model configuration</h3>
+
+<p>In order to work with Baum, you must ensure that your model class extends
+<code>Baum\Node</code>.</p>
+
+<p>This is the easiest it can get:</p>
+
+<pre><code>&lt;?php
+
+class Category extends Baum\Node {
+
+}
+</code></pre>
+
+<p>This is a <em>slightly</em> more complex example where we have the column names customized:</p>
+
+<pre><code>&lt;?php
+
+class Dictionary extends Baum\Node {
+
+  protected $table = 'dictionary';
+
+  // 'parent_id' column name
+  protected $parentColumn = 'parent_id';
+
+  // 'lft' column name
+  protected $leftColumn = 'lidx';
+
+  // 'rgt' column name
+  protected $rightColumn = 'ridx';
+
+  // 'depth' column name
+  protected $depthColumn = 'nesting';
+
+  // guard attributes from mass-assignment
+  protected $guarded = array('id', 'parent_id', 'lidx', 'ridx', 'nesting');
+
+}
+</code></pre>
+
+<p>Remember that, obviously, the column names must match those in the database table.</p>
+
+<h3>Migration configuration</h3>
+
+<p>You must ensure that the database table that supports your Baum models has the
+following columns:</p>
+
+<ul>
+<li>
+<code>parent_id</code>: a reference to the parent (int)</li>
+<li>
+<code>lft</code>: left index bound (int)</li>
+<li>
+<code>rgt</code>: right index bound (int)</li>
+<li>
+<code>depth</code>: depth or nesting level (int)</li>
+</ul><p>Here is a sample migration file:</p>
+
+<pre><code>&lt;?php
+
+class Category extends Migration {
+
+  public function up() {
+    Schema::create('categories', function(Blueprint $table) {
+      $table-&gt;increments('id');
+
+      $table-&gt;integer('parent_id')-&gt;nullable();
+      $table-&gt;integer('lft')-&gt;nullable();
+      $table-&gt;integer('rgt')-&gt;nullable();
+      $table-&gt;integer('depth')-&gt;nullable();
+
+      $table-&gt;string('name', 255);
+
+      $table-&gt;timestamps();
+    });
+  }
+
+  public function down() {
+    Schema::drop('categories');
+  }
+
+}
+</code></pre>
+
+<p>You may freely modify the column names, provided you change them both in the
+migration and the model.</p>
+
+<p><a name="usage"></a></p>
+
+<h2>Usage</h2>
+
+<p>After you've configured your model and run the migration, you are now ready
+to use Baum with your model. Below are some examples.</p>
+
+<ul>
+<li><a href="#creating-root-node">Creating a root node</a></li>
+<li><a href="#inserting-nodes">Inserting nodes</a></li>
+<li><a href="#deleting-nodes">Deleting nodes</a></li>
+<li><a href="#node-level">Getting the nesting level of a node</a></li>
+<li><a href="#moving-nodes">Moving nodes around</a></li>
+<li><a href="#node-questions">Asking questions to your nodes</a></li>
+<li><a href="#node-relations">Relations</a></li>
+<li><a href="#node-basic-scopes">Root and Leaf scopes</a></li>
+<li><a href="#node-chains">Accessing the ancestry/descendancy chain</a></li>
+<li><a href="#node-model-events">Model events: <code>moving</code> and <code>moved</code></a></li>
+</ul><p><a name="creating-root-node"></a></p>
+
+<h3>Creating a root node</h3>
+
+<p>By default, all nodes are created as roots:</p>
+
+<pre><code>$root = Category::crete(['name' =&gt; 'Root category']);
+</code></pre>
+
+<p>Alternatively, you may find yourself in the need of <em>converting</em> an existing node
+into a <em>root node</em>:</p>
+
+<pre><code>$node-&gt;makeRoot();
+</code></pre>
+
+<p><a name="inserting-nodes"></a></p>
+
+<h3>Inserting nodes</h3>
+
+<pre><code>// Directly with a relation
+$child1 = $root-&gt;children()-&gt;create(['name' =&gt; 'Child 1']);
+
+// with the `makeChildOf` method
+$child2 = Category::create(['name' =&gt; 'Child 2']);
+$child2-&gt;makeChildOf($root);
+</code></pre>
+
+<p><a name="deleting-nodes"></a></p>
+
+<h3>Deleting nodes</h3>
+
+<pre><code>$child1-&gt;delete();
+</code></pre>
+
+<p>Descendants of deleted nodes will also be deleted and all the <code>lft</code> and <code>rgt</code>
+bound will be recalculated. Pleases note that, for now, <code>deleting</code> and <code>deleted</code>
+model events for the descendants will not be fired.</p>
+
+<p><a name="node-level"></a></p>
+
+<h3>Getting the nesting level of a node</h3>
+
+<p>The <code>getLevel()</code> method will return current nesting level, or depth, of a node.</p>
+
+<pre><code>$node-&gt;getLevel() // 0 when root
+</code></pre>
+
+<p><a name="moving-nodes"></a></p>
+
+<h3>Moving nodes around</h3>
+
+<p>Baum provides several methods for moving nodes around:</p>
+
+<ul>
+<li>
+<code>moveLeft()</code>: Find the left sibling and move to left of it.</li>
+<li>
+<code>moveRight()</code>: Find the right sibling and move to the right of it.</li>
+<li>
+<code>moveToLeftOf($otherNode)</code>: Move to the node to the left of ...</li>
+<li>
+<code>moveToRightOf($otherNode)</code>: Move to the node to the right of ...</li>
+<li>
+<code>makeNextSiblingOf($otherNode)</code>: Alias for <code>moveToRightOf</code>.</li>
+<li>
+<code>makeSiblingOf($otherNode)</code>: Alias for <code>makeNextSiblingOf</code>.</li>
+<li>
+<code>makePreviousSiblingOf($otherNode)</code>: Alias for <code>moveToLeftOf</code>.</li>
+<li>
+<code>makeChildOf($otherNode)</code>: Make the node a child of ...</li>
+<li>
+<code>makeRoot()</code>: Make current node a root node.</li>
+</ul><p>For example:</p>
+
+<pre><code>$root = Creatures::create(['name' =&gt; 'The Root of All Evil']);
+
+$dragons = Creatures::create(['name' =&gt; 'Here Be Dragons']);
+$dragons-&gt;makeChildOf($root);
+
+$monsters = new Creatures(['name' =&gt; 'Horrible Monsters']);
+$monsters-&gt;save();
+
+$monsters-makeSiblingOf($dragons);
+
+$demons = Creatures::where('name', '=', 'demons');
+$demons-&gt;moveToLeftOf($dragons);
+</code></pre>
+
+<p><a name="node-questions"></a></p>
+
+<h3>Asking questions to your nodes</h3>
+
+<p>You can ask some questions to your Baum nodes:</p>
+
+<ul>
+<li>
+<code>isRoot()</code>: Returns true if this is a root node.</li>
+<li>
+<code>isLeaf()</code>: Returns true if this is a leaf node (end of a branch).</li>
+<li>
+<code>isChild()</code>: Returns true if this is a child node.</li>
+<li>
+<code>isDescendantOf($other)</code>: Returns true if node is a descendant of the other.</li>
+<li>
+<code>isSelfOrDescendantOf($other)</code>: Returns true if node is self or a descendant.</li>
+<li>
+<code>isAncestorOf($other)</code>: Returns true if node is an ancestor of the other.</li>
+<li>
+<code>isSelfOrAncestorOf($other)</code>: Returns true if node is self or an ancestor.</li>
+<li>
+<code>equals($node)</code>: current node instance equals the other.</li>
+<li>
+<code>insideSubtree($node)</code>: Checks wether the given node is inside the subtree
+defined by the left and right indices.</li>
+</ul><p>Using the nodes from the previous example:</p>
+
+<pre><code>$demons-&gt;isRoot(); // =&gt; false
+
+$demons-&gt;isDescendantOf($root) // =&gt; true
+</code></pre>
+
+<p><a name="node-relations"></a></p>
+
+<h3>Relations</h3>
+
+<p>Baum provides two self-referential Eloquent relations for your nodes: <code>parent</code>
+and <code>children</code>.</p>
+
+<pre><code>$parent = $node-&gt;parent()-&gt;get();
+
+$children = $node-&gt;children()-&gt;get();
+</code></pre>
+
+<p><a name="node-basic-scopes"></a></p>
+
+<h3>Root and Leaf scopes</h3>
+
+<p>Baum provides some very basic query scopes for accessing the root and leaf nodes:</p>
+
+<pre><code>// Query scope which targets all root nodes
+Category::roots()
+
+// All leaf nodes (nodes at the end of a branch)
+Category:allLeaves()
+</code></pre>
+
+<p>You may also be interested in only the first root:</p>
+
+<pre><code>$firstRootNode = Category::root();
+</code></pre>
+
+<p><a name="node-chains"></a></p>
+
+<h3>Accessing the ancestry/descendancy chain</h3>
+
+<p>There are several methods which Baum offers to access the ancestry/desncendancy
+chain of a node in the Nested Set tree. The main thing to keep in mind is that
+they are provided in two ways:</p>
+
+<p>First as <strong>query scopes</strong>, returning an <code>Illuminate\Database\Eloquent\Builder</code>
+instance to continue to query further. To get <em>actual</em> results from these,
+remember to call <code>get()</code> or <code>first()</code>.</p>
+
+<ul>
+<li>
+<code>ancestorsAndSelf()</code>: Targets all the ancestor chain nodes including the current one.</li>
+<li>
+<code>ancestors()</code>: Query the ancestor chain nodes excluding the current one.</li>
+<li>
+<code>siblingsAndSelf()</code>: Instance scope which targets all children of the parent, including self.</li>
+<li>
+<code>siblings()</code>: Instance scope targeting all children of the parent, except self.</li>
+<li>
+<code>leaves()</code>: Instance scope targeting all of its nested children which do not have children.</li>
+<li>
+<code>descendantsAndSelf()</code>: Scope targeting itself and all of its nested children.</li>
+<li>
+<code>descendants()</code>: Set of all children &amp; nested children.</li>
+</ul><p>Second, as <strong>methods</strong> which return actual <code>Baum\Node</code> instances.</p>
+
+<ul>
+<li>
+<code>getRoot()</code>: Returns the root node starting at the current node.</li>
+<li>
+<code>getAncestorsAndSelf()</code>: Retrieve all the ancestor chain including the current node.</li>
+<li>
+<code>getAncestors()</code>: Get all the ancestor chain from the database excluding the current node.</li>
+<li>
+<code>getSiblingsAndSelf()</code>: Get all children of the parent, including self.</li>
+<li>
+<code>getSiblings()</code>: Return all children of the parent, except self.</li>
+<li>
+<code>getLeaves()</code>: Return all of its nested children which do not have children.</li>
+<li>
+<code>getDescendantsAndSelf()</code>: Retrieve all nested children an self.</li>
+<li>
+<code>getDescendants()</code>: Retrieve all of its children &amp; nested children.</li>
+</ul><p>Here's a simple example for iterating a node's descendants (provided a name
+attribute is available):</p>
+
+<pre><code>$node = Category::where('name', '=', 'Books');
+
+foreach($node-&gt;getDescendantsAndSelf() as $descendants) {
+  echo "{$node-&gt;name}";
+}
+</code></pre>
+
+<p><a name="node-model-events"></a></p>
+
+<h3>Model events: <code>moving</code> and <code>moved</code>
+</h3>
+
+<p>Baum models fire the following events: <code>moving</code> and <code>moved</code> every time a node
+is <em>moved</em> around the Nested Set tree. This allows you to hook into those points
+in the node movement process. As with normal Eloquent model events, if <code>false</code>
+is returned from the <code>moving</code> event, the movement operation will be cancelled.</p>
+
+<p>The recommended way to hook into those events is by using the model's boot
+method:</p>
+
+<pre><code>class Category extends Baum\Node {
+
+  public static function boot() {
+    parent::boot();
+
+    static::moving(function($node) {
+      // Before moving the node this function will be called.
+    });
+
+    static::moved(function($node) {
+      // After the move operation is processed this function will be
+      // called.
+    });
+  }
+
+}
+</code></pre>
+
+<h2>TODO</h2>
+
+<p>Some things I'm probably adding to this library (soonish, I hope):</p>
+
+<ol>
+<li>Scoping support. As of now, there's no scoping involved in Baum's queries.
+Introducing scoping support, and some way to configure it, will allow us
+to have various Nested Set models in the same database table.</li>
+<li>Rebuild from other implementations. You've got a current model &amp; table,
+with only a <code>parent_id</code> id column? Shouldn't be a problem. Should it?</li>
+</ol><h2>Contributing</h2>
+
+<p>Thinking of contributing? Maybe you've found some nasty bug? That's great news!</p>
+
+<ol>
+<li>Fork the project:.</li>
+<li>Create your bugfix/feature branch.</li>
+<li>Commit your changes &amp; push to the branch.</li>
+<li>Create new Pull Request</li>
+</ol><h2>License</h2>
+
+<p>Baum is licensed under the terms of the <a href="http://opensource.org/licenses/MIT">MIT License</a>
+(See LICENSE file for details).</p>
+
+<hr><p>Coded by <a href="http://etrepat.com">Estanislau Trepat (etrepat)</a>. I'm also
+<a href="http://twitter.com/etrepat">@etrepat</a> on twitter.</p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
