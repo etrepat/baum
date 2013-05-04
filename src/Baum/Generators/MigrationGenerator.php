@@ -17,10 +17,29 @@ class MigrationGenerator extends Generator {
 
     $this->files->put($path, $this->parseStub($stub, [
       'table' => $this->tableize($name),
-      'class' => $this->classify($name)
+      'class' => $this->getMigrationClassName($name)
     ]));
 
     return $path;
+  }
+
+  /**
+   * Get the migration name.
+   *
+   * @param string $name
+   * @return string
+   */
+  protected function getMigrationName($name) {
+    return 'create_' . $this->tableize($name) . '_table';
+  }
+
+  /**
+   * Get the name for the migration class.
+   *
+   * @param string $name
+   */
+  protected function getMigrationClassName($name) {
+    return $this->classify($this->getMigrationName($name));
   }
 
   /**
@@ -31,7 +50,7 @@ class MigrationGenerator extends Generator {
    * @return string
    */
   protected function getPath($name, $path) {
-    return $path . '/' . $this->getDatePrefix() . '_create_' . $this->tableize($name) . '_table.php';
+    return $path . '/' . $this->getDatePrefix() . '_' . $this->getMigrationName($name) . '.php';
   }
 
   /**
