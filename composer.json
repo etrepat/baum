@@ -1,8 +1,8 @@
 {
-  "name": "etrepat/baum",
+  "name": "baum/baum",
   "type": "library",
   "description": "Baum is an implementation of the Nested Set pattern for Eloquent models.",
-  "keywords": ["nested set", "laravel 4", "eloquent", "database"],
+  "keywords": ["nested set", "laravel", "laravel 4", "eloquent", "database"],
   "license": "MIT",
   "authors": [
     {

@@ -29,7 +29,7 @@ class BaumServiceProvider extends ServiceProvider {
    * @return void
    */
   public function boot() {
-    $this->package('etrepat/baum');
+    $this->package('baum/baum');
   }
 
   /**
