@@ -26,6 +26,13 @@ class {{class}} extends Migration {
       // $table->string('name', 255);
 
       $table->timestamps();
+
+      // Default indexes
+      // Add indexes on parent_id, lft, rgt columns by default. Of course,
+      // the correct ones will depend on the application and use case.
+      $table->index('parent_id');
+      $table->index('lft');
+      $table->index('rgt');
     });
   }
 
