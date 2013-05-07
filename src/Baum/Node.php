@@ -92,27 +92,19 @@ abstract class Node extends Model {
 
     static::creating(function($node) {
       $node->setDefaultLeftAndRight();
-
-      return true;
     });
 
     static::saving(function($node) {
       $node->storeNewParent();
-
-      return true;
     });
 
     static::saved(function($node) {
       $node->moveToNewParent();
       $node->setDepth();
-
-      return true;
     });
 
     static::deleting(function($node) {
       $node->destroyDescendants();
-
-      return true;
     });
   }
 
