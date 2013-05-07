@@ -57,7 +57,7 @@ The numbers represent the left and right boundaries.  The table then might
 look like this:
 
     id | parent_id | lft  | rgt  | depth | data
-     1 |           |    1 |   14 |     0 |root
+     1 |           |    1 |   14 |     0 | root
      2 |         1 |    2 |    7 |     1 | Child 1
      3 |         2 |    3 |    4 |     2 | Child 1.1
      4 |         2 |    5 |    6 |     2 | Child 1.2
@@ -67,15 +67,21 @@ look like this:
 
 To get all children of a _parent_ node, you
 
-    SELECT * WHERE lft IS BETWEEN parent.lft AND parent.rgt
+```sql
+SELECT * WHERE lft IS BETWEEN parent.lft AND parent.rgt
+```
 
 To get the number of children, it's
 
-    (right - left - 1)/2
+```sql
+(right - left - 1)/2
+```
 
 To get a node and all its ancestors going back to the root, you
 
-    SELECT * WHERE node.lft IS BETWEEN lft AND rgt
+```sql
+SELECT * WHERE node.lft IS BETWEEN lft AND rgt
+```
 
 As you can see, queries that would be recursive and prohibitively slow on
 ordinary trees are suddenly quite fast. Nifty, isn't it?
@@ -83,8 +89,8 @@ ordinary trees are suddenly quite fast. Nifty, isn't it?
 <a name="installation"></a>
 ## Installation
 
-Baum works with Laravel 4 beta 4 and, hopefully, onwards. You can add it to your
-`composer.json` file with:
+Baum works with Laravel 4 onwards. You can add it to your `composer.json` file
+with:
 
     "baum/baum": "~1.0"
 
@@ -119,36 +125,36 @@ In order to work with Baum, you must ensure that your model class extends
 
 This is the easiest it can get:
 
-    <?php
+```php
+class Category extends Baum\Node {
 
-    class Category extends Baum\Node {
-
-    }
+}
+```
 
 This is a *slightly* more complex example where we have the column names customized:
 
-    <?php
+```php
+class Dictionary extends Baum\Node {
 
-    class Dictionary extends Baum\Node {
+  protected $table = 'dictionary';
 
-      protected $table = 'dictionary';
+  // 'parent_id' column name
+  protected $parentColumn = 'parent_id';
 
-      // 'parent_id' column name
-      protected $parentColumn = 'parent_id';
+  // 'lft' column name
+  protected $leftColumn = 'lidx';
 
-      // 'lft' column name
-      protected $leftColumn = 'lidx';
+  // 'rgt' column name
+  protected $rightColumn = 'ridx';
 
-      // 'rgt' column name
-      protected $rightColumn = 'ridx';
+  // 'depth' column name
+  protected $depthColumn = 'nesting';
 
-      // 'depth' column name
-      protected $depthColumn = 'nesting';
+  // guard attributes from mass-assignment
+  protected $guarded = array('id', 'parent_id', 'lidx', 'ridx', 'nesting');
 
-      // guard attributes from mass-assignment
-      protected $guarded = array('id', 'parent_id', 'lidx', 'ridx', 'nesting');
-
-    }
+}
+```
 
 Remember that, obviously, the column names must match those in the database table.
 
@@ -164,30 +170,30 @@ following columns:
 
 Here is a sample migration file:
 
-    <?php
+```php
+class Category extends Migration {
 
-    class Category extends Migration {
+  public function up() {
+    Schema::create('categories', function(Blueprint $table) {
+      $table->increments('id');
 
-      public function up() {
-        Schema::create('categories', function(Blueprint $table) {
-          $table->increments('id');
+      $table->integer('parent_id')->nullable();
+      $table->integer('lft')->nullable();
+      $table->integer('rgt')->nullable();
+      $table->integer('depth')->nullable();
 
-          $table->integer('parent_id')->nullable();
-          $table->integer('lft')->nullable();
-          $table->integer('rgt')->nullable();
-          $table->integer('depth')->nullable();
+      $table->string('name', 255);
 
-          $table->string('name', 255);
+      $table->timestamps();
+    });
+  }
 
-          $table->timestamps();
-        });
-      }
+  public function down() {
+    Schema::drop('categories');
+  }
 
-      public function down() {
-        Schema::drop('categories');
-      }
-
-    }
+}
+```
 
 You may freely modify the column names, provided you change them both in the
 migration and the model.
@@ -214,27 +220,35 @@ to use Baum with your model. Below are some examples.
 
 By default, all nodes are created as roots:
 
-    $root = Category::crete(['name' => 'Root category']);
+```php
+$root = Category::crete(['name' => 'Root category']);
+```
 
 Alternatively, you may find yourself in the need of *converting* an existing node
 into a *root node*:
 
-    $node->makeRoot();
+```php
+$node->makeRoot();
+```
 
 <a name="inserting-nodes"></a>
 ### Inserting nodes
 
-    // Directly with a relation
-    $child1 = $root->children()->create(['name' => 'Child 1']);
+```php
+// Directly with a relation
+$child1 = $root->children()->create(['name' => 'Child 1']);
 
-    // with the `makeChildOf` method
-    $child2 = Category::create(['name' => 'Child 2']);
-    $child2->makeChildOf($root);
+// with the `makeChildOf` method
+$child2 = Category::create(['name' => 'Child 2']);
+$child2->makeChildOf($root);
+```
 
 <a name="deleting-nodes"></a>
 ### Deleting nodes
 
-    $child1->delete();
+```php
+$child1->delete();
+```
 
 Descendants of deleted nodes will also be deleted and all the `lft` and `rgt`
 bound will be recalculated. Pleases note that, for now, `deleting` and `deleted`
@@ -245,7 +259,9 @@ model events for the descendants will not be fired.
 
 The `getLevel()` method will return current nesting level, or depth, of a node.
 
-    $node->getLevel() // 0 when root
+```php
+$node->getLevel() // 0 when root
+```
 
 <a name="moving-nodes"></a>
 ### Moving nodes around
@@ -264,18 +280,20 @@ Baum provides several methods for moving nodes around:
 
 For example:
 
-    $root = Creatures::create(['name' => 'The Root of All Evil']);
+```php
+$root = Creatures::create(['name' => 'The Root of All Evil']);
 
-    $dragons = Creatures::create(['name' => 'Here Be Dragons']);
-    $dragons->makeChildOf($root);
+$dragons = Creatures::create(['name' => 'Here Be Dragons']);
+$dragons->makeChildOf($root);
 
-    $monsters = new Creatures(['name' => 'Horrible Monsters']);
-    $monsters->save();
+$monsters = new Creatures(['name' => 'Horrible Monsters']);
+$monsters->save();
 
-    $monsters-makeSiblingOf($dragons);
+$monsters-makeSiblingOf($dragons);
 
-    $demons = Creatures::where('name', '=', 'demons');
-    $demons->moveToLeftOf($dragons);
+$demons = Creatures::where('name', '=', 'demons');
+$demons->moveToLeftOf($dragons);
+```
 
 <a name="node-questions"></a>
 ### Asking questions to your nodes
@@ -295,9 +313,11 @@ defined by the left and right indices.
 
 Using the nodes from the previous example:
 
-    $demons->isRoot(); // => false
+```php
+$demons->isRoot(); // => false
 
-    $demons->isDescendantOf($root) // => true
+$demons->isDescendantOf($root) // => true
+```
 
 <a name="node-relations"></a>
 ### Relations
@@ -305,24 +325,30 @@ Using the nodes from the previous example:
 Baum provides two self-referential Eloquent relations for your nodes: `parent`
 and `children`.
 
-    $parent = $node->parent()->get();
+```php
+$parent = $node->parent()->get();
 
-    $children = $node->children()->get();
+$children = $node->children()->get();
+```
 
 <a name="node-basic-scopes"></a>
 ### Root and Leaf scopes
 
 Baum provides some very basic query scopes for accessing the root and leaf nodes:
 
-    // Query scope which targets all root nodes
-    Category::roots()
+```php
+// Query scope which targets all root nodes
+Category::roots()
 
-    // All leaf nodes (nodes at the end of a branch)
-    Category:allLeaves()
+// All leaf nodes (nodes at the end of a branch)
+Category:allLeaves()
+```
 
 You may also be interested in only the first root:
 
-    $firstRootNode = Category::root();
+```php
+$firstRootNode = Category::root();
+```
 
 <a name="node-chains"></a>
 ### Accessing the ancestry/descendancy chain
@@ -357,11 +383,13 @@ Second, as **methods** which return actual `Baum\Node` instances.
 Here's a simple example for iterating a node's descendants (provided a name
 attribute is available):
 
-    $node = Category::where('name', '=', 'Books');
+```php
+$node = Category::where('name', '=', 'Books');
 
-    foreach($node->getDescendantsAndSelf() as $descendants) {
-      echo "{$node->name}";
-    }
+foreach($node->getDescendantsAndSelf() as $descendants) {
+  echo "{$node->name}";
+}
+```
 
 <a name="node-model-events"></a>
 ### Model events: `moving` and `moved`
@@ -374,22 +402,24 @@ is returned from the `moving` event, the movement operation will be cancelled.
 The recommended way to hook into those events is by using the model's boot
 method:
 
-    class Category extends Baum\Node {
+```php
+class Category extends Baum\Node {
 
-      public static function boot() {
-        parent::boot();
+  public static function boot() {
+    parent::boot();
 
-        static::moving(function($node) {
-          // Before moving the node this function will be called.
-        });
+    static::moving(function($node) {
+      // Before moving the node this function will be called.
+    });
 
-        static::moved(function($node) {
-          // After the move operation is processed this function will be
-          // called.
-        });
-      }
+    static::moved(function($node) {
+      // After the move operation is processed this function will be
+      // called.
+    });
+  }
 
-    }
+}
+```
 
 ## TODO
 
