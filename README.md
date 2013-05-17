@@ -221,7 +221,7 @@ to use Baum with your model. Below are some examples.
 By default, all nodes are created as roots:
 
 ```php
-$root = Category::crete(['name' => 'Root category']);
+$root = Category::create(['name' => 'Root category']);
 ```
 
 Alternatively, you may find yourself in the need of *converting* an existing node
@@ -268,7 +268,7 @@ $node->getLevel() // 0 when root
 
 Baum provides several methods for moving nodes around:
 
-* `moveLeft()`: Find the left sibling and move to left of it.
+* `moveLeft()`: Find the left sibling and move to the left of it.
 * `moveRight()`: Find the right sibling and move to the right of it.
 * `moveToLeftOf($otherNode)`: Move to the node to the left of ...
 * `moveToRightOf($otherNode)`: Move to the node to the right of ...
@@ -372,12 +372,12 @@ remember to call `get()` or `first()`.
 Second, as **methods** which return actual `Baum\Node` instances.
 
 * `getRoot()`: Returns the root node starting at the current node.
-* `getAncestorsAndSelf()`: Retrieve all the ancestor chain including the current node.
-* `getAncestors()`: Get all the ancestor chain from the database excluding the current node.
+* `getAncestorsAndSelf()`: Retrieve all of the ancestor chain including the current node.
+* `getAncestors()`: Get all of the ancestor chain from the database excluding the current node.
 * `getSiblingsAndSelf()`: Get all children of the parent, including self.
 * `getSiblings()`: Return all children of the parent, except self.
 * `getLeaves()`: Return all of its nested children which do not have children.
-* `getDescendantsAndSelf()`: Retrieve all nested children an self.
+* `getDescendantsAndSelf()`: Retrieve all nested children and self.
 * `getDescendants()`: Retrieve all of its children & nested children.
 
 Here's a simple example for iterating a node's descendants (provided a name
