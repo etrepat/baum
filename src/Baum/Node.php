@@ -752,4 +752,15 @@ abstract class Node extends Model {
   protected function moveTo($target, $position) {
     return Move::to($this, $target, $position);
   }
+
+  /**
+   * Overload new Collection
+   *
+   * @param array $models
+   * @return \Baum\Collection
+   */
+  public function newCollection(array $models = array())
+  {
+    return new Baum\Collection($models);
+  }
 }
