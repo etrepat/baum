@@ -353,7 +353,7 @@ $firstRootNode = Category::root();
 <a name="node-chains"></a>
 ### Accessing the ancestry/descendancy chain
 
-There are several methods which Baum offers to access the ancestry/desncendancy
+There are several methods which Baum offers to access the ancestry/descendancy
 chain of a node in the Nested Set tree. The main thing to keep in mind is that
 they are provided in two ways:
 
@@ -386,8 +386,8 @@ attribute is available):
 ```php
 $node = Category::where('name', '=', 'Books');
 
-foreach($node->getDescendantsAndSelf() as $descendants) {
-  echo "{$node->name}";
+foreach($node->getDescendantsAndSelf() as $descendant) {
+  echo "{$descendant->name}";
 }
 ```
 
