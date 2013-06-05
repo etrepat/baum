@@ -325,7 +325,8 @@ abstract class Node extends Model {
   public function ancestorsAndSelf() {
     return $this->newQuery()
                 ->where($this->getLeftColumnName(), '<=', $this->getLeft())
-                ->where($this->getRightColumnName(), '>=', $this->getRight());
+                ->where($this->getRightColumnName(), '>=', $this->getRight())
+                ->orderBy($this->getLeftColumnName());
   }
 
   /**
