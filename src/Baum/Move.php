@@ -276,6 +276,8 @@ class Move {
     if ( $this->position == 'child' )
       $this->_parentId = $this->target->getKey();
 
+	if(empty($this->_parentId)) $this->_parentId = 'NULL';
+	
     return $this->_parentId;
   }
 
