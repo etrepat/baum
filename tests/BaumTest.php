@@ -338,4 +338,107 @@ class BaumTest extends PHPUnit_Framework_TestCase {
   public function testGetRightSiblingOfRightmostNodeIsNull() {
     $this->assertNull($this->categories('Child 3')->getRightSibling());
   }
+
+  public function testMoveLeft() {
+    $this->categories('Child 2')->moveLeft();
+
+    $this->assertNull($this->categories('Child 2')->getLeftSibling());
+
+    $this->assertEquals($this->categories('Child 1'), $this->categories('Child 2')->getRightSibling());
+  }
+
+  public function testMoveRight() {
+    $this->categories('Child 2')->moveRight();
+
+    $this->assertNull($this->categories('Child 2')->getRightSibling());
+
+    $this->assertEquals($this->categories('Child 3'), $this->categories('Child 2')->getLeftSibling());
+  }
+
+  public function testMoveToLeftOf() {
+    $this->categories('Child 3')->moveToLeftOf($this->categories('Child 1'));
+
+    $this->assertNull($this->categories('Child 3')->getLeftSibling());
+
+    $this->assertEquals($this->categories('Child 1'), $this->categories('Child 3')->getRightSibling());
+  }
+
+  public function testMoveToRightOf() {
+    $this->categories('Child 1')->moveToRightOf($this->categories('Child 3'));
+
+    $this->assertNull($this->categories('Child 1')->getRightSibling());
+
+    $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->getLeftSibling());
+  }
+
+  public function testMakeRoot() {
+    $this->categories('Child 2')->makeRoot();
+
+    $newRoot = $this->categories('Child 2');
+
+    $this->assertNull($newRoot->parent()->first());
+    $this->assertEquals(0, $newRoot->getLevel());
+    $this->assertEquals(7, $newRoot->getLeft());
+    $this->assertEquals(10, $newRoot->getRight());
+
+    $this->assertEquals(1, $this->categories('Child 2.1')->getLevel());
+  }
+
+  public function testMakeChildOf() {
+    $this->categories('Child 1')->makeChildOf($this->categories('Child 3'));
+
+    $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->parent()->first());
+  }
+
+  public function testMakeChildOfAppendsAtTheEnd() {
+    $newChild = Category::create(['name' => 'Child 4']);
+
+    $newChild->makeChildOf($this->categories('Root 1'));
+
+    $lastChild = $this->categories('Root 1')->children()->get()->last();
+    $this->assertEquals($newChild, $lastChild);
+  }
+
+  public function testMakeChildOfMovesWithSubtree() {
+    $this->categories('Child 2')->makeChildOf($this->categories('Child 1'));
+
+    $this->assertEquals($this->categories('Child 1')->getKey(), $this->categories('Child 2')->getParentId());
+
+    $this->assertEquals(3, $this->categories('Child 2')->getLeft());
+    $this->assertEquals(6, $this->categories('Child 2')->getRight());
+
+    $this->assertEquals(2, $this->categories('Child 1')->getLeft());
+    $this->assertEquals(7, $this->categories('Child 1')->getRight());
+  }
+
+  public function testMakeChildOfSwappingRoots() {
+    $newRoot = Category::create(['name' => 'Root 3']);
+
+    $this->assertEquals(13, $newRoot->getLeft());
+    $this->assertEquals(14, $newRoot->getRight());
+
+    $this->categories('Root 2')->makeChildOf($newRoot);
+
+    $this->assertEquals($newRoot->getKey(), $this->categories('Root 2')->getParentId());
+
+    $this->assertEquals(12, $this->categories('Root 2')->getLeft());
+    $this->assertEquals(13, $this->categories('Root 2')->getRight());
+
+    $this->assertEquals(11, $newRoot->getLeft());
+    $this->assertEquals(14, $newRoot->getRight());
+  }
+
+  public function testMakeChildOfSwappingRootsWithSubtrees() {
+    $newRoot = Category::create(['name' => 'Root 3']);
+
+    $this->categories('Root 1')->makeChildOf($newRoot);
+
+    $this->assertEquals($newRoot->getKey(), $this->categories('Root 1')->getParentId());
+
+    $this->assertEquals(4, $this->categories('Root 1')->getLeft());
+    $this->assertEquals(13, $this->categories('Root 1')->getRight());
+
+    $this->assertEquals(8, $this->categories('Child 2.1')->getLeft());
+    $this->assertEquals(9, $this->categories('Child 2.1')->getRight());
+  }
 }
