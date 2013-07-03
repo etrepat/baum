@@ -3,6 +3,8 @@
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\Model;
 
+use Mockery as m;
+
 class BaumTest extends PHPUnit_Framework_TestCase {
 
   public static function setUpBeforeClass() {
@@ -35,6 +37,8 @@ class BaumTest extends PHPUnit_Framework_TestCase {
 
   public function tearDown() {
     Capsule::table('categories')->delete();
+
+    m::close();
   }
 
   protected function categories($name) {
@@ -267,7 +271,6 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($children[2], $this->categories('Child 3'));
   }
 
-
   public function testIsSelfOrAncestorOf() {
     $this->assertTrue($this->categories('Root 1')->isSelfOrAncestorOf($this->categories('Child 1')));
     $this->assertTrue($this->categories('Root 1')->isSelfOrAncestorOf($this->categories('Child 2.1')));
@@ -441,4 +444,41 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals(8, $this->categories('Child 2.1')->getLeft());
     $this->assertEquals(9, $this->categories('Child 2.1')->getRight());
   }
+
+  public function testMovementEventsFire() {
+    $dispatcher = Model::getEventDispatcher();
+    Model::setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+
+    $child = $this->categories('Child 1');
+
+    $events->shouldReceive('until')->once()->with('eloquent.moving: '.get_class($child), $child)->andReturn(true);
+    $events->shouldReceive('fire')->once()->with('eloquent.moved: '.get_class($child), $child)->andReturn(true);
+
+    $child->moveToRightOf($this->categories('Child 3'));
+
+    Model::setEventDispatcher($dispatcher);
+  }
+
+  public function testMovementHaltsWhenReturningFalseFromMoving() {
+    Category::moving(function($node) { return false; });
+
+    $dispatcher = Model::getEventDispatcher();
+    Model::setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+
+    $unchanged = $this->categories('Child 2');
+
+    $events->shouldReceive('until')->once()->with('eloquent.moving: '.get_class($unchanged), $unchanged)->andReturn(false);
+
+    $unchanged->makeRoot();
+
+    $unchanged->reload();
+
+    $this->assertEquals(1, $unchanged->getParentId());
+    $this->assertEquals(1, $unchanged->getLevel());
+    $this->assertEquals(4, $unchanged->getLeft());
+    $this->assertEquals(7, $unchanged->getRight());
+
+    Model::setEventDispatcher($dispatcher);
+  }
+
 }
