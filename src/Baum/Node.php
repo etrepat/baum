@@ -408,7 +408,8 @@ abstract class Node extends Model {
    */
   public function leaves() {
     return $this->descendants()
-                ->whereRaw($this->getQualifiedRightColumName() . ' - ' . $this->getQualifiedLeftColumName() . ' = 1');
+                ->whereRaw($this->getQualifiedRightColumName() . ' - ' . $this->getQualifiedLeftColumName() . ' = 1')
+                ->orderBy($this->getLeftColumnName(), 'asc');
   }
 
   /**
