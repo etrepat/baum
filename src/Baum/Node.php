@@ -463,6 +463,25 @@ abstract class Node extends Model {
   }
 
   /**
+   * Set of "immediate" descendants (aka children), alias for the children relation.
+   *
+   * @return \Illuminate\Database\Query\Builder
+   */
+  public function immediateDescendants() {
+    return $this->children();
+  }
+
+  /**
+   * Retrive all of its "immediate" descendants.
+   *
+   * @param array   $columns
+   * @return \Illuminate\Database\Eloquent\Collection
+   */
+  public function getImmediateDescendants($columns = array('*')) {
+    return $this->children()->get($columns);
+  }
+
+  /**
   * Returns the level of this node in the tree.
   * Root level is 0.
   *

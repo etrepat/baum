@@ -271,6 +271,16 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($children[2], $this->categories('Child 3'));
   }
 
+  public function testGetImmediateDescendants() {
+    $expected = array($this->categories('Child 1'), $this->categories('Child 2'), $this->categories('Child 3'));
+
+    $this->assertEquals($expected, $this->categories('Root 1')->getImmediateDescendants()->all());
+
+    $this->assertEquals(array($this->categories('Child 2.1')), $this->categories('Child 2')->getImmediateDescendants()->all());
+
+    $this->assertEmpty($this->categories('Root 2')->getImmediateDescendants()->all());
+  }
+
   public function testIsSelfOrAncestorOf() {
     $this->assertTrue($this->categories('Root 1')->isSelfOrAncestorOf($this->categories('Child 1')));
     $this->assertTrue($this->categories('Root 1')->isSelfOrAncestorOf($this->categories('Child 2.1')));

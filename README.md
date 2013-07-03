@@ -368,6 +368,7 @@ remember to call `get()` or `first()`.
 * `leaves()`: Instance scope targeting all of its nested children which do not have children.
 * `descendantsAndSelf()`: Scope targeting itself and all of its nested children.
 * `descendants()`: Set of all children & nested children.
+* `immediateDescendants()`: Set of all children nodes (non-recursive).
 
 Second, as **methods** which return actual `Baum\Node` instances.
 
@@ -379,6 +380,7 @@ Second, as **methods** which return actual `Baum\Node` instances.
 * `getLeaves()`: Return all of its nested children which do not have children.
 * `getDescendantsAndSelf()`: Retrieve all nested children and self.
 * `getDescendants()`: Retrieve all of its children & nested children.
+* `getImmediateDescendants()`: Retrieve all of its children nodes (non-recursive).
 
 Here's a simple example for iterating a node's descendants (provided a name
 attribute is available):
