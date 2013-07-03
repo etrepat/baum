@@ -327,7 +327,7 @@ abstract class Node extends Model {
     return $this->newQuery()
                 ->where($this->getLeftColumnName(), '<=', $this->getLeft())
                 ->where($this->getRightColumnName(), '>=', $this->getRight())
-                ->orderBy($this->getLeftColumnName());
+                ->orderBy($this->getLeftColumnName(), 'asc');
   }
 
   /**
@@ -367,7 +367,8 @@ abstract class Node extends Model {
    */
   public function siblingsAndSelf() {
     return $this->newQuery()
-                ->where($this->getParentColumnName(), $this->getParentId());
+                ->where($this->getParentColumnName(), $this->getParentId())
+                ->orderBy($this->getLeftColumnName(), 'asc');
   }
 
   /**
@@ -428,7 +429,8 @@ abstract class Node extends Model {
   public function descendantsAndSelf() {
     return $this->newQuery()
                 ->where($this->getLeftColumnName(), '>=', $this->getLeft())
-                ->where($this->getLeftColumnName(), '<', $this->getRight());
+                ->where($this->getLeftColumnName(), '<', $this->getRight())
+                ->orderBy($this->getLeftColumnName(), 'asc');
   }
 
   /**
@@ -521,8 +523,9 @@ abstract class Node extends Model {
   public function getLeftSibling() {
     return $this->siblings()
                 ->where($this->getLeftColumnName(), '<', $this->getLeft())
-                ->orderBy($this->getLeftColumnName(), 'asc')
-                ->first();
+                ->orderBy($this->getLeftColumnName(), 'desc')
+                ->get()
+                ->last();
   }
 
   /**

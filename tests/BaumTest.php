@@ -304,4 +304,38 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertFalse($this->categories('Child 1')->isDescendantOf($this->categories('Child 1')));
   }
 
+  public function testGetLeftSibling() {
+    $this->assertEquals($this->categories('Child 1'), $this->categories('Child 2')->getLeftSibling());
+    $this->assertEquals($this->categories('Child 2'), $this->categories('Child 3')->getLeftSibling());
+  }
+
+  public function testGetLeftSiblingOfFirstRootIsNull() {
+    $this->assertNull($this->categories('Root 1')->getLeftSibling());
+  }
+
+  public function testGetLeftSiblingWithNoneIsNull() {
+    $this->assertNull($this->categories('Child 2.1')->getLeftSibling());
+  }
+
+  public function testGetLeftSiblingOfLeftmostNodeIsNull() {
+    $this->assertNull($this->categories('Child 1')->getLeftSibling());
+  }
+
+  public function testGetRightSibling() {
+    $this->assertEquals($this->categories('Child 3'), $this->categories('Child 2')->getRightSibling());
+    $this->assertEquals($this->categories('Child 2'), $this->categories('Child 1')->getRightSibling());
+  }
+
+  public function testGetRightSiblingOfRoots() {
+    $this->assertEquals($this->categories('Root 2'), $this->categories('Root 1')->getRightSibling());
+    $this->assertNull($this->categories('Root 2')->getRightSibling());
+  }
+
+  public function testGetRightSiblingWithNoneIsNull() {
+    $this->assertNull($this->categories('Child 2.1')->getRightSibling());
+  }
+
+  public function testGetRightSiblingOfRightmostNodeIsNull() {
+    $this->assertNull($this->categories('Child 3')->getRightSibling());
+  }
 }
