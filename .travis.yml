@@ -1,11 +1,6 @@
 language: php
 
-branches:
-  only:
-    - master
-
 php:
-  - 5.3
   - 5.4
 
 before_script:
