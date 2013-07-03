@@ -231,7 +231,8 @@ abstract class Node extends Model {
   * @return \Illuminate\Database\Eloquent\Relations\HasMany
   */
   public function children() {
-    return $this->hasMany(get_class($this), $this->getParentColumnName());
+    return $this->hasMany(get_class($this), $this->getParentColumnName())
+                ->orderBy($this->getLeftColumnName());
   }
 
   /**
