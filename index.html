@@ -28,12 +28,16 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h1>Baum</h1>
+          <h1>
+<a name="baum" class="anchor" href="#baum"><span class="octicon octicon-link"></span></a>Baum</h1>
+
+<p><a href="https://travis-ci.org/etrepat/baum"><img src="https://travis-ci.org/etrepat/baum.png?branch=master" alt="Build Status"></a></p>
 
 <p>Baum is an implementation of the <a href="http://en.wikipedia.org/wiki/Nested_set_model">Nested Set</a>
 pattern for <a href="http://laravel.com/">Laravel 4's</a> Eloquent ORM.</p>
 
-<h2>Documentation</h2>
+<h2>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
 
 <ul>
 <li><a href="#about">About Nested Sets</a></li>
@@ -43,7 +47,8 @@ pattern for <a href="http://laravel.com/">Laravel 4's</a> Eloquent ORM.</p>
 <li><a href="#usage">Usage</a></li>
 </ul><p><a name="about"></a></p>
 
-<h2>About Nested Sets</h2>
+<h2>
+<a name="about-nested-sets" class="anchor" href="#about-nested-sets"><span class="octicon octicon-link"></span></a>About Nested Sets</h2>
 
 <p>A nested set is a smart way to implement an <em>ordered</em> tree that allows for fast,
 non-recursive queries. For example, you can fetch all descendants of a node in a
@@ -59,7 +64,8 @@ for more info. Also, this is a good introductory tutorial:
 
 <p><a name="theory"></a></p>
 
-<h2>The theory behind, a TL;DR version</h2>
+<h2>
+<a name="the-theory-behind-a-tldr-version" class="anchor" href="#the-theory-behind-a-tldr-version"><span class="octicon octicon-link"></span></a>The theory behind, a TL;DR version</h2>
 
 <p>An easy way to visualize how a nested set works is to think of a parent entity surrounding all
 of its children, and its parent surrounding it, etc. So this tree:</p>
@@ -90,7 +96,7 @@ of its children, and its parent surrounding it, etc. So this tree:</p>
 look like this:</p>
 
 <pre><code>id | parent_id | lft  | rgt  | depth | data
- 1 |           |    1 |   14 |     0 |root
+ 1 |           |    1 |   14 |     0 | root
  2 |         1 |    2 |    7 |     1 | Child 1
  3 |         2 |    3 |    4 |     2 | Child 1.1
  4 |         2 |    5 |    6 |     2 | Child 1.2
@@ -101,28 +107,29 @@ look like this:</p>
 
 <p>To get all children of a <em>parent</em> node, you</p>
 
-<pre><code>SELECT * WHERE lft IS BETWEEN parent.lft AND parent.rgt
-</code></pre>
+<div class="highlight"><pre><span class="k">SELECT</span> <span class="o">*</span> <span class="k">WHERE</span> <span class="n">lft</span> <span class="k">IS</span> <span class="k">BETWEEN</span> <span class="n">parent</span><span class="p">.</span><span class="n">lft</span> <span class="k">AND</span> <span class="n">parent</span><span class="p">.</span><span class="n">rgt</span>
+</pre></div>
 
 <p>To get the number of children, it's</p>
 
-<pre><code>(right - left - 1)/2
-</code></pre>
+<div class="highlight"><pre><span class="p">(</span><span class="k">right</span> <span class="o">-</span> <span class="k">left</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+</pre></div>
 
 <p>To get a node and all its ancestors going back to the root, you</p>
 
-<pre><code>SELECT * WHERE node.lft IS BETWEEN lft AND rgt
-</code></pre>
+<div class="highlight"><pre><span class="k">SELECT</span> <span class="o">*</span> <span class="k">WHERE</span> <span class="n">node</span><span class="p">.</span><span class="n">lft</span> <span class="k">IS</span> <span class="k">BETWEEN</span> <span class="n">lft</span> <span class="k">AND</span> <span class="n">rgt</span>
+</pre></div>
 
 <p>As you can see, queries that would be recursive and prohibitively slow on
 ordinary trees are suddenly quite fast. Nifty, isn't it?</p>
 
 <p><a name="installation"></a></p>
 
-<h2>Installation</h2>
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<p>Baum works with Laravel 4 beta 4 and, hopefully, onwards. You can add it to your
-<code>composer.json</code> file with:</p>
+<p>Baum works with Laravel 4 onwards. You can add it to your <code>composer.json</code> file
+with:</p>
 
 <pre><code>"baum/baum": "~1.0"
 </code></pre>
@@ -138,7 +145,8 @@ the following line into the <code>providers</code> array:</p>
 
 <p><a name="getting-started"></a></p>
 
-<h2>Getting started</h2>
+<h2>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started</h2>
 
 <p>After the package is correctly installed the easiest way to get started is to
 run the provided generator:</p>
@@ -154,49 +162,47 @@ take a look at those files, as each of them describes how they can be customized
 
 <p>Next, you would probably run <code>artisan migrate</code> to apply the migration.</p>
 
-<h3>Model configuration</h3>
+<h3>
+<a name="model-configuration" class="anchor" href="#model-configuration"><span class="octicon octicon-link"></span></a>Model configuration</h3>
 
 <p>In order to work with Baum, you must ensure that your model class extends
 <code>Baum\Node</code>.</p>
 
 <p>This is the easiest it can get:</p>
 
-<pre><code>&lt;?php
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">Category</span> <span class="k">extends</span> <span class="nx">Baum\Node</span> <span class="p">{</span>
 
-class Category extends Baum\Node {
-
-}
-</code></pre>
+<span class="p">}</span>
+</pre></div>
 
 <p>This is a <em>slightly</em> more complex example where we have the column names customized:</p>
 
-<pre><code>&lt;?php
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">Dictionary</span> <span class="k">extends</span> <span class="nx">Baum\Node</span> <span class="p">{</span>
 
-class Dictionary extends Baum\Node {
+  <span class="k">protected</span> <span class="nv">$table</span> <span class="o">=</span> <span class="s1">'dictionary'</span><span class="p">;</span>
 
-  protected $table = 'dictionary';
+  <span class="c1">// 'parent_id' column name</span>
+  <span class="k">protected</span> <span class="nv">$parentColumn</span> <span class="o">=</span> <span class="s1">'parent_id'</span><span class="p">;</span>
 
-  // 'parent_id' column name
-  protected $parentColumn = 'parent_id';
+  <span class="c1">// 'lft' column name</span>
+  <span class="k">protected</span> <span class="nv">$leftColumn</span> <span class="o">=</span> <span class="s1">'lidx'</span><span class="p">;</span>
 
-  // 'lft' column name
-  protected $leftColumn = 'lidx';
+  <span class="c1">// 'rgt' column name</span>
+  <span class="k">protected</span> <span class="nv">$rightColumn</span> <span class="o">=</span> <span class="s1">'ridx'</span><span class="p">;</span>
 
-  // 'rgt' column name
-  protected $rightColumn = 'ridx';
+  <span class="c1">// 'depth' column name</span>
+  <span class="k">protected</span> <span class="nv">$depthColumn</span> <span class="o">=</span> <span class="s1">'nesting'</span><span class="p">;</span>
 
-  // 'depth' column name
-  protected $depthColumn = 'nesting';
+  <span class="c1">// guard attributes from mass-assignment</span>
+  <span class="k">protected</span> <span class="nv">$guarded</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'parent_id'</span><span class="p">,</span> <span class="s1">'lidx'</span><span class="p">,</span> <span class="s1">'ridx'</span><span class="p">,</span> <span class="s1">'nesting'</span><span class="p">);</span>
 
-  // guard attributes from mass-assignment
-  protected $guarded = array('id', 'parent_id', 'lidx', 'ridx', 'nesting');
-
-}
-</code></pre>
+<span class="p">}</span>
+</pre></div>
 
 <p>Remember that, obviously, the column names must match those in the database table.</p>
 
-<h3>Migration configuration</h3>
+<h3>
+<a name="migration-configuration" class="anchor" href="#migration-configuration"><span class="octicon octicon-link"></span></a>Migration configuration</h3>
 
 <p>You must ensure that the database table that supports your Baum models has the
 following columns:</p>
@@ -212,38 +218,37 @@ following columns:</p>
 <code>depth</code>: depth or nesting level (int)</li>
 </ul><p>Here is a sample migration file:</p>
 
-<pre><code>&lt;?php
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">Category</span> <span class="k">extends</span> <span class="nx">Migration</span> <span class="p">{</span>
 
-class Category extends Migration {
+  <span class="k">public</span> <span class="k">function</span> <span class="nf">up</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">Schema</span><span class="o">::</span><span class="na">create</span><span class="p">(</span><span class="s1">'categories'</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nx">Blueprint</span> <span class="nv">$table</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
 
-  public function up() {
-    Schema::create('categories', function(Blueprint $table) {
-      $table-&gt;increments('id');
+      <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">(</span><span class="s1">'parent_id'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullable</span><span class="p">();</span>
+      <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">(</span><span class="s1">'lft'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullable</span><span class="p">();</span>
+      <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">(</span><span class="s1">'rgt'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullable</span><span class="p">();</span>
+      <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">(</span><span class="s1">'depth'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullable</span><span class="p">();</span>
 
-      $table-&gt;integer('parent_id')-&gt;nullable();
-      $table-&gt;integer('lft')-&gt;nullable();
-      $table-&gt;integer('rgt')-&gt;nullable();
-      $table-&gt;integer('depth')-&gt;nullable();
+      <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="mi">255</span><span class="p">);</span>
 
-      $table-&gt;string('name', 255);
+      <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">timestamps</span><span class="p">();</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
 
-      $table-&gt;timestamps();
-    });
-  }
+  <span class="k">public</span> <span class="k">function</span> <span class="nf">down</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">Schema</span><span class="o">::</span><span class="na">drop</span><span class="p">(</span><span class="s1">'categories'</span><span class="p">);</span>
+  <span class="p">}</span>
 
-  public function down() {
-    Schema::drop('categories');
-  }
-
-}
-</code></pre>
+<span class="p">}</span>
+</pre></div>
 
 <p>You may freely modify the column names, provided you change them both in the
 migration and the model.</p>
 
 <p><a name="usage"></a></p>
 
-<h2>Usage</h2>
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <p>After you've configured your model and run the migration, you are now ready
 to use Baum with your model. Below are some examples.</p>
@@ -261,37 +266,40 @@ to use Baum with your model. Below are some examples.</p>
 <li><a href="#node-model-events">Model events: <code>moving</code> and <code>moved</code></a></li>
 </ul><p><a name="creating-root-node"></a></p>
 
-<h3>Creating a root node</h3>
+<h3>
+<a name="creating-a-root-node" class="anchor" href="#creating-a-root-node"><span class="octicon octicon-link"></span></a>Creating a root node</h3>
 
 <p>By default, all nodes are created as roots:</p>
 
-<pre><code>$root = Category::crete(['name' =&gt; 'Root category']);
-</code></pre>
+<div class="highlight"><pre><span class="nv">$root</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Root category'</span><span class="p">]);</span>
+</pre></div>
 
 <p>Alternatively, you may find yourself in the need of <em>converting</em> an existing node
 into a <em>root node</em>:</p>
 
-<pre><code>$node-&gt;makeRoot();
-</code></pre>
+<div class="highlight"><pre><span class="nv">$node</span><span class="o">-&gt;</span><span class="na">makeRoot</span><span class="p">();</span>
+</pre></div>
 
 <p><a name="inserting-nodes"></a></p>
 
-<h3>Inserting nodes</h3>
+<h3>
+<a name="inserting-nodes" class="anchor" href="#inserting-nodes"><span class="octicon octicon-link"></span></a>Inserting nodes</h3>
 
-<pre><code>// Directly with a relation
-$child1 = $root-&gt;children()-&gt;create(['name' =&gt; 'Child 1']);
+<div class="highlight"><pre><span class="c1">// Directly with a relation</span>
+<span class="nv">$child1</span> <span class="o">=</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Child 1'</span><span class="p">]);</span>
 
-// with the `makeChildOf` method
-$child2 = Category::create(['name' =&gt; 'Child 2']);
-$child2-&gt;makeChildOf($root);
-</code></pre>
+<span class="c1">// with the `makeChildOf` method</span>
+<span class="nv">$child2</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Child 2'</span><span class="p">]);</span>
+<span class="nv">$child2</span><span class="o">-&gt;</span><span class="na">makeChildOf</span><span class="p">(</span><span class="nv">$root</span><span class="p">);</span>
+</pre></div>
 
 <p><a name="deleting-nodes"></a></p>
 
-<h3>Deleting nodes</h3>
+<h3>
+<a name="deleting-nodes" class="anchor" href="#deleting-nodes"><span class="octicon octicon-link"></span></a>Deleting nodes</h3>
 
-<pre><code>$child1-&gt;delete();
-</code></pre>
+<div class="highlight"><pre><span class="nv">$child1</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span>
+</pre></div>
 
 <p>Descendants of deleted nodes will also be deleted and all the <code>lft</code> and <code>rgt</code>
 bound will be recalculated. Pleases note that, for now, <code>deleting</code> and <code>deleted</code>
@@ -299,22 +307,24 @@ model events for the descendants will not be fired.</p>
 
 <p><a name="node-level"></a></p>
 
-<h3>Getting the nesting level of a node</h3>
+<h3>
+<a name="getting-the-nesting-level-of-a-node" class="anchor" href="#getting-the-nesting-level-of-a-node"><span class="octicon octicon-link"></span></a>Getting the nesting level of a node</h3>
 
 <p>The <code>getLevel()</code> method will return current nesting level, or depth, of a node.</p>
 
-<pre><code>$node-&gt;getLevel() // 0 when root
-</code></pre>
+<div class="highlight"><pre><span class="nv">$node</span><span class="o">-&gt;</span><span class="na">getLevel</span><span class="p">()</span> <span class="c1">// 0 when root</span>
+</pre></div>
 
 <p><a name="moving-nodes"></a></p>
 
-<h3>Moving nodes around</h3>
+<h3>
+<a name="moving-nodes-around" class="anchor" href="#moving-nodes-around"><span class="octicon octicon-link"></span></a>Moving nodes around</h3>
 
 <p>Baum provides several methods for moving nodes around:</p>
 
 <ul>
 <li>
-<code>moveLeft()</code>: Find the left sibling and move to left of it.</li>
+<code>moveLeft()</code>: Find the left sibling and move to the left of it.</li>
 <li>
 <code>moveRight()</code>: Find the right sibling and move to the right of it.</li>
 <li>
@@ -333,23 +343,24 @@ model events for the descendants will not be fired.</p>
 <code>makeRoot()</code>: Make current node a root node.</li>
 </ul><p>For example:</p>
 
-<pre><code>$root = Creatures::create(['name' =&gt; 'The Root of All Evil']);
+<div class="highlight"><pre><span class="nv">$root</span> <span class="o">=</span> <span class="nx">Creatures</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'The Root of All Evil'</span><span class="p">]);</span>
 
-$dragons = Creatures::create(['name' =&gt; 'Here Be Dragons']);
-$dragons-&gt;makeChildOf($root);
+<span class="nv">$dragons</span> <span class="o">=</span> <span class="nx">Creatures</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Here Be Dragons'</span><span class="p">]);</span>
+<span class="nv">$dragons</span><span class="o">-&gt;</span><span class="na">makeChildOf</span><span class="p">(</span><span class="nv">$root</span><span class="p">);</span>
 
-$monsters = new Creatures(['name' =&gt; 'Horrible Monsters']);
-$monsters-&gt;save();
+<span class="nv">$monsters</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Creatures</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Horrible Monsters'</span><span class="p">]);</span>
+<span class="nv">$monsters</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
 
-$monsters-makeSiblingOf($dragons);
+<span class="nv">$monsters</span><span class="o">-</span><span class="nx">makeSiblingOf</span><span class="p">(</span><span class="nv">$dragons</span><span class="p">);</span>
 
-$demons = Creatures::where('name', '=', 'demons');
-$demons-&gt;moveToLeftOf($dragons);
-</code></pre>
+<span class="nv">$demons</span> <span class="o">=</span> <span class="nx">Creatures</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="s1">'demons'</span><span class="p">);</span>
+<span class="nv">$demons</span><span class="o">-&gt;</span><span class="na">moveToLeftOf</span><span class="p">(</span><span class="nv">$dragons</span><span class="p">);</span>
+</pre></div>
 
 <p><a name="node-questions"></a></p>
 
-<h3>Asking questions to your nodes</h3>
+<h3>
+<a name="asking-questions-to-your-nodes" class="anchor" href="#asking-questions-to-your-nodes"><span class="octicon octicon-link"></span></a>Asking questions to your nodes</h3>
 
 <p>You can ask some questions to your Baum nodes:</p>
 
@@ -375,46 +386,49 @@ $demons-&gt;moveToLeftOf($dragons);
 defined by the left and right indices.</li>
 </ul><p>Using the nodes from the previous example:</p>
 
-<pre><code>$demons-&gt;isRoot(); // =&gt; false
+<div class="highlight"><pre><span class="nv">$demons</span><span class="o">-&gt;</span><span class="na">isRoot</span><span class="p">();</span> <span class="c1">// =&gt; false</span>
 
-$demons-&gt;isDescendantOf($root) // =&gt; true
-</code></pre>
+<span class="nv">$demons</span><span class="o">-&gt;</span><span class="na">isDescendantOf</span><span class="p">(</span><span class="nv">$root</span><span class="p">)</span> <span class="c1">// =&gt; true</span>
+</pre></div>
 
 <p><a name="node-relations"></a></p>
 
-<h3>Relations</h3>
+<h3>
+<a name="relations" class="anchor" href="#relations"><span class="octicon octicon-link"></span></a>Relations</h3>
 
 <p>Baum provides two self-referential Eloquent relations for your nodes: <code>parent</code>
 and <code>children</code>.</p>
 
-<pre><code>$parent = $node-&gt;parent()-&gt;get();
+<div class="highlight"><pre><span class="nv">$parent</span> <span class="o">=</span> <span class="nv">$node</span><span class="o">-&gt;</span><span class="na">parent</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span>
 
-$children = $node-&gt;children()-&gt;get();
-</code></pre>
+<span class="nv">$children</span> <span class="o">=</span> <span class="nv">$node</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span>
+</pre></div>
 
 <p><a name="node-basic-scopes"></a></p>
 
-<h3>Root and Leaf scopes</h3>
+<h3>
+<a name="root-and-leaf-scopes" class="anchor" href="#root-and-leaf-scopes"><span class="octicon octicon-link"></span></a>Root and Leaf scopes</h3>
 
 <p>Baum provides some very basic query scopes for accessing the root and leaf nodes:</p>
 
-<pre><code>// Query scope which targets all root nodes
-Category::roots()
+<div class="highlight"><pre><span class="c1">// Query scope which targets all root nodes</span>
+<span class="nx">Category</span><span class="o">::</span><span class="na">roots</span><span class="p">()</span>
 
-// All leaf nodes (nodes at the end of a branch)
-Category:allLeaves()
-</code></pre>
+<span class="c1">// All leaf nodes (nodes at the end of a branch)</span>
+<span class="nx">Category</span><span class="o">:</span><span class="nx">allLeaves</span><span class="p">()</span>
+</pre></div>
 
 <p>You may also be interested in only the first root:</p>
 
-<pre><code>$firstRootNode = Category::root();
-</code></pre>
+<div class="highlight"><pre><span class="nv">$firstRootNode</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">root</span><span class="p">();</span>
+</pre></div>
 
 <p><a name="node-chains"></a></p>
 
-<h3>Accessing the ancestry/descendancy chain</h3>
+<h3>
+<a name="accessing-the-ancestrydescendancy-chain" class="anchor" href="#accessing-the-ancestrydescendancy-chain"><span class="octicon octicon-link"></span></a>Accessing the ancestry/descendancy chain</h3>
 
-<p>There are several methods which Baum offers to access the ancestry/desncendancy
+<p>There are several methods which Baum offers to access the ancestry/descendancy
 chain of a node in the Nested Set tree. The main thing to keep in mind is that
 they are provided in two ways:</p>
 
@@ -437,15 +451,17 @@ remember to call <code>get()</code> or <code>first()</code>.</p>
 <code>descendantsAndSelf()</code>: Scope targeting itself and all of its nested children.</li>
 <li>
 <code>descendants()</code>: Set of all children &amp; nested children.</li>
+<li>
+<code>immediateDescendants()</code>: Set of all children nodes (non-recursive).</li>
 </ul><p>Second, as <strong>methods</strong> which return actual <code>Baum\Node</code> instances.</p>
 
 <ul>
 <li>
 <code>getRoot()</code>: Returns the root node starting at the current node.</li>
 <li>
-<code>getAncestorsAndSelf()</code>: Retrieve all the ancestor chain including the current node.</li>
+<code>getAncestorsAndSelf()</code>: Retrieve all of the ancestor chain including the current node.</li>
 <li>
-<code>getAncestors()</code>: Get all the ancestor chain from the database excluding the current node.</li>
+<code>getAncestors()</code>: Get all of the ancestor chain from the database excluding the current node.</li>
 <li>
 <code>getSiblingsAndSelf()</code>: Get all children of the parent, including self.</li>
 <li>
@@ -453,22 +469,25 @@ remember to call <code>get()</code> or <code>first()</code>.</p>
 <li>
 <code>getLeaves()</code>: Return all of its nested children which do not have children.</li>
 <li>
-<code>getDescendantsAndSelf()</code>: Retrieve all nested children an self.</li>
+<code>getDescendantsAndSelf()</code>: Retrieve all nested children and self.</li>
 <li>
 <code>getDescendants()</code>: Retrieve all of its children &amp; nested children.</li>
+<li>
+<code>getImmediateDescendants()</code>: Retrieve all of its children nodes (non-recursive).</li>
 </ul><p>Here's a simple example for iterating a node's descendants (provided a name
 attribute is available):</p>
 
-<pre><code>$node = Category::where('name', '=', 'Books');
+<div class="highlight"><pre><span class="nv">$node</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="s1">'Books'</span><span class="p">);</span>
 
-foreach($node-&gt;getDescendantsAndSelf() as $descendants) {
-  echo "{$node-&gt;name}";
-}
-</code></pre>
+<span class="k">foreach</span><span class="p">(</span><span class="nv">$node</span><span class="o">-&gt;</span><span class="na">getDescendantsAndSelf</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$descendant</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">echo</span> <span class="s2">"</span><span class="si">{</span><span class="nv">$descendant</span><span class="o">-&gt;</span><span class="na">name</span><span class="si">}</span><span class="s2">"</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
 
 <p><a name="node-model-events"></a></p>
 
-<h3>Model events: <code>moving</code> and <code>moved</code>
+<h3>
+<a name="model-events-moving-and-moved" class="anchor" href="#model-events-moving-and-moved"><span class="octicon octicon-link"></span></a>Model events: <code>moving</code> and <code>moved</code>
 </h3>
 
 <p>Baum models fire the following events: <code>moving</code> and <code>moved</code> every time a node
@@ -479,25 +498,26 @@ is returned from the <code>moving</code> event, the movement operation will be c
 <p>The recommended way to hook into those events is by using the model's boot
 method:</p>
 
-<pre><code>class Category extends Baum\Node {
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">Category</span> <span class="k">extends</span> <span class="nx">Baum\Node</span> <span class="p">{</span>
 
-  public static function boot() {
-    parent::boot();
+  <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">boot</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">parent</span><span class="o">::</span><span class="na">boot</span><span class="p">();</span>
 
-    static::moving(function($node) {
-      // Before moving the node this function will be called.
-    });
+    <span class="k">static</span><span class="o">::</span><span class="na">moving</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$node</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// Before moving the node this function will be called.</span>
+    <span class="p">});</span>
 
-    static::moved(function($node) {
-      // After the move operation is processed this function will be
-      // called.
-    });
-  }
+    <span class="k">static</span><span class="o">::</span><span class="na">moved</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$node</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// After the move operation is processed this function will be</span>
+      <span class="c1">// called.</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
 
-}
-</code></pre>
+<span class="p">}</span>
+</pre></div>
 
-<h2>TODO</h2>
+<h2>
+<a name="todo" class="anchor" href="#todo"><span class="octicon octicon-link"></span></a>TODO</h2>
 
 <p>Some things I'm probably adding to this library (soonish, I hope):</p>
 
@@ -507,7 +527,8 @@ Introducing scoping support, and some way to configure it, will allow us
 to have various Nested Set models in the same database table.</li>
 <li>Rebuild from other implementations. You've got a current model &amp; table,
 with only a <code>parent_id</code> id column? Shouldn't be a problem. Should it?</li>
-</ol><h2>Contributing</h2>
+</ol><h2>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
 <p>Thinking of contributing? Maybe you've found some nasty bug? That's great news!</p>
 
@@ -516,7 +537,8 @@ with only a <code>parent_id</code> id column? Shouldn't be a problem. Should it?
 <li>Create your bugfix/feature branch.</li>
 <li>Commit your changes &amp; push to the branch.</li>
 <li>Create new Pull Request</li>
-</ol><h2>License</h2>
+</ol><h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
 
 <p>Baum is licensed under the terms of the <a href="http://opensource.org/licenses/MIT">MIT License</a>
 (See LICENSE file for details).</p>
@@ -537,7 +559,7 @@ with only a <code>parent_id</code> id column? Shouldn't be a problem. Should it?
 
           <p class="repo-owner"><a href="https://github.com/etrepat/baum"></a> is maintained by <a href="https://github.com/etrepat">etrepat</a>.</p>
 
-          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.</p>
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
         </aside>
       </div>
     </div>
