@@ -276,8 +276,9 @@ class Move {
     if ( $this->position == 'child' )
       $this->_parentId = $this->target->getKey();
 
-	if(empty($this->_parentId)) $this->_parentId = 'NULL';
-	
+    // We are probably dealing with a root node here
+    if ( is_null($this->_parentId) ) $this->_parentId = 'NULL';
+
     return $this->_parentId;
   }
 
