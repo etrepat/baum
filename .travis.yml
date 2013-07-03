@@ -1,6 +1,10 @@
 language: php
 
-php: 
+branches:
+  only:
+    - master
+
+php:
   - 5.3
   - 5.4
 
