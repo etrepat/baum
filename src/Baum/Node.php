@@ -1,7 +1,7 @@
 <?php
 namespace Baum;
 
-use Illuminate\Database\Eloquent\Model;
+use Baum\Extensions\Eloquent\Model;
 
 /**
  * Node
@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Model;
  * commercial categories, etc.) or an efficient way of querying big trees.
  */
 abstract class Node extends Model {
-  use Extensions\ModelExtensions;
 
   /**
   * Column name to store the reference to parent's node.
@@ -717,13 +716,15 @@ abstract class Node extends Model {
    * @return \Baum\Node
    */
   public function setDepth() {
-    $this->getConnection()->transaction(function() {
-      $this->reload();
+    $self = $this;
 
-      $level = $this->getLevel();
+    $this->getConnection()->transaction(function() use ($self) {
+      $self->reload();
 
-      $this->newQuery()->where($this->getKeyName(), '=', $this->getKey())->update(array($this->getDepthColumnName() => $level));
-      $this->setAttribute($this->getDepthColumnName(), $level);
+      $level = $self->getLevel();
+
+      $self->newQuery()->where($self->getKeyName(), '=', $self->getKey())->update(array($self->getDepthColumnName() => $level));
+      $self->setAttribute($self->getDepthColumnName(), $level);
     });
 
     return $this;
@@ -738,22 +739,24 @@ abstract class Node extends Model {
   public function destroyDescendants() {
     if ( is_null($this->getRight()) || is_null($this->getLeft()) ) return;
 
-    $this->getConnection()->transaction(function() {
-      $this->reload();
+    $self = $this;
 
-      $lftCol = $this->getLeftColumnName();
-      $rgtCol = $this->getRightColumnName();
-      $lft    = $this->getLeft();
-      $rgt    = $this->getRight();
+    $this->getConnection()->transaction(function() use ($self) {
+      $self->reload();
+
+      $lftCol = $self->getLeftColumnName();
+      $rgtCol = $self->getRightColumnName();
+      $lft    = $self->getLeft();
+      $rgt    = $self->getRight();
 
       // Prune children
-      $this->newQuery()->where($lftCol, '>', $lft)->where($rgtCol, '<', $rgt)->delete();
+      $self->newQuery()->where($lftCol, '>', $lft)->where($rgtCol, '<', $rgt)->delete();
 
       // Update left and right indexes for the remaining nodes
       $diff = $rgt - $lft + 1;
 
-      $this->newQuery()->where($lftCol, '>', $rgt)->decrement($lftCol, $diff);
-      $this->newQuery()->where($rgtCol, '>', $rgt)->decrement($rgtCol, $diff);
+      $self->newQuery()->where($lftCol, '>', $rgt)->decrement($lftCol, $diff);
+      $self->newQuery()->where($rgtCol, '>', $rgt)->decrement($rgtCol, $diff);
     });
   }
 

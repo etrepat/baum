@@ -1,7 +1,10 @@
 <?php
-namespace Baum\Extensions;
 
-trait ModelExtensions {
+namespace Baum\Extensions\Eloquent;
+
+use Illuminate\Database\Eloquent\Model as BaseModel;
+
+abstract class Model extends BaseModel {
 
   /**
    * Reloads the model from the database.
@@ -18,28 +21,6 @@ trait ModelExtensions {
     }
 
     return $this;
-  }
-
-  /**
-   * Find first model.
-   *
-   * @return \Illuminate\Database\Eloquent\Model
-   */
-  public static function first() {
-    $instance = new static;
-
-    return $instance->newQuery()->orderBy($instance->getKeyName(), 'asc')->first();
-  }
-
-  /**
-   * Find last model.
-   *
-   * @return \Illuminate\Database\Eloquent\Model
-   */
-  public static function last() {
-    $instance = new static;
-
-    return $instance->newQuery()->orderBy($instance->getKeyName(), 'desc')->first();
   }
 
   /**
