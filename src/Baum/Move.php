@@ -164,13 +164,13 @@ class Move {
       ELSE $wrappedParent END";
 
     return $this->node->newQuery()
-                      ->whereBetween($leftColumn, [$a, $d])
-                      ->orWhereBetween($rightColumn, [$a, $d])
-                      ->update([
+                      ->whereBetween($leftColumn, array($a, $d))
+                      ->orWhereBetween($rightColumn, array($a, $d))
+                      ->update(array(
                         $leftColumn   => $connection->raw($lftSql),
                         $rightColumn  => $connection->raw($rgtSql),
                         $parentColumn => $connection->raw($parentSql)
-                      ]);
+                      ));
   }
 
   /**
@@ -196,7 +196,7 @@ class Move {
     if ( !$this->node->exists )
       throw new MoveNotPossibleException('A new node cannot be moved.');
 
-    if ( array_search($this->position, ['child', 'left', 'right']) === FALSE )
+    if ( array_search($this->position, array('child', 'left', 'right')) === FALSE )
       throw new MoveNotPossibleException("Position should be one of ['child', 'left', 'right'] but is {$this->position}.");
 
     if ( $this->node->equals($this->target) )
@@ -255,12 +255,12 @@ class Move {
 
     // we have defined the boundaries of two non-overlapping intervals,
     // so sorting puts both the intervals and their boundaries in order
-    $this->_boundaries = [
+    $this->_boundaries = array(
       $this->node->getLeft()  ,
       $this->node->getRight() ,
       $this->bound1()         ,
       $this->bound2()
-    ];
+    );
     sort($this->_boundaries);
 
     return $this->_boundaries;

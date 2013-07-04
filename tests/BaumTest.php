@@ -25,12 +25,12 @@ class BaumTest extends PHPUnit_Framework_TestCase {
   public function setUp() {
     Model::unguard();
 
-    Category::create(['id' => 1, 'name' => 'Root 1'   , 'lft' => 1  , 'rgt' => 10 , 'depth' => 0]);
-    Category::create(['id' => 2, 'name' => 'Child 1'  , 'lft' => 2  , 'rgt' => 3  , 'depth' => 1, 'parent_id' => 1]);
-    Category::create(['id' => 3, 'name' => 'Child 2'  , 'lft' => 4  , 'rgt' => 7  , 'depth' => 1, 'parent_id' => 1]);
-    Category::create(['id' => 4, 'name' => 'Child 2.1', 'lft' => 5  , 'rgt' => 6  , 'depth' => 2, 'parent_id' => 3]);
-    Category::create(['id' => 5, 'name' => 'Child 3'  , 'lft' => 8  , 'rgt' => 9  , 'depth' => 1, 'parent_id' => 1]);
-    Category::create(['id' => 6, 'name' => 'Root 2'   , 'lft' => 11 , 'rgt' => 12 , 'depth' => 0]);
+    Category::create(array('id' => 1, 'name' => 'Root 1'   , 'lft' => 1  , 'rgt' => 10 , 'depth' => 0));
+    Category::create(array('id' => 2, 'name' => 'Child 1'  , 'lft' => 2  , 'rgt' => 3  , 'depth' => 1, 'parent_id' => 1));
+    Category::create(array('id' => 3, 'name' => 'Child 2'  , 'lft' => 4  , 'rgt' => 7  , 'depth' => 1, 'parent_id' => 1));
+    Category::create(array('id' => 4, 'name' => 'Child 2.1', 'lft' => 5  , 'rgt' => 6  , 'depth' => 2, 'parent_id' => 3));
+    Category::create(array('id' => 5, 'name' => 'Child 3'  , 'lft' => 8  , 'rgt' => 9  , 'depth' => 1, 'parent_id' => 1));
+    Category::create(array('id' => 6, 'name' => 'Root 2'   , 'lft' => 11 , 'rgt' => 12 , 'depth' => 0));
 
     Model::reguard();
   }
@@ -164,10 +164,10 @@ class BaumTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testDepthIsUpdatedWhenMadeChild() {
-    $a = Category::create(['name' => 'A']);
-    $b = Category::create(['name' => 'B']);
-    $c = Category::create(['name' => 'C']);
-    $d = Category::create(['name' => 'D']);
+    $a = Category::create(array('name' => 'A'));
+    $b = Category::create(array('name' => 'B'));
+    $c = Category::create(array('name' => 'C'));
+    $d = Category::create(array('name' => 'D'));
 
     // a > b > c > d
     $b->makeChildOf($a);
@@ -186,10 +186,10 @@ class BaumTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testDepthIsUpdatedOnDescendantsWhenParentMoves() {
-    $a = Category::create(['name' => 'A']);
-    $b = Category::create(['name' => 'B']);
-    $c = Category::create(['name' => 'C']);
-    $d = Category::create(['name' => 'D']);
+    $a = Category::create(array('name' => 'A'));
+    $b = Category::create(array('name' => 'B'));
+    $c = Category::create(array('name' => 'C'));
+    $d = Category::create(array('name' => 'D'));
 
     // a > b > c > d
     $b->makeChildOf($a);
@@ -239,9 +239,9 @@ class BaumTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testDescendantsRecursesChildren() {
-    $a = Category::create(['name' => 'A']);
-    $b = Category::create(['name' => 'B']);
-    $c = Category::create(['name' => 'C']);
+    $a = Category::create(array('name' => 'A'));
+    $b = Category::create(array('name' => 'B'));
+    $c = Category::create(array('name' => 'C'));
 
     // a > b > c
     $b->makeChildOf($a);
@@ -276,7 +276,7 @@ class BaumTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testCreateChildrenWithRelation() {
-    $child = new Category(['name' => 'Child 3.1']);
+    $child = new Category(array('name' => 'Child 3.1'));
 
     $this->categories('Child 3')->children()->save($child);
 
@@ -417,7 +417,7 @@ class BaumTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testMakeChildOfAppendsAtTheEnd() {
-    $newChild = Category::create(['name' => 'Child 4']);
+    $newChild = Category::create(array('name' => 'Child 4'));
 
     $newChild->makeChildOf($this->categories('Root 1'));
 
@@ -438,7 +438,7 @@ class BaumTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testMakeChildOfSwappingRoots() {
-    $newRoot = Category::create(['name' => 'Root 3']);
+    $newRoot = Category::create(array('name' => 'Root 3'));
 
     $this->assertEquals(13, $newRoot->getLeft());
     $this->assertEquals(14, $newRoot->getRight());
@@ -455,7 +455,7 @@ class BaumTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testMakeChildOfSwappingRootsWithSubtrees() {
-    $newRoot = Category::create(['name' => 'Root 3']);
+    $newRoot = Category::create(array('name' => 'Root 3'));
 
     $this->categories('Root 1')->makeChildOf($newRoot);
 
