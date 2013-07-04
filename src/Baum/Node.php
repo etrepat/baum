@@ -780,4 +780,5 @@ abstract class Node extends Model {
   protected function moveTo($target, $position) {
     return Move::to($this, $target, $position);
   }
+
 }

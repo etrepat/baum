@@ -330,4 +330,5 @@ class Move {
 
     return static::$dispatcher->$method($event, $this->node);
   }
+
 }

@@ -8,6 +8,8 @@ use Mockery as m;
 class BaumTest extends PHPUnit_Framework_TestCase {
 
   public static function setUpBeforeClass() {
+    Capsule::schema()->dropIfExists('categories');
+
     Capsule::schema()->create('categories', function($t) {
       $t->increments('id');
 
@@ -33,16 +35,15 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     Category::create(array('id' => 6, 'name' => 'Root 2'   , 'lft' => 11 , 'rgt' => 12 , 'depth' => 0));
 
     Model::reguard();
+
+    if ( Capsule::connection()->getDriverName() === 'pgsql' )
+      Capsule::connection()->statement('ALTER SEQUENCE categories_id_seq RESTART WITH 7');
   }
 
   public function tearDown() {
     Capsule::table('categories')->delete();
 
     m::close();
-  }
-
-  public static function tearDownAfterClass() {
-    Capsule::schema()->drop('categories');
   }
 
   protected function categories($name) {

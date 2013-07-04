@@ -3,6 +3,7 @@
 namespace Baum\Extensions\Eloquent;
 
 use Illuminate\Database\Eloquent\Model as BaseModel;
+use Baum\Extensions\Query\Builder as QueryBuilder;
 
 abstract class Model extends BaseModel {
 
@@ -41,6 +42,19 @@ abstract class Model extends BaseModel {
    */
   public static function moved($callback) {
     static::registerModelEvent('moved', $callback);
+  }
+
+  /**
+   * Get a new query builder instance for the connection.
+   *
+   * @return \Baum\Extensions\Query\Builder
+   */
+  protected function newBaseQueryBuilder() {
+    $conn = $this->getConnection();
+
+    $grammar = $conn->getQueryGrammar();
+
+    return new QueryBuilder($conn, $grammar, $conn->getPostProcessor());
   }
 
 }
