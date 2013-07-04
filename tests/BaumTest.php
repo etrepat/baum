@@ -522,4 +522,49 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertFalse($this->categories('Child 2.1')->insideSubtree($this->categories('Root 2')));
   }
 
+  /**
+   * @expectedException Baum\MoveNotPossibleException
+   */
+  public function testUnpersistedNodeCannotBeMoved() {
+    $unpersisted = new Category(array('name' => 'Unpersisted'));
+
+    $unpersisted->moveToRightOf($this->categories('Root 1'));
+  }
+
+  /**
+   * @expectedException Baum\MoveNotPossibleException
+   */
+  public function testUnpersistedNodeCannotBeMadeChild() {
+    $unpersisted = new Category(array('name' => 'Unpersisted'));
+
+    $unpersisted->makeChildOf($this->categories('Root 1'));
+  }
+
+  /**
+   * @expectedException Baum\MoveNotPossibleException
+   */
+  public function testNodesCannotBeMovedToItself() {
+    $node = $this->categories('Child 1');
+
+    $node->moveToRightOf($node);
+  }
+
+  /**
+   * @expectedException Baum\MoveNotPossibleException
+   */
+  public function testNodesCannotBeMadeChildOfThemselves() {
+    $node = $this->categories('Child 1');
+
+    $node->makeChildOf($node);
+  }
+
+  /**
+   * @expectedException Baum\MoveNotPossibleException
+   */
+  public function testNodesCannotBeMovedToDescendantsOfThemselves() {
+    $node = $this->categories('Root 1');
+
+    $node->makeChildOf($this->categories('Child 2.1'));
+  }
+
 }
