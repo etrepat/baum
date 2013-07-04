@@ -271,6 +271,15 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($children[2], $this->categories('Child 3'));
   }
 
+  public function testCreateChildrenWithRelation() {
+    $child = new Category(['name' => 'Child 3.1']);
+
+    $this->categories('Child 3')->children()->save($child);
+
+    $this->assertTrue($child->exists);
+    $this->assertEquals($this->categories('Child 3')->getKey(), $child->getParentId());
+  }
+
   public function testGetImmediateDescendants() {
     $expected = array($this->categories('Child 1'), $this->categories('Child 2'), $this->categories('Child 3'));
 
