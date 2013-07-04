@@ -658,10 +658,10 @@ abstract class Node extends Model {
    */
   public function insideSubtree($node) {
     return (
-      $node->getLeft()  >= $this->getLeft()   &&
-      $node->getLeft()  <= $this->getRight()  &&
-      $node->getRight() >= $this->getLeft()   &&
-      $node->getRight() <= $this->getRight()
+      $this->getLeft()  >= $node->getLeft()   &&
+      $this->getLeft()  <= $node->getRight()  &&
+      $this->getRight() >= $node->getLeft()   &&
+      $this->getRight() <= $node->getRight()
     );
   }
 

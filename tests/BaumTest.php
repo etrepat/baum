@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\Model;
-
 use Mockery as m;
 
 class BaumTest extends PHPUnit_Framework_TestCase {
@@ -480,18 +479,19 @@ class BaumTest extends PHPUnit_Framework_TestCase {
 
     $child->moveToRightOf($this->categories('Child 3'));
 
+    Model::unsetEventDispatcher();
     Model::setEventDispatcher($dispatcher);
   }
 
   public function testMovementHaltsWhenReturningFalseFromMoving() {
+    $dispatcher = Model::getEventDispatcher();
+
+    Model::setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher[until]'));
+    $events->shouldReceive('until')->once()->with('eloquent.moving: '.get_class($unchanged), $unchanged)->andReturn(false);
+
     Category::moving(function($node) { return false; });
 
-    $dispatcher = Model::getEventDispatcher();
-    Model::setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
-
     $unchanged = $this->categories('Child 2');
-
-    $events->shouldReceive('until')->once()->with('eloquent.moving: '.get_class($unchanged), $unchanged)->andReturn(false);
 
     $unchanged->makeRoot();
 
@@ -502,7 +502,24 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals(4, $unchanged->getLeft());
     $this->assertEquals(7, $unchanged->getRight());
 
+    Model::getEventDispatcher()->forget('eloquent.moving: '.get_class($unchanged));
+
+    Model::unsetEventDispatcher();
     Model::setEventDispatcher($dispatcher);
+  }
+
+  public function testInsideSubtree() {
+    $this->assertFalse($this->categories('Child 1')->insideSubtree($this->categories('Root 2')));
+    $this->assertFalse($this->categories('Child 2')->insideSubtree($this->categories('Root 2')));
+    $this->assertFalse($this->categories('Child 3')->insideSubtree($this->categories('Root 2')));
+
+    $this->assertTrue($this->categories('Child 1')->insideSubtree($this->categories('Root 1')));
+    $this->assertTrue($this->categories('Child 2')->insideSubtree($this->categories('Root 1')));
+    $this->assertTrue($this->categories('Child 2.1')->insideSubtree($this->categories('Root 1')));
+    $this->assertTrue($this->categories('Child 3')->insideSubtree($this->categories('Root 1')));
+
+    $this->assertTrue($this->categories('Child 2.1')->insideSubtree($this->categories('Child 2')));
+    $this->assertFalse($this->categories('Child 2.1')->insideSubtree($this->categories('Root 2')));
   }
 
 }
