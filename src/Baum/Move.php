@@ -133,7 +133,7 @@ class Move {
    *
    * @return int
    */
-  protected function updateStructure() {
+  public function updateStructure() {
     list($a, $b, $c, $d) = $this->boundaries();
 
     $connection = $this->node->getConnection();
