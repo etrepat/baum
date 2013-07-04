@@ -71,7 +71,7 @@ class BaumTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testGetRootNonPersistedWhenSet() {
-    $parent = Category::first();
+    $parent = Category::roots()->first();
 
     $child = new Category;
     $child->setAttribute($child->getParentColumnName(), $parent->getKey());
