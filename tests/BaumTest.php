@@ -41,6 +41,10 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     m::close();
   }
 
+  public static function tearDownAfterClass() {
+    Capsule::schema()->drop('categories');
+  }
+
   protected function categories($name) {
     return Category::where('name', '=', $name)->first();
   }
