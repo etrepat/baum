@@ -1,3 +1,17 @@
+## 1.0.3
+_July 5th 2013_
+
+* enhanments
+  - Add support for PHP 5.3 to make Baum match the requirements of Eloquent.
+  - Improve Postgres friendliness
+
+* bug fixes
+  - `insideSubtree` was inside incorrectly to guard against impossible moves. Fixed.
+  - Due to default ordering by `lft` column, Postgres complained when using
+  aggregate methods on queries which had SORT BY clauses. Now those are pruned
+  before running aggregates.
+
+
 ## 1.0.2
 _July 3rd 2013_
 
