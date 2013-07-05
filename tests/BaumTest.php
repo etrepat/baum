@@ -484,14 +484,15 @@ class BaumTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testMovementHaltsWhenReturningFalseFromMoving() {
+    $unchanged = $this->categories('Child 2');
+
     $dispatcher = Model::getEventDispatcher();
 
     Model::setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher[until]'));
     $events->shouldReceive('until')->once()->with('eloquent.moving: '.get_class($unchanged), $unchanged)->andReturn(false);
 
+    // Force "moving" to return false
     Category::moving(function($node) { return false; });
-
-    $unchanged = $this->categories('Child 2');
 
     $unchanged->makeRoot();
 
@@ -502,6 +503,7 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals(4, $unchanged->getLeft());
     $this->assertEquals(7, $unchanged->getRight());
 
+    // Restore
     Model::getEventDispatcher()->forget('eloquent.moving: '.get_class($unchanged));
 
     Model::unsetEventDispatcher();
