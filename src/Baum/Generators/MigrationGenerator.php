@@ -15,10 +15,10 @@ class MigrationGenerator extends Generator {
 
     $stub = $this->getStub('migration');
 
-    $this->files->put($path, $this->parseStub($stub, [
+    $this->files->put($path, $this->parseStub($stub, array(
       'table' => $this->tableize($name),
       'class' => $this->getMigrationClassName($name)
-    ]));
+    )));
 
     return $path;
   }
