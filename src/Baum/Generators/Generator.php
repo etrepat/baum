@@ -60,7 +60,7 @@ abstract class Generator {
    * @param string $replacements
    * @return string
    */
-  protected function parseStub($stub, $replacements=[]) {
+  protected function parseStub($stub, $replacements=array()) {
     $output = $stub;
 
     foreach ($replacements as $key => $replacement) {
