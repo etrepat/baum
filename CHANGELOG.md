@@ -1,3 +1,9 @@
+## 1.0.4
+_July 18 2013_
+
+* bug fixes
+  - Full support for PHP >= 5.3.7. Baum should work if Eloquent works.
+
 ## 1.0.3
 _July 5th 2013_
 
