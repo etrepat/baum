@@ -291,7 +291,7 @@ $dragons->makeChildOf($root);
 $monsters = new Creatures(['name' => 'Horrible Monsters']);
 $monsters->save();
 
-$monsters-makeSiblingOf($dragons);
+$monsters->makeSiblingOf($dragons);
 
 $demons = Creatures::where('name', '=', 'demons');
 $demons->moveToLeftOf($dragons);
