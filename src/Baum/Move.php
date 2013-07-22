@@ -163,14 +163,17 @@ class Move {
       WHEN $wrappedId = $currentId THEN $parentId
       ELSE $wrappedParent END";
 
-    return $this->node->newQuery()
-                      ->whereBetween($leftColumn, array($a, $d))
-                      ->orWhereBetween($rightColumn, array($a, $d))
-                      ->update(array(
-                        $leftColumn   => $connection->raw($lftSql),
-                        $rightColumn  => $connection->raw($rgtSql),
-                        $parentColumn => $connection->raw($parentSql)
-                      ));
+    return $this->node
+                ->newNestedSetQuery()
+                ->where(function($query) use ($leftColumn, $rightColumn, $a, $d) {
+                  $query->whereBetween($leftColumn, array($a, $d))
+                        ->orWhereBetween($rightColumn, array($a, $d));
+                })
+                ->update(array(
+                  $leftColumn   => $connection->raw($lftSql),
+                  $rightColumn  => $connection->raw($rgtSql),
+                  $parentColumn => $connection->raw($parentSql)
+                ));
   }
 
   /**
@@ -184,7 +187,7 @@ class Move {
   protected function resolveNode($node) {
     if ( $node instanceof \Baum\Node ) return $node->reload();
 
-    return $this->node->newQuery()->find($node);
+    return $this->node->newNestedSetQuery()->find($node);
   }
 
   /**
@@ -204,6 +207,9 @@ class Move {
 
     if ( $this->target->insideSubtree($this->node) )
       throw new MoveNotPossibleException('A node cannot be moved to a descendant of itself (inside moved tree).');
+
+    if ( !is_null($this->target) && !$this->node->inSameScope($this->target) )
+      throw new MoveNotPossibleException('A node cannot be moved to a different scope.');
   }
 
   /**

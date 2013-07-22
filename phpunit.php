@@ -22,3 +22,5 @@ $capsule->setAsGlobal();
  * Manually load some required models
  */
 require __DIR__.'/tests/models/Category.php';
+require __DIR__.'/tests/models/ScopedCategory.php';
+require __DIR__.'/tests/models/Menu.php';

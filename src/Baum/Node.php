@@ -59,6 +59,13 @@ abstract class Node extends Model {
   protected static $moveToNewParentId = NULL;
 
   /**
+   * Columns which restrict what we consider our Nested Set list
+   *
+   * @var array
+   */
+  protected $scoped = array();
+
+  /**
    * The "booting" method of the model.
    *
    * We'll use this method to register event listeners on a Node instance as
@@ -235,6 +242,23 @@ abstract class Node extends Model {
   }
 
   /**
+   * Get a new "scoped" query builder for the Node's model.
+   *
+   * @param  bool  $excludeDeleted
+   * @return \Illuminate\Database\Eloquent\Builder|static
+   */
+  public function newNestedSetQuery($excludeDeleted = true) {
+    $builder = $this->newQuery($excludeDeleted)->orderBy($this->getLeftColumnName());
+
+    if ( !empty($this->scoped) ) {
+      foreach($this->scoped as $scopeFld)
+        $builder->where($scopeFld, '=', $this->$scopeFld);
+    }
+
+    return $builder;
+  }
+
+  /**
    * Returns the first root node.
    *
    * @return NestedSet
@@ -251,9 +275,7 @@ abstract class Node extends Model {
   public static function roots() {
     $instance = new static;
 
-    return $instance->newQuery()
-                    ->whereNull($instance->getParentColumnName())
-                    ->orderBy($instance->getLeftColumnName());
+    return $instance->newNestedSetQuery()->whereNull($instance->getParentColumnName());
   }
 
   /**
@@ -265,9 +287,8 @@ abstract class Node extends Model {
   public static function allLeaves() {
     $instance = new static;
 
-    return $instance->newQuery()
-                    ->whereRaw($instance->getQualifiedRightColumName() . ' - ' . $instance->getQualifiedLeftColumName() . ' = 1')
-                    ->orderBy($instance->getLeftColumnName());
+    return $instance->newNestedSetQuery()
+                    ->whereRaw($instance->getQualifiedRightColumName() . ' - ' . $instance->getQualifiedLeftColumName() . ' = 1');
   }
 
   /**
@@ -323,10 +344,9 @@ abstract class Node extends Model {
    * @return \Illuminate\Database\Eloquent\Builder
    */
   public function ancestorsAndSelf() {
-    return $this->newQuery()
+    return $this->newNestedSetQuery()
                 ->where($this->getLeftColumnName(), '<=', $this->getLeft())
-                ->where($this->getRightColumnName(), '>=', $this->getRight())
-                ->orderBy($this->getLeftColumnName(), 'asc');
+                ->where($this->getRightColumnName(), '>=', $this->getRight());
   }
 
   /**
@@ -365,9 +385,8 @@ abstract class Node extends Model {
    * @return \Illuminate\Database\Eloquent\Builder
    */
   public function siblingsAndSelf() {
-    return $this->newQuery()
-                ->where($this->getParentColumnName(), $this->getParentId())
-                ->orderBy($this->getLeftColumnName(), 'asc');
+    return $this->newNestedSetQuery()
+                ->where($this->getParentColumnName(), $this->getParentId());
   }
 
   /**
@@ -407,8 +426,7 @@ abstract class Node extends Model {
    */
   public function leaves() {
     return $this->descendants()
-                ->whereRaw($this->getQualifiedRightColumName() . ' - ' . $this->getQualifiedLeftColumName() . ' = 1')
-                ->orderBy($this->getLeftColumnName(), 'asc');
+                ->whereRaw($this->getQualifiedRightColumName() . ' - ' . $this->getQualifiedLeftColumName() . ' = 1');
   }
 
   /**
@@ -427,10 +445,9 @@ abstract class Node extends Model {
    * @return \Illuminate\Database\Query\Builder
    */
   public function descendantsAndSelf() {
-    return $this->newQuery()
+    return $this->newNestedSetQuery()
                 ->where($this->getLeftColumnName(), '>=', $this->getLeft())
-                ->where($this->getLeftColumnName(), '<', $this->getRight())
-                ->orderBy($this->getLeftColumnName(), 'asc');
+                ->where($this->getLeftColumnName(), '<', $this->getRight());
   }
 
   /**
@@ -501,7 +518,11 @@ abstract class Node extends Model {
    * @return boolean
    */
   public function isDescendantOf($other) {
-    return $this->getLeft() > $other->getLeft() && $this->getLeft() < $other->getRight();
+    return (
+      $this->getLeft() > $other->getLeft()  &&
+      $this->getLeft() < $other->getRight() &&
+      $this->inSameScope($other)
+    );
   }
 
   /**
@@ -511,7 +532,11 @@ abstract class Node extends Model {
    * @return boolean
    */
   public function isSelfOrDescendantOf($other) {
-   return $this->getLeft() >= $other->getLeft() && $this->getLeft() < $other->getRight();
+   return (
+      $this->getLeft() >= $other->getLeft() &&
+      $this->getLeft() < $other->getRight() &&
+      $this->inSameScope($other)
+    );
   }
 
   /**
@@ -521,7 +546,11 @@ abstract class Node extends Model {
    * @return boolean
    */
   public function isAncestorOf($other) {
-    return $this->getLeft() < $other->getLeft() && $this->getRight() > $other->getLeft();
+    return (
+      $this->getLeft() < $other->getLeft()  &&
+      $this->getRight() > $other->getLeft() &&
+      $this->inSameScope($other)
+    );
   }
 
   /**
@@ -531,7 +560,11 @@ abstract class Node extends Model {
    * @return boolean
    */
   public function isSelfOrAncestorOf($other) {
-   return $this->getLeft() <= $other->getLeft() && $this->getRight() > $other->getLeft();
+   return (
+      $this->getLeft() <= $other->getLeft() &&
+      $this->getRight() > $other->getLeft() &&
+      $this->inSameScope($other)
+    );
   }
 
   /**
@@ -650,6 +683,20 @@ abstract class Node extends Model {
   }
 
   /**
+   * Checkes if the given node is in the same scope as the current one.
+   *
+   * @param \Baum\Node
+   * @return boolean
+   */
+  public function inSameScope($other) {
+    foreach((array) $this->scoped as $fld) {
+      if ( $this->$fld != $other->$fld ) return false;
+    }
+
+    return true;
+  }
+
+  /**
    * Checks wether the given node is a descendant of itself. Basically, whether
    * its in the subtree defined by the left and right indices.
    *
@@ -670,9 +717,8 @@ abstract class Node extends Model {
    *
    * @return void
    */
-  // protected function setDefaultLeftAndRight() {
   public function setDefaultLeftAndRight() {
-    $withHighestRight = $this->newQUery()->orderBy($this->getRightColumnName(), 'desc')->take(1)->first();
+    $withHighestRight = $this->newQuery()->orderBy($this->getRightColumnName(), 'desc')->take(1)->first();
 
     $maxRgt = 0;
     if ( !is_null($withHighestRight) ) $maxRgt = $withHighestRight->getRight();
@@ -723,7 +769,7 @@ abstract class Node extends Model {
 
       $level = $self->getLevel();
 
-      $self->newQuery()->where($self->getKeyName(), '=', $self->getKey())->update(array($self->getDepthColumnName() => $level));
+      $self->newNestedSetQuery()->where($self->getKeyName(), '=', $self->getKey())->update(array($self->getDepthColumnName() => $level));
       $self->setAttribute($self->getDepthColumnName(), $level);
     });
 
@@ -750,13 +796,13 @@ abstract class Node extends Model {
       $rgt    = $self->getRight();
 
       // Prune children
-      $self->newQuery()->where($lftCol, '>', $lft)->where($rgtCol, '<', $rgt)->delete();
+      $self->newNestedSetQuery()->where($lftCol, '>', $lft)->where($rgtCol, '<', $rgt)->delete();
 
       // Update left and right indexes for the remaining nodes
       $diff = $rgt - $lft + 1;
 
-      $self->newQuery()->where($lftCol, '>', $rgt)->decrement($lftCol, $diff);
-      $self->newQuery()->where($rgtCol, '>', $rgt)->decrement($rgtCol, $diff);
+      $self->newNestedSetQuery()->where($lftCol, '>', $rgt)->decrement($lftCol, $diff);
+      $self->newNestedSetQuery()->where($rgtCol, '>', $rgt)->decrement($rgtCol, $diff);
     });
   }
 

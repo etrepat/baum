@@ -19,7 +19,23 @@ class BaumTest extends PHPUnit_Framework_TestCase {
 
       $t->string('name', 255);
 
-      $t->timestamps();
+      $t->integer('company_id')->unsigned()->nullable();
+    });
+
+    Capsule::schema()->dropIfExists('menus');
+
+    Capsule::schema()->create('menus', function($t) {
+      $t->increments('id');
+
+      $t->string('caption', 255);
+
+      $t->integer('parent_id')->nullable();
+      $t->integer('lft')->nullable();
+      $t->integer('rgt')->nullable();
+      $t->integer('depth')->nullable();
+
+      $t->integer('site_id')->unsigned()->nullable();
+      $t->string('language', 3)->nullable();
     });
   }
 
@@ -41,12 +57,17 @@ class BaumTest extends PHPUnit_Framework_TestCase {
 
   public function tearDown() {
     Capsule::table('categories')->delete();
+    Capsule::table('menus')->delete();
 
     m::close();
   }
 
   protected function categories($name) {
     return Category::where('name', '=', $name)->first();
+  }
+
+  protected function menus($caption) {
+    return Menu::where('caption', '=', $caption)->first();
   }
 
   public function testRootsStatic() {
@@ -567,6 +588,117 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $node = $this->categories('Root 1');
 
     $node->makeChildOf($this->categories('Child 2.1'));
+  }
+
+  public function testInSameScope() {
+    $root   = ScopedCategory::root();
+    $child  = $root->children()->first();
+
+    $this->assertTrue($child->inSameScope($root));
+
+    $child->update(array('company_id' => 75));
+
+    $this->assertFalse($child->inSameScope($root));
+  }
+
+  public function testIsSelfOrAncestorOfScoped() {
+    $root   = ScopedCategory::root();
+    $child  = $root->children()->first();
+
+    $this->assertTrue($root->isSelfOrAncestorOf($child));
+
+    $child->update(array('company_id' => 75));
+    $this->assertFalse($root->isSelfOrAncestorOf($child));
+  }
+
+  public function testIsSelfOrDescendantOfScoped() {
+    $root   = ScopedCategory::root();
+    $child  = $root->children()->first();
+
+    $this->assertTrue($child->isSelfOrDescendantOf($root));
+
+    $child->update(array('company_id' => 75));
+    $this->assertFalse($child->isSelfOrDescendantOf($root));
+  }
+
+  public function testGetSiblingsAndSelfWithScope() {
+    $menu1 = Menu::create(array('caption' => 'A', 'site_id' => 1, 'language' => 'en'));
+    $menu2 = Menu::create(array('caption' => 'B', 'site_id' => 1, 'language' => 'en'));
+    $menu3 = Menu::create(array('caption' => 'C', 'site_id' => 1, 'language' => 'es'));
+
+    $menu1->reload();
+    $menu2->reload();
+    $menu3->reload();
+
+    $expected = array($menu1, $menu2);
+    $this->assertEquals($expected, $menu1->getSiblingsAndSelf()->all());
+
+    $expected = array($menu3);
+    $this->assertEquals($expected, $menu3->getSiblingsAndSelf()->all());
+  }
+
+  public function testSimpleMovementsWithScope() {
+    $root   = Menu::create(array('caption' => 'R' , 'site_id' => 1, 'language' => 'en'));
+    $child1 = Menu::create(array('caption' => 'C1', 'site_id' => 1, 'language' => 'en'));
+    $child2 = Menu::create(array('caption' => 'C2', 'site_id' => 1, 'language' => 'en'));
+
+    $child1->makeChildOf($root);
+    $child2->makeChildOf($root);
+
+    $this->assertEquals($root, $this->menus('R'));
+
+    $expected = array($child1, $child2);
+    $this->assertEquals($expected, $this->menus('R')->children()->get()->all());
+  }
+
+  public function testInSameScopeWithMultipleScopes() {
+    $root1  = Menu::create(array('caption' => 'Root 1'  , 'site_id' => 1, 'language' => 'en'));
+    $child1 = Menu::create(array('caption' => 'Child 1' , 'site_id' => 1, 'language' => 'en'));
+    $root2  = Menu::create(array('caption' => 'Raíz 1'  , 'site_id' => 1, 'language' => 'es'));
+
+    $child1->makeChildOf($root1);
+
+    $this->assertTrue($this->menus('Root 1')->inSameScope($this->menus('Child 1')));
+    $this->assertTrue($this->menus('Child 1')->inSameScope($this->menus('Root 1')));
+    $this->assertFalse($this->menus('Root 1')->inSameScope($this->menus('Raíz 1')));
+  }
+
+  /**
+   * @expectedException Baum\MoveNotPossibleException
+   */
+  public function testNodesCannotBeMovedBetweenScopes() {
+    $root1  = Menu::create(array('caption' => 'Root 1'  , 'site_id' => 1, 'language' => 'en'));
+    $child1 = Menu::create(array('caption' => 'Child 1' , 'site_id' => 1, 'language' => 'en'));
+    $root2  = Menu::create(array('caption' => 'Raíz 1'  , 'site_id' => 1, 'language' => 'es'));
+    $child2 = Menu::create(array('caption' => 'Hijo 1'  , 'site_id' => 1, 'language' => 'es'));
+
+    $child1->makeChildOf($root1);
+    $child2->makeChildOf($root2);
+
+    $child2->makeChildOf($root1);
+  }
+
+  public function testMoveNodeBetweenScopes() {
+    $root1    = Menu::create(array('caption' => 'TL1', 'site_id' => 1, 'language' => 'en'));
+    $child11  = Menu::create(array('caption' => 'C11', 'site_id' => 1, 'language' => 'en'));
+    $child12  = Menu::create(array('caption' => 'C12', 'site_id' => 1, 'language' => 'en'));
+    $child11->makeChildOf($root1);
+    $child12->makeChildOf($root1);
+
+    $root2    = Menu::create(array('caption' => 'TL2', 'site_id' => 2, 'language' => 'en'));
+    $child21  = Menu::create(array('caption' => 'C21', 'site_id' => 2, 'language' => 'en'));
+    $child22  = Menu::create(array('caption' => 'C22', 'site_id' => 2, 'language' => 'en'));
+    $child21->makeChildOf($root2);
+    $child22->makeChildOf($root2);
+
+    $child11->update(array('site_id' => 2));
+    $child11->makeChildOf($root2);
+
+    $expected = array($this->menus('C12'));
+    $this->assertEquals($expected, $root1->children()->get()->all());
+
+    $expected = array($this->menus('C21'), $this->menus('C22'), $this->menus('C11'));
+    $this->assertEquals($expected, $root2->children()->get()->all());
   }
 
 }
