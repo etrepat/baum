@@ -264,6 +264,7 @@ to use Baum with your model. Below are some examples.</p>
 <li><a href="#node-basic-scopes">Root and Leaf scopes</a></li>
 <li><a href="#node-chains">Accessing the ancestry/descendancy chain</a></li>
 <li><a href="#node-model-events">Model events: <code>moving</code> and <code>moved</code></a></li>
+<li><a href="#scope-support">Scope support</a></li>
 </ul><p><a name="creating-root-node"></a></p>
 
 <h3>
@@ -351,7 +352,7 @@ model events for the descendants will not be fired.</p>
 <span class="nv">$monsters</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Creatures</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Horrible Monsters'</span><span class="p">]);</span>
 <span class="nv">$monsters</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
 
-<span class="nv">$monsters</span><span class="o">-</span><span class="nx">makeSiblingOf</span><span class="p">(</span><span class="nv">$dragons</span><span class="p">);</span>
+<span class="nv">$monsters</span><span class="o">-&gt;</span><span class="na">makeSiblingOf</span><span class="p">(</span><span class="nv">$dragons</span><span class="p">);</span>
 
 <span class="nv">$demons</span> <span class="o">=</span> <span class="nx">Creatures</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="s1">'demons'</span><span class="p">);</span>
 <span class="nv">$demons</span><span class="o">-&gt;</span><span class="na">moveToLeftOf</span><span class="p">(</span><span class="nv">$dragons</span><span class="p">);</span>
@@ -384,6 +385,10 @@ model events for the descendants will not be fired.</p>
 <li>
 <code>insideSubtree($node)</code>: Checks wether the given node is inside the subtree
 defined by the left and right indices.</li>
+<li>
+<code>inSameScope($node)</code>: Returns true if the given node is in the same scope
+as the current one. That is, if <em>every</em> column in the <code>scoped</code> property has
+the same value in both nodes.</li>
 </ul><p>Using the nodes from the previous example:</p>
 
 <div class="highlight"><pre><span class="nv">$demons</span><span class="o">-&gt;</span><span class="na">isRoot</span><span class="p">();</span> <span class="c1">// =&gt; false</span>
@@ -516,18 +521,55 @@ method:</p>
 <span class="p">}</span>
 </pre></div>
 
+<p><a name="scope-support"></a></p>
+
+<h3>
+<a name="scope-support" class="anchor" href="#scope-support"><span class="octicon octicon-link"></span></a>Scope support</h3>
+
+<p>Baum provides a simple method to provide Nested Set "scoping" which restricts
+what we consider part of a nested set tree. This should allow for multiple nested
+set trees in the same database table.</p>
+
+<p>To make use of the scoping funcionality you may override the <code>scoped</code> model
+attribute in your subclass. This attribute should contain an array of the column
+names (database fields) which shall be used to restrict Nested Set queries:</p>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">Category</span> <span class="k">extends</span> <span class="nx">Baum\Node</span> <span class="p">{</span>
+  <span class="o">...</span>
+  <span class="k">protected</span> <span class="nv">$scoped</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">'company_id'</span><span class="p">);</span>
+  <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>In the previous example, <code>company_id</code> effectively restricts (or "scopes") a
+Nested Set tree. So, for each value of that field we may be able to construct
+a full different tree.</p>
+
+<div class="highlight"><pre><span class="nv">$root1</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'R1'</span><span class="p">,</span> <span class="s1">'company_id'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">]);</span>
+<span class="nv">$root2</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'R2'</span><span class="p">,</span> <span class="s1">'company_id'</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">]);</span>
+
+<span class="nv">$child1</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'C1'</span><span class="p">,</span> <span class="s1">'company_id'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">]);</span>
+<span class="nv">$child2</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'C2'</span><span class="p">,</span> <span class="s1">'company_id'</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">]);</span>
+
+<span class="nv">$child1</span><span class="o">-&gt;</span><span class="na">makeChildOf</span><span class="p">(</span><span class="nv">$root1</span><span class="p">);</span>
+<span class="nv">$child2</span><span class="o">-&gt;</span><span class="na">makeChildOf</span><span class="p">(</span><span class="nv">$root2</span><span class="p">);</span>
+
+<span class="nv">$root1</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span> <span class="c1">// &lt;- returns $child1</span>
+<span class="nv">$root2</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span> <span class="c1">// &lt;- returns $child2</span>
+</pre></div>
+
+<p>All methods which ask or traverse the Nested Set tree will use the <code>scoped</code>
+attribute (if provided).</p>
+
 <h2>
 <a name="todo" class="anchor" href="#todo"><span class="octicon octicon-link"></span></a>TODO</h2>
 
 <p>Some things I'm probably adding to this library (soonish, I hope):</p>
 
-<ol>
-<li>Scoping support. As of now, there's no scoping involved in Baum's queries.
-Introducing scoping support, and some way to configure it, will allow us
-to have various Nested Set models in the same database table.</li>
+<ul>
 <li>Rebuild from other implementations. You've got a current model &amp; table,
 with only a <code>parent_id</code> id column? Shouldn't be a problem. Should it?</li>
-</ol><h2>
+</ul><h2>
 <a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
 <p>Thinking of contributing? Maybe you've found some nasty bug? That's great news!</p>
