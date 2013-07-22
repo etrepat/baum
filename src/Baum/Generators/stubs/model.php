@@ -61,6 +61,21 @@ class {{class}} extends Node {
   // */
   // protected $guarded = array('id', 'parent_id', 'lft', 'rgt', 'depth');
 
+  //
+  // This is to support "scoping" which may allow to have multiple nested
+  // set trees in the same database table.
+  //
+  // You should provide here the column names which should restrict Nested
+  // Set queries. f.ex: company_id, etc.
+  //
+
+  // /**
+  //  * Columns which restrict what we consider our Nested Set list
+  //  *
+  //  * @var array
+  //  */
+  // protected $scoped = array();
+
   //////////////////////////////////////////////////////////////////////////////
 
   //
