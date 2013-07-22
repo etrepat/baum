@@ -216,6 +216,7 @@ to use Baum with your model. Below are some examples.
 * [Root and Leaf scopes](#node-basic-scopes)
 * [Accessing the ancestry/descendancy chain](#node-chains)
 * [Model events: `moving` and `moved`](#node-model-events)
+* [Scope support](#scope-support)
 
 <a name="creating-root-node"></a>
 ### Creating a root node
@@ -312,6 +313,9 @@ You can ask some questions to your Baum nodes:
 * `equals($node)`: current node instance equals the other.
 * `insideSubtree($node)`: Checks wether the given node is inside the subtree
 defined by the left and right indices.
+* `inSameScope($node)`: Returns true if the given node is in the same scope
+as the current one. That is, if *every* column in the `scoped` property has
+the same value in both nodes.
 
 Using the nodes from the previous example:
 
@@ -425,14 +429,51 @@ class Category extends Baum\Node {
 }
 ```
 
+<a name="scope-support"></a>
+### Scope support
+
+Baum provides a simple method to provide Nested Set "scoping" which restricts
+what we consider part of a nested set tree. This should allow for multiple nested
+set trees in the same database table.
+
+To make use of the scoping funcionality you may override the `scoped` model
+attribute in your subclass. This attribute should contain an array of the column
+names (database fields) which shall be used to restrict Nested Set queries:
+
+```php
+class Category extends Baum\Node {
+  ...
+  protected $scoped = array('company_id');
+  ...
+}
+```
+
+In the previous example, `company_id` effectively restricts (or "scopes") a
+Nested Set tree. So, for each value of that field we may be able to construct
+a full different tree.
+
+```php
+$root1 = Category::create(['name' => 'R1', 'company_id' => 1]);
+$root2 = Category::create(['name' => 'R2', 'company_id' => 2]);
+
+$child1 = Category::create(['name' => 'C1', 'company_id' => 1]);
+$child2 = Category::create(['name' => 'C2', 'company_id' => 2]);
+
+$child1->makeChildOf($root1);
+$child2->makeChildOf($root2);
+
+$root1->children()->get(); // <- returns $child1
+$root2->children()->get(); // <- returns $child2
+```
+
+All methods which ask or traverse the Nested Set tree will use the `scoped`
+attribute (if provided).
+
 ## TODO
 
 Some things I'm probably adding to this library (soonish, I hope):
 
-1. Scoping support. As of now, there's no scoping involved in Baum's queries.
-Introducing scoping support, and some way to configure it, will allow us
-to have various Nested Set models in the same database table.
-2. Rebuild from other implementations. You've got a current model & table,
+* Rebuild from other implementations. You've got a current model & table,
 with only a `parent_id` id column? Shouldn't be a problem. Should it?
 
 ## Contributing

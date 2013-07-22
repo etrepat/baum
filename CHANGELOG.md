@@ -1,3 +1,10 @@
+## 1.0.5
+_July 22 2013_
+
+* enhancements
+  - Implement simple means to implement "scopes" for a Nested Set tree, allowing
+  for multiple trees in the same database table.
+
 ## 1.0.4
 _July 18 2013_
 
