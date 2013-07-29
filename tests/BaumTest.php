@@ -138,6 +138,30 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($this->categories('Child 2'), $parent);
   }
 
+  public function testWithoutNodeScope() {
+    $child = $this->categories('Child 2.1');
+
+    $expected = array($this->categories('Root 1'), $child);
+
+    $this->assertEquals($expected, $child->ancestorsAndSelf()->withoutNode($this->categories('Child 2'))->get()->all());
+  }
+
+  public function testWithoutSelfScope() {
+    $child = $this->categories('Child 2.1');
+
+    $expected = array($this->categories('Root 1'), $this->categories('Child 2'));
+
+    $this->assertEquals($expected, $child->ancestorsAndSelf()->withoutSelf()->get()->all());
+  }
+
+  public function testWithoutRootScope() {
+    $child = $this->categories('Child 2.1');
+
+    $expected = array($this->categories('Child 2'), $child);
+
+    $this->assertEquals($expected, $child->ancestorsAndSelf()->withoutRoot()->get()->all());
+  }
+
   public function testGetAncestorsAndSelf() {
     $child = $this->categories('Child 2.1');
 
@@ -152,6 +176,22 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $expected = array($this->categories('Root 1'), $this->categories('Child 2'));
 
     $this->assertEquals($expected, $child->getAncestors()->all());
+  }
+
+  public function testGetAncestorsAndSelfWithoutRoot() {
+    $child = $this->categories('Child 2.1');
+
+    $expected = array($this->categories('Child 2'), $child);
+
+    $this->assertEquals($expected, $child->getAncestorsAndSelfWithoutRoot()->all());
+  }
+
+  public function testGetAncestorsWithoutRoot() {
+    $child  = $this->categories('Child 2.1');
+
+    $expected = array($this->categories('Child 2'));
+
+    $this->assertEquals($expected, $child->getAncestorsWithoutRoot()->all());
   }
 
   public function testGetSiblingsAndSelf() {

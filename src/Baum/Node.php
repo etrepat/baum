@@ -292,6 +292,35 @@ abstract class Node extends Model {
   }
 
   /**
+   * Query scope which extracts a certain node object from the current query
+   * expression.
+   *
+   * @return \Illuminate\Database\Query\Builder
+   */
+  public function scopeWithoutNode($query, $node) {
+    return $query->where($node->getKeyName(), '!=', $node->getKey());
+  }
+
+  /**
+   * Extracts current node (self) from current query expression.
+   *
+   * @return \Illuminate\Database\Query\Builder
+   */
+  public function scopeWithoutSelf($query) {
+    return $this->scopeWithoutNode($query, $this);
+  }
+
+  /**
+   * Extracts first root (from the current node p-o-v) from current query
+   * expression.
+   *
+   * @return \Illuminate\Database\Query\Builder
+   */
+  public function scopeWithoutRoot($query) {
+    return $this->scopeWithoutNode($query, $this->getRoot());
+  }
+
+  /**
    * Returns true if this is a root node.
    *
    * @return boolean
@@ -360,13 +389,24 @@ abstract class Node extends Model {
   }
 
   /**
+   * Get all the ancestor chain from the database including the current node
+   * but without the root node.
+   *
+   * @param  array  $columns
+   * @return \Illuminate\Database\Eloquent\Collection
+   */
+  public function getAncestorsAndSelfWithoutRoot($columns = array('*')) {
+    return $this->ancestorsAndSelf()->withoutRoot()->get($columns);
+  }
+
+  /**
    * Instance scope which targets all the ancestor chain nodes excluding
    * the current one.
    *
    * @return \Illuminate\Database\Eloquent\Builder
    */
   public function ancestors() {
-    return $this->withoutSelf($this->ancestorsAndSelf());
+    return $this->ancestorsAndSelf()->withoutSelf();
   }
 
   /**
@@ -377,6 +417,17 @@ abstract class Node extends Model {
    */
   public function getAncestors($columns = array('*')) {
     return $this->ancestors()->get($columns);
+  }
+
+  /**
+   * Get all the ancestor chain from the database excluding the current node
+   * and the root node (from the current node's perspective).
+   *
+   * @param  array  $columns
+   * @return \Illuminate\Database\Eloquent\Collection
+   */
+  public function getAncestorsWithoutRoot($columns = array('*')) {
+    return $this->ancestors()->withoutRoot()->get($columns);
   }
 
   /**
@@ -405,7 +456,7 @@ abstract class Node extends Model {
    * @return \Illuminate\Database\Eloquent\Builder
    */
   public function siblings() {
-    return $this->withoutSelf($this->siblingsAndSelf());
+    return $this->siblingsAndSelf()->withoutSelf();
   }
 
   /**
@@ -466,7 +517,7 @@ abstract class Node extends Model {
    * @return \Illuminate\Database\Query\Builder
    */
   public function descendants() {
-    return $this->withoutSelf($this->descendantsAndSelf());
+    return $this->descendantsAndSelf()->withoutSelf();
   }
 
   /**
@@ -804,15 +855,6 @@ abstract class Node extends Model {
       $self->newNestedSetQuery()->where($lftCol, '>', $rgt)->decrement($lftCol, $diff);
       $self->newNestedSetQuery()->where($rgtCol, '>', $rgt)->decrement($rgtCol, $diff);
     });
-  }
-
-  /**
-   * Return a new QueryBuilder (scope) object without the current node.
-   *
-   * @return \Illuminate\Database\Query\Builder
-   */
-  protected function withoutSelf($scope) {
-    return $scope->where($this->getKeyName(), '!=', $this->getKey());
   }
 
   /**
