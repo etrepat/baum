@@ -217,6 +217,7 @@ to use Baum with your model. Below are some examples.
 * [Accessing the ancestry/descendancy chain](#node-chains)
 * [Model events: `moving` and `moved`](#node-model-events)
 * [Scope support](#scope-support)
+* [Misc/Utility functions](#misc-utilities)
 
 <a name="creating-root-node"></a>
 ### Creating a root node
@@ -376,11 +377,14 @@ remember to call `get()` or `first()`.
 * `descendants()`: Set of all children & nested children.
 * `immediateDescendants()`: Set of all children nodes (non-recursive).
 
-Second, as **methods** which return actual `Baum\Node` instances.
+Second, as **methods** which return actual `Baum\Node` instances (inside a `Collection`
+object where appropiate):
 
 * `getRoot()`: Returns the root node starting at the current node.
 * `getAncestorsAndSelf()`: Retrieve all of the ancestor chain including the current node.
+* `getAncestorsAndSelfWithoutRoot()`: All ancestors (including the current node) except the root node.
 * `getAncestors()`: Get all of the ancestor chain from the database excluding the current node.
+* `getAncestorsWithoutRoot()`: All ancestors except the current node and the root node.
 * `getSiblingsAndSelf()`: Get all children of the parent, including self.
 * `getSiblings()`: Return all children of the parent, except self.
 * `getLeaves()`: Return all of its nested children which do not have children.
@@ -468,6 +472,26 @@ $root2->children()->get(); // <- returns $child2
 
 All methods which ask or traverse the Nested Set tree will use the `scoped`
 attribute (if provided).
+
+<a name="misc-utilities"></a>
+### Misc/Utility functions
+
+#### Node extraction query scopes
+
+Baum provides some query scopes which may be used to extract (remove) selected nodes
+from the current results set.
+
+* `withoutNode(node)`: Extracts the specified node from the current results set.
+* `withoutSelf()`: Extracts itself from the current results set.
+* `withoutRoot()`: Extracts the current root node from the results set.
+
+```php
+$node = Category::where('name', '=', 'Some category I do not want to see.')
+
+$root = Category::where('name', '=', 'Old boooks');
+var_dump($root->descendantsAndSelf()->withoutNode($node)->get());
+... // <- This result set will not contain $node
+```
 
 ## TODO
 
