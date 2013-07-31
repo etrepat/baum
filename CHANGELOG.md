@@ -1,3 +1,10 @@
+## 1.0.6
+_July 31 2013_
+
+* enhancements
+  - Implement `withoutNode`, `withoutRoot`, `withoutSelf` query scopes.
+  - [#15] Add `Node::getNestedList` static method thanks to @gerp.
+
 ## 1.0.5
 _July 22 2013_
 
