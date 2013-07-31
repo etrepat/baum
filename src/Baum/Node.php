@@ -858,6 +858,26 @@ abstract class Node extends Model {
   }
 
   /**
+   * Return an key-value array indicating the node's depth with $seperator
+   *
+   * @return Array
+   */
+  public static function getNestedList($column, $key = null, $seperator = ' ') {
+    $instance = new static;
+
+    $key = $key ?: $instance->getKeyName();
+    $depthColumn = $instance->getDepthColumnName();
+
+    $nodes = $instance->newNestedSetQuery()->get()->toArray();
+
+    return array_combine(array_map(function($node) use($key) {
+      return $node[$key];
+    }, $nodes), array_map(function($node) use($seperator, $depthColumn, $column) {
+      return str_repeat($seperator, $node[$depthColumn]) . $node[$column];
+    }, $nodes));
+  }
+
+  /**
    * Main move method. Here we handle all node movements with the corresponding
    * lft/rgt index updates.
    *

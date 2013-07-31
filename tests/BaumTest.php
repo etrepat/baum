@@ -120,6 +120,22 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertContains('Root 2', $leaves);
   }
 
+  public function testGetNestedList() {
+    $seperator = ' ';
+    $nestedList = Category::getNestedList('name', 'id', $seperator);
+
+    $expected = array(
+      1 => str_repeat($seperator, 0). 'Root 1',
+      2 => str_repeat($seperator, 1). 'Child 1',
+      3 => str_repeat($seperator, 1). 'Child 2',
+      4 => str_repeat($seperator, 2). 'Child 2.1',
+      5 => str_repeat($seperator, 1). 'Child 3',
+      6 => str_repeat($seperator, 0). 'Root 2',
+    );
+
+    $this->assertEquals($expected, $nestedList);
+  }
+
   public function testIsLeaf() {
     $this->assertTrue($this->categories('Child 1')->isLeaf());
     $this->assertTrue($this->categories('Child 2.1')->isLeaf());
