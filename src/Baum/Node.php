@@ -155,7 +155,7 @@ abstract class Node extends Model {
    *
    * @return string
    */
-  public function getQualifiedLeftColumName() {
+  public function getQualifiedLeftColumnName() {
     return $this->getTable() . '.' . $this->getLeftColumnName();
   }
 
@@ -182,7 +182,7 @@ abstract class Node extends Model {
    *
    * @return string
    */
-  public function getQualifiedRightColumName() {
+  public function getQualifiedRightColumnName() {
     return $this->getTable() . '.' . $this->getRightColumnName();
   }
 
@@ -288,7 +288,7 @@ abstract class Node extends Model {
     $instance = new static;
 
     return $instance->newNestedSetQuery()
-                    ->whereRaw($instance->getQualifiedRightColumName() . ' - ' . $instance->getQualifiedLeftColumName() . ' = 1');
+                    ->whereRaw($instance->getQualifiedRightColumnName() . ' - ' . $instance->getQualifiedLeftColumnName() . ' = 1');
   }
 
   /**
@@ -477,7 +477,7 @@ abstract class Node extends Model {
    */
   public function leaves() {
     return $this->descendants()
-                ->whereRaw($this->getQualifiedRightColumName() . ' - ' . $this->getQualifiedLeftColumName() . ' = 1');
+                ->whereRaw($this->getQualifiedRightColumnName() . ' - ' . $this->getQualifiedLeftColumnName() . ' = 1');
   }
 
   /**

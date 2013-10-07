@@ -70,6 +70,59 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     return Menu::where('caption', '=', $caption)->first();
   }
 
+  public function testGetParentColumnName() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getParentColumnName(), 'parent_id');
+  }
+
+  public function testGetQualifiedParentColumnName() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getQualifiedParentColumnName(), 'categories.parent_id');
+  }
+
+  public function testGetParentId() {
+    $this->assertNull($this->categories('Root 1')->getParentId());
+    $this->assertEquals($this->categories('Child 1')->getParentId(), 1);
+  }
+
+  public function testGetLeftColumnName() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getLeftColumnName(), 'lft');
+  }
+
+  public function testGetQualifiedLeftColumnName() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getQualifiedLeftColumnName(), 'categories.lft');
+  }
+
+  public function testGetLeft() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getLeft(), 1);
+  }
+
+  public function testGetRightColumnName() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getRightColumnName(), 'rgt');
+  }
+
+  public function testGetQualifiedRightColumnName() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getQualifiedRightColumnName(), 'categories.rgt');
+  }
+
+  public function testGetRight() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getRight(), 10);
+  }
+
   public function testRootsStatic() {
     $query = Category::whereNull('parent_id')->get();
     $roots = Category::roots()->get();
