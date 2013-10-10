@@ -287,6 +287,15 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($leaves, $this->categories('Root 1')->getLeaves()->all());
   }
 
+  public function testGetLeavesIteration() {
+    $node = $this->categories('Root 1');
+
+    $expectedIds = array(2, 4, 5);
+
+    foreach($node->getLeaves() as $i => $leaf)
+      $this->assertEquals($expectedIds[$i], $leaf->id);
+  }
+
   public function testGetLevel() {
     $this->assertEquals(0, $this->categories('Root 1')->getLevel());
     $this->assertEquals(1, $this->categories('Child 1')->getLevel());

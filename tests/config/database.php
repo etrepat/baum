@@ -7,7 +7,7 @@ return array(
   'prefix'    => ''
 );
 
-// Test against local Postgres
+// // Test against local Postgres
 // return array(
 //   'driver'   => 'pgsql',
 //   'host'     => 'localhost',
@@ -17,4 +17,16 @@ return array(
 //   'charset'  => 'utf8',
 //   'prefix'   => '',
 //   'schema'   => 'public',
+// );
+
+// // Test against local MySQL
+// return array(
+//   'driver'   => 'mysql',
+//   'host'     => 'localhost',
+//   'database' => 'baum_test',
+//   'username' => 'mysql',
+//   'password' => 'mysql',
+//   'charset'   => 'utf8',
+//   'collation' => 'utf8_unicode_ci',
+//   'prefix'    => '',
 // );
