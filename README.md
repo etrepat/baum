@@ -295,7 +295,7 @@ $monsters->save();
 
 $monsters->makeSiblingOf($dragons);
 
-$demons = Creatures::where('name', '=', 'demons');
+$demons = Creatures::where('name', '=', 'demons')->first();
 $demons->moveToLeftOf($dragons);
 ```
 
@@ -396,7 +396,7 @@ Here's a simple example for iterating a node's descendants (provided a name
 attribute is available):
 
 ```php
-$node = Category::where('name', '=', 'Books');
+$node = Category::where('name', '=', 'Books')->first();
 
 foreach($node->getDescendantsAndSelf() as $descendant) {
   echo "{$descendant->name}";
@@ -486,9 +486,9 @@ from the current results set.
 * `withoutRoot()`: Extracts the current root node from the results set.
 
 ```php
-$node = Category::where('name', '=', 'Some category I do not want to see.')
+$node = Category::where('name', '=', 'Some category I do not want to see.')->first();
 
-$root = Category::where('name', '=', 'Old boooks');
+$root = Category::where('name', '=', 'Old boooks')->first();
 var_dump($root->descendantsAndSelf()->withoutNode($node)->get());
 ... // <- This result set will not contain $node
 ```
