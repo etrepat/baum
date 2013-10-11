@@ -51,8 +51,13 @@ class BaumTest extends PHPUnit_Framework_TestCase {
 
     Model::reguard();
 
-    if ( Capsule::connection()->getDriverName() === 'pgsql' )
-      Capsule::connection()->statement('ALTER SEQUENCE categories_id_seq RESTART WITH 7');
+    if ( Capsule::connection()->getDriverName() === 'pgsql' ) {
+      $tablePrefix = Capsule::connection()->getTablePrefix();
+
+      $sequenceName = $tablePrefix . 'categories_id_seq';
+
+      Capsule::connection()->statement('ALTER SEQUENCE ' . $sequenceName . ' RESTART WITH 7');
+    }
   }
 
   public function tearDown() {
