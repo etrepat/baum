@@ -155,7 +155,7 @@ abstract class Node extends Model {
    *
    * @return string
    */
-  public function getQualifiedLeftColumName() {
+  public function getQualifiedLeftColumnName() {
     return $this->getTable() . '.' . $this->getLeftColumnName();
   }
 
@@ -182,7 +182,7 @@ abstract class Node extends Model {
    *
    * @return string
    */
-  public function getQualifiedRightColumName() {
+  public function getQualifiedRightColumnName() {
     return $this->getTable() . '.' . $this->getRightColumnName();
   }
 
@@ -287,8 +287,13 @@ abstract class Node extends Model {
   public static function allLeaves() {
     $instance = new static;
 
+    $grammar = $instance->getConnection()->getQueryGrammar();
+
+    $rgtCol = $grammar->wrap($instance->getQualifiedRightColumnName());
+    $lftCol = $grammar->wrap($instance->getQualifiedLeftColumnName());
+
     return $instance->newNestedSetQuery()
-                    ->whereRaw($instance->getQualifiedRightColumName() . ' - ' . $instance->getQualifiedLeftColumName() . ' = 1');
+                    ->whereRaw($rgtCol . ' - ' .$lftCol . ' = 1');
   }
 
   /**
@@ -476,8 +481,13 @@ abstract class Node extends Model {
    * @return \Illuminate\Database\Query\Builder
    */
   public function leaves() {
+    $grammar = $this->getConnection()->getQueryGrammar();
+
+    $rgtCol = $grammar->wrap($this->getQualifiedRightColumnName());
+    $lftCol = $grammar->wrap($this->getQualifiedLeftColumnName());
+
     return $this->descendants()
-                ->whereRaw($this->getQualifiedRightColumName() . ' - ' . $this->getQualifiedLeftColumName() . ' = 1');
+                ->whereRaw($rgtCol . ' - ' . $lftCol . ' = 1');
   }
 
   /**

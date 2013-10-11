@@ -1,3 +1,10 @@
+## 1.0.8
+_Oct 11 2013_
+
+* bug fixes
+  - Properly wrap column names when used inside raw queries.
+  - Correct examples from README.
+
 ## 1.0.6
 _July 31 2013_
 

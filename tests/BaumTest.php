@@ -51,8 +51,13 @@ class BaumTest extends PHPUnit_Framework_TestCase {
 
     Model::reguard();
 
-    if ( Capsule::connection()->getDriverName() === 'pgsql' )
-      Capsule::connection()->statement('ALTER SEQUENCE categories_id_seq RESTART WITH 7');
+    if ( Capsule::connection()->getDriverName() === 'pgsql' ) {
+      $tablePrefix = Capsule::connection()->getTablePrefix();
+
+      $sequenceName = $tablePrefix . 'categories_id_seq';
+
+      Capsule::connection()->statement('ALTER SEQUENCE ' . $sequenceName . ' RESTART WITH 7');
+    }
   }
 
   public function tearDown() {
@@ -68,6 +73,59 @@ class BaumTest extends PHPUnit_Framework_TestCase {
 
   protected function menus($caption) {
     return Menu::where('caption', '=', $caption)->first();
+  }
+
+  public function testGetParentColumnName() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getParentColumnName(), 'parent_id');
+  }
+
+  public function testGetQualifiedParentColumnName() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getQualifiedParentColumnName(), 'categories.parent_id');
+  }
+
+  public function testGetParentId() {
+    $this->assertNull($this->categories('Root 1')->getParentId());
+    $this->assertEquals($this->categories('Child 1')->getParentId(), 1);
+  }
+
+  public function testGetLeftColumnName() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getLeftColumnName(), 'lft');
+  }
+
+  public function testGetQualifiedLeftColumnName() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getQualifiedLeftColumnName(), 'categories.lft');
+  }
+
+  public function testGetLeft() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getLeft(), 1);
+  }
+
+  public function testGetRightColumnName() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getRightColumnName(), 'rgt');
+  }
+
+  public function testGetQualifiedRightColumnName() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getQualifiedRightColumnName(), 'categories.rgt');
+  }
+
+  public function testGetRight() {
+    $category = $this->categories('Root 1');
+
+    $this->assertEquals($category->getRight(), 10);
   }
 
   public function testRootsStatic() {
@@ -232,6 +290,15 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $leaves = array($this->categories('Child 1'), $this->categories('Child 2.1'), $this->categories('Child 3'));
 
     $this->assertEquals($leaves, $this->categories('Root 1')->getLeaves()->all());
+  }
+
+  public function testGetLeavesIteration() {
+    $node = $this->categories('Root 1');
+
+    $expectedIds = array(2, 4, 5);
+
+    foreach($node->getLeaves() as $i => $leaf)
+      $this->assertEquals($expectedIds[$i], $leaf->id);
   }
 
   public function testGetLevel() {
