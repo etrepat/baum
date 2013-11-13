@@ -205,6 +205,12 @@ class Move {
     if ( $this->node->equals($this->target) )
       throw new MoveNotPossibleException('A node cannot be moved to itself.');
 
+    if ( $this->position === 'left' && ($this->node->getLeft() - 1) === $this->node->parent->getLeft() )
+      throw new MoveNotPossibleException('This node cannot move any further to the left.');
+
+    if ( $this->position === 'right' && ($this->node->getRight() + 1) === $this->node->parent->getRight() )
+      throw new MoveNotPossibleException('This node cannot move any further to the left.');
+
     if ( $this->target->insideSubtree($this->node) )
       throw new MoveNotPossibleException('A node cannot be moved to a descendant of itself (inside moved tree).');
 
