@@ -259,6 +259,16 @@ abstract class Node extends Model {
   }
 
   /**
+   * Overload new Collection
+   *
+   * @param array $models
+   * @return \Baum\Collection
+   */
+  public function newCollection(array $models = array()) {
+    return new Baum\Collection($models);
+  }
+
+  /**
    * Returns the first root node.
    *
    * @return NestedSet
