@@ -824,4 +824,24 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($expected, $root2->children()->get()->all());
   }
 
+  public function testToHierarchyReturnsAnEloquentCollection() {
+    $categories = Category::all()->toHierarchy();
+
+    $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $categories);
+  }
+
+  public function testToHierarchyReturnsHierarchicalData() {
+    $categories = Category::all()->toHierarchy();
+
+    $this->assertEquals(2, $categories->count());
+
+    $first = $categories->first();
+    $this->assertEquals('Root 1', $first->name);
+    $this->assertEquals(3, $first->children->count());
+
+    $first_lvl2 = $first->children->first();
+    $this->assertEquals('Child 1', $first_lvl2->name);
+    $this->assertEquals(0, $first_lvl2->children->count());
+  }
+
 }
