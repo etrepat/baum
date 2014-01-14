@@ -202,21 +202,16 @@ class Move {
     if ( array_search($this->position, array('child', 'left', 'right')) === FALSE )
       throw new MoveNotPossibleException("Position should be one of ['child', 'left', 'right'] but is {$this->position}.");
 
+    if ( is_null($this->target) )
+      throw new MoveNotPossibleException('Could not resolve target node.');
+
     if ( $this->node->equals($this->target) )
       throw new MoveNotPossibleException('A node cannot be moved to itself.');
-
-    if ( $this->node->parent ) {
-        if ( $this->position === 'left' && ($this->node->getLeft() - 1) === $this->node->parent->getLeft() )
-          throw new MoveNotPossibleException('This node cannot move any further to the left.');
-
-        if ( $this->position === 'right' && ($this->node->getRight() + 1) === $this->node->parent->getRight() )
-          throw new MoveNotPossibleException('This node cannot move any further to the right.');
-    }
 
     if ( $this->target->insideSubtree($this->node) )
       throw new MoveNotPossibleException('A node cannot be moved to a descendant of itself (inside moved tree).');
 
-    if ( !is_null($this->target) && !$this->node->inSameScope($this->target) )
+    if ( !$this->node->inSameScope($this->target) )
       throw new MoveNotPossibleException('A node cannot be moved to a different scope.');
   }
 
