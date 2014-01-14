@@ -215,6 +215,7 @@ to use Baum with your model. Below are some examples.
 * [Relations](#node-relations)
 * [Root and Leaf scopes](#node-basic-scopes)
 * [Accessing the ancestry/descendancy chain](#node-chains)
+* [Dumping the hierarchy tree](#hierarchy-tree)
 * [Model events: `moving` and `moved`](#node-model-events)
 * [Scope support](#scope-support)
 * [Misc/Utility functions](#misc-utilities)
@@ -403,6 +404,20 @@ foreach($node->getDescendantsAndSelf() as $descendant) {
 }
 ```
 
+<a name="hierarchy-tree"></a>
+### Dumping the hierarchy tree
+
+Baum extends the default `Eloquent\Collection` class and provides the
+`toHierarchy` method to it which returns a nested collection representing the
+queried tree.
+
+Retrieving a complete tree hierarchy into a regular `Collection` object with
+its children *properly nested* is as simple as:
+
+```php
+$tree = Category::where('name', '=', Books)->getDescendantsAndSelf()->toHierarchy();
+```
+
 <a name="node-model-events"></a>
 ### Model events: `moving` and `moved`
 
@@ -493,21 +508,15 @@ var_dump($root->descendantsAndSelf()->withoutNode($node)->get());
 ... // <- This result set will not contain $node
 ```
 
-## TODO
-
-Some things I'm probably adding to this library (soonish, I hope):
-
-* Rebuild from other implementations. You've got a current model & table,
-with only a `parent_id` id column? Shouldn't be a problem. Should it?
-
 ## Contributing
 
 Thinking of contributing? Maybe you've found some nasty bug? That's great news!
 
 1. Fork the project:.
 2. Create your bugfix/feature branch.
-3. Commit your changes & push to the branch.
-4. Create new Pull Request
+3. Code away your changes and, if you can, provide some tests.
+4. Commit your changes & push to the branch.
+5. Create a new Pull Request
 
 ## License
 
