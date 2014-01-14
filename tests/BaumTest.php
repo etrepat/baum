@@ -517,12 +517,32 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($this->categories('Child 1'), $this->categories('Child 2')->getRightSibling());
   }
 
+  /**
+   * @expectedException Baum\MoveNotPossibleException
+   */
+  public function testMoveLeftRaisesAnExceptionWhenNotPossible() {
+    $node = $this->categories('Child 2');
+
+    $node->moveLeft();
+    $node->moveLeft();
+  }
+
   public function testMoveRight() {
     $this->categories('Child 2')->moveRight();
 
     $this->assertNull($this->categories('Child 2')->getRightSibling());
 
     $this->assertEquals($this->categories('Child 3'), $this->categories('Child 2')->getLeftSibling());
+  }
+
+  /**
+   * @expectedException Baum\MoveNotPossibleException
+   */
+  public function testMoveRightRaisesAnExceptionWhenNotPossible() {
+    $node = $this->categories('Child 2');
+
+    $node->moveRight();
+    $node->moveRight();
   }
 
   public function testMoveToLeftOf() {
@@ -533,12 +553,26 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($this->categories('Child 1'), $this->categories('Child 3')->getRightSibling());
   }
 
+  /**
+   * @expectedException Baum\MoveNotPossibleException
+   */
+  public function testMoveToLeftOfRaisesAnExceptionWhenNotPossible() {
+    $this->categories('Child 1')->moveToLeftOf($this->categories('Child 1')->getLeftSibling());
+  }
+
   public function testMoveToRightOf() {
     $this->categories('Child 1')->moveToRightOf($this->categories('Child 3'));
 
     $this->assertNull($this->categories('Child 1')->getRightSibling());
 
     $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->getLeftSibling());
+  }
+
+  /**
+   * @expectedException Baum\MoveNotPossibleException
+   */
+  public function testMoveToRightOfRaisesAnExceptionWhenNotPossible() {
+    $this->categories('Child 3')->moveToRightOf($this->categories('Child 3')->getRightSibling());
   }
 
   public function testMakeRoot() {
