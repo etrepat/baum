@@ -1,3 +1,17 @@
+## 1.0.9
+_Jan 14 2014_
+
+* bug fixes
+  - [#26] Prevent impossible moves to the left or right. Now moving a node too
+  further to the left or right raises a `MoveNotPossibleException`. Thanks to
+  @ziadoz for spotting this issue and providing a patch.
+
+* enhancenments
+  - [#5] Implement `toHierarchy` method which returns a nested collection
+  representing the queried tree. Great thanks go to @Surt for his patch on this.
+  - Add a static `all` method which works as the regular `Eloquent\Model::all`
+  method but sorts for the `lft` column.
+
 ## 1.0.8
 _Oct 11 2013_
 
