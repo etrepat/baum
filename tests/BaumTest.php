@@ -128,6 +128,13 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($category->getRight(), 10);
   }
 
+  public function testAllStaticReturnsResultsSortedByLft() {
+    $results = Category::all();
+    $check = Category::query()->orderBy('lft')->get();
+
+    $this->assertEquals($results, $check);
+  }
+
   public function testRootsStatic() {
     $query = Category::whereNull('parent_id')->get();
     $roots = Category::roots()->get();

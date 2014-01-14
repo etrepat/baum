@@ -270,6 +270,18 @@ abstract class Node extends Model {
   }
 
   /**
+   * Get all of the nodes from the database.
+   *
+   * @param  array  $columns
+   * @return \Illuminate\Database\Eloquent\Collection|static[]
+   */
+  public static function all($columns = array('*')) {
+    $instance = new static;
+
+    return $instance->newNestedSetQuery()->get($columns);
+  }
+
+  /**
    * Returns the first root node.
    *
    * @return NestedSet
