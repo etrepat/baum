@@ -202,8 +202,12 @@ class Move {
     if ( array_search($this->position, array('child', 'left', 'right')) === FALSE )
       throw new MoveNotPossibleException("Position should be one of ['child', 'left', 'right'] but is {$this->position}.");
 
-    if ( is_null($this->target) )
-      throw new MoveNotPossibleException('Could not resolve target node.');
+    if ( is_null($this->target) ) {
+      if ( $this->position === 'left' || $this->position === 'right' )
+        throw new MoveNotPossibleException("Could not resolve target node. This node cannot move any further to the {$this->position}.");
+      else
+        throw new MoveNotPossibleException('Could not resolve target node.');
+    }
 
     if ( $this->node->equals($this->target) )
       throw new MoveNotPossibleException('A node cannot be moved to itself.');
