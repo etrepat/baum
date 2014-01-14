@@ -1,6 +1,7 @@
 <?php
 namespace Baum;
 
+use Baum\Extensions\Eloquent\Collection;
 use Baum\Extensions\Eloquent\Model;
 
 /**
@@ -256,6 +257,16 @@ abstract class Node extends Model {
     }
 
     return $builder;
+  }
+
+  /**
+   * Overload new Collection
+   *
+   * @param array $models
+   * @return \Baum\Extensions\Eloquent\Collection
+   */
+  public function newCollection(array $models = array()) {
+    return new Collection($models);
   }
 
   /**
