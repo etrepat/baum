@@ -885,4 +885,130 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals(0, $first_lvl2->children->count());
   }
 
+  public function testToHierarchyNestsCorrectly() {
+    // Prune all categories
+    Category::query()->delete();
+
+    // Build a sample tree structure:
+    //
+    //   - A
+    //     |- A.1
+    //     |- A.2
+    //   - B
+    //     |- B.1
+    //     |- B.2
+    //         |- B.2.1
+    //         |- B.2.2
+    //           |- B.2.2.1
+    //         |- B.2.3
+    //     |- B.3
+    //   - C
+    //     |- C.1
+    //     |- C.2
+    //   - D
+    //
+    $a = Category::create(array('name' => 'A'));
+    $b = Category::create(array('name' => 'B'));
+    $c = Category::create(array('name' => 'C'));
+    $d = Category::create(array('name' => 'D'));
+
+    $ch = Category::create(array('name' => 'A.1'));
+    $ch->makeChildOf($a);
+
+    $ch = Category::create(array('name' => 'A.2'));
+    $ch->makeChildOf($a);
+
+    $ch = Category::create(array('name' => 'B.1'));
+    $ch->makeChildOf($b);
+
+    $ch = Category::create(array('name' => 'B.2'));
+    $ch->makeChildOf($b);
+
+    $ch2 = Category::create(array('name' => 'B.2.1'));
+    $ch2->makeChildOf($ch);
+
+    $ch2 = Category::create(array('name' => 'B.2.2'));
+    $ch2->makeChildOf($ch);
+
+    $ch3 = Category::create(array('name' => 'B.2.2.1'));
+    $ch3->makeChildOf($ch2);
+
+    $ch2 = Category::create(array('name' => 'B.2.3'));
+    $ch2->makeChildOf($ch);
+
+    $ch = Category::create(array('name' => 'B.3'));
+    $ch->makeChildOf($b);
+
+    $ch = Category::create(array('name' => 'C.1'));
+    $ch->makeChildOf($c);
+
+    $ch = Category::create(array('name' => 'C.2'));
+    $ch->makeChildOf($c);
+
+    // Simple function which aids in converting the tree hierarchy into something
+    // more easily testable...
+    function hmap(array $nodes) {
+      $output = array();
+
+      foreach($nodes as $node)
+        $output[$node['name']] = empty($node['children']) ? null : hmap($node['children']);
+
+      return $output;
+    }
+
+    // Build expectations (expected trees/subtrees)
+    $expectedWholeTree = array(
+      'A' =>  array ( 'A.1' => null, 'A.2' => null ),
+      'B' =>  array (
+        'B.1' => null,
+        'B.2' =>
+        array (
+          'B.2.1' => null,
+          'B.2.2' =>  array ( 'B.2.2.1' => null ),
+          'B.2.3' => null,
+        ),
+        'B.3' => null,
+      ),
+      'C' =>  array ( 'C.1' => null, 'C.2' => null ),
+      'D' => null
+    );
+
+    $expectedSubtreeA = array('A' =>  array ( 'A.1' => null, 'A.2' => null ));
+
+    $expectedSubtreeB = array(
+      'B' => array (
+        'B.1' => null,
+        'B.2' =>
+        array (
+          'B.2.1' => null,
+          'B.2.2' => array ( 'B.2.2.1' => null ),
+          'B.2.3' => null
+        ),
+        'B.3' => null
+      )
+    );
+
+    $expectedSubtreeC = array( 'C.1' => null, 'C.2' => null );
+
+    $expectedSubtreeD = array('D' => null);
+
+    // Perform assertions
+    $wholeTree = hmap(Category::all()->toHierarchy()->toArray());
+    $this->assertEquals($expectedWholeTree, $wholeTree);
+
+    $subtreeA = hmap($this->categories('A')->getDescendantsAndSelf()->toHierarchy()->toArray());
+    $this->assertEquals($expectedSubtreeA, $subtreeA);
+
+    $subtreeB = hmap($this->categories('B')->getDescendantsAndSelf()->toHierarchy()->toArray());
+    $this->assertEquals($expectedSubtreeB, $subtreeB);
+
+    $subtreeC = hmap($this->categories('C')->getDescendants()->toHierarchy()->toArray());
+    $this->assertEquals($expectedSubtreeC, $subtreeC);
+
+    $subtreeD = hmap($this->categories('D')->getDescendantsAndSelf()->toHierarchy()->toArray());
+    $this->assertEquals($expectedSubtreeD, $subtreeD);
+
+    $this->assertTrue($this->categories('D')->getDescendants()->toHierarchy()->isEmpty());
+  }
+
 }
