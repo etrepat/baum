@@ -1,0 +1,11 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/bootstrap.php';
+
+// Prepare the DB
+require __DIR__.'/tests/BaumTest.php';
+BaumTest::setUpBeforeClass();
+
+$boris = new \Boris\Boris('> ');
+$boris->start();
