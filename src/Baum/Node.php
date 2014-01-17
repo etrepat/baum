@@ -224,6 +224,27 @@ abstract class Node extends Model {
   }
 
   /**
+   * Get the column names which define our scope
+   *
+   * @return array
+   */
+  public function getScopedColumns() {
+    return (array) $this->scoped;
+  }
+
+  /**
+   * Get the qualified column names which define our scope
+   *
+   * @return array
+   */
+  public function getQualifiedScopedColumns() {
+    $prefix = $this->getTable() . '.';
+
+    return array_map(function($c) use ($prefix) {
+      return $prefix . $c; }, $this->getScopedColumns());
+  }
+
+  /**
   * Parent relation (self-referential) 1-1.
   *
   * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
