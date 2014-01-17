@@ -341,6 +341,17 @@ abstract class Node extends Model {
   }
 
   /**
+   * Checks wether the underlying Nested Set structure is valid.
+   *
+   * @return boolean
+   */
+  public static function isValid() {
+    $validator = new SetValidator(new static);
+
+    return $validator->passes();
+  }
+
+  /**
    * Query scope which extracts a certain node object from the current query
    * expression.
    *
