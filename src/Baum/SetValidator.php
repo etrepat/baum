@@ -13,13 +13,13 @@ class SetValidator {
   protected $node = NULL;
 
   /**
-   * Create a new \Baum\Validator class instance.
+   * Create a new \Baum\SetValidator class instance.
    *
    * @param   \Baum\Node      $node
    * @return  void
    */
   public function __construct($node) {
-    $this->node   = $node;
+    $this->node = $node;
   }
 
   /**
@@ -80,7 +80,7 @@ class SetValidator {
 
     // If a scope is defined in the model we should check that the roots are
     // valid *for each* value in the scope columns.
-    if ( !empty($this->node->getScopedColumns()) )
+    if ( $this->node->isScoped() )
       return $this->validateRootsByScope($roots);
 
     return $this->isEachRootValid($roots);
@@ -213,8 +213,7 @@ class SetValidator {
     $rootsGroupedByScope = array();
 
     foreach($roots as $root) {
-      $key = array_map(function($column) use ($root) {
-        return $root->getAttribute($column); }, $root->getScopedColumns());
+      $key = $this->keyForScope($root);
 
       if ( !isset($rootsGroupedByScope[$key]) )
         $rootsGroupedByScope[$key] = array();
@@ -223,6 +222,24 @@ class SetValidator {
     }
 
     return $rootsGroupedByScope;
+  }
+
+  /**
+   * Builds a single string for the given scope columns values. Useful for
+   * making array keys for grouping.
+   *
+   * @param Baum\Node   $node
+   * @return string
+   */
+  protected function keyForScope($node) {
+    return implode('-', array_map(function($column) use ($node) {
+      $value = $node->getAttribute($column);
+
+      if ( is_null($value) )
+        return 'NULL';
+
+      return $value;
+    }, $node->getScopedColumns()));
   }
 
 }
