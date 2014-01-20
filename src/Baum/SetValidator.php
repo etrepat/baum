@@ -140,14 +140,21 @@ class SetValidator {
    * @return  boolean
    */
   protected function duplicatesExistForColumn($column) {
-    $columnsForSelect = implode(',',
-      array_merge($this->node->getQualifiedScopedColumns(), array($column)));
+    $columns = array_merge($this->node->getQualifiedScopedColumns(), array($column));
 
-    $result = $this->node->newQuery()
-      ->select(static::raw("$columnsForSelect, COUNT($column)"))
-      ->groupBy($columnsForSelect)
-      ->havingRaw("COUNT($column) > 1")
-      ->first();
+    $columnsForSelect = implode(', ', array_map(function($col) {
+      return static::wrap($col); }, $columns));
+
+    $wrappedColumn = static::wrap($column);
+
+    $query = $this->node->newQuery()
+      ->select(static::raw("$columnsForSelect, COUNT($wrappedColumn)"))
+      ->havingRaw("COUNT($wrappedColumn) > 1");
+
+    foreach($columns as $col)
+      $query->groupBy($col);
+
+    $result = $query->first();
 
     return !is_null($result);
   }
