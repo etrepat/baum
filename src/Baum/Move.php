@@ -2,6 +2,7 @@
 namespace Baum;
 
 use \Illuminate\Events\Dispatcher;
+use Baum\Helpers\DatabaseHelper as DB;
 
 /**
 * Move
@@ -108,7 +109,7 @@ class Move {
     if ( $this->hasChange() ) {
       $self = $this;
 
-      $this->node->getConnection()->transaction(function() use ($self) {
+      DB::transaction(function() use ($self) {
         $self->updateStructure();
       });
 
@@ -136,18 +137,15 @@ class Move {
   public function updateStructure() {
     list($a, $b, $c, $d) = $this->boundaries();
 
-    $connection = $this->node->getConnection();
-    $grammar    = $connection->getQueryGrammar();
-
     $currentId      = $this->node->getKey();
     $parentId       = $this->parentId();
     $leftColumn     = $this->node->getLeftColumnName();
     $rightColumn    = $this->node->getRightColumnName();
     $parentColumn   = $this->node->getParentColumnName();
-    $wrappedLeft    = $grammar->wrap($leftColumn);
-    $wrappedRight   = $grammar->wrap($rightColumn);
-    $wrappedParent  = $grammar->wrap($parentColumn);
-    $wrappedId      = $grammar->wrap($this->node->getKeyName());
+    $wrappedLeft    = DB::wrap($leftColumn);
+    $wrappedRight   = DB::wrap($rightColumn);
+    $wrappedParent  = DB::wrap($parentColumn);
+    $wrappedId      = DB::wrap($this->node->getKeyName());
 
     $lftSql = "CASE
       WHEN $wrappedLeft BETWEEN $a AND $b THEN $wrappedLeft + $d - $b
@@ -170,9 +168,9 @@ class Move {
                         ->orWhereBetween($rightColumn, array($a, $d));
                 })
                 ->update(array(
-                  $leftColumn   => $connection->raw($lftSql),
-                  $rightColumn  => $connection->raw($rgtSql),
-                  $parentColumn => $connection->raw($parentSql)
+                  $leftColumn   => DB::raw($lftSql),
+                  $rightColumn  => DB::raw($rgtSql),
+                  $parentColumn => DB::raw($parentSql)
                 ));
   }
 

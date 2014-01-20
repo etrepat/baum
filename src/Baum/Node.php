@@ -3,6 +3,7 @@ namespace Baum;
 
 use Baum\Extensions\Eloquent\Collection;
 use Baum\Extensions\Eloquent\Model;
+use Baum\Helpers\DatabaseHelper as DB;
 
 /**
  * Node
@@ -331,10 +332,8 @@ abstract class Node extends Model {
   public static function allLeaves() {
     $instance = new static;
 
-    $grammar = $instance->getConnection()->getQueryGrammar();
-
-    $rgtCol = $grammar->wrap($instance->getQualifiedRightColumnName());
-    $lftCol = $grammar->wrap($instance->getQualifiedLeftColumnName());
+    $rgtCol = DB::wrap($instance->getQualifiedRightColumnName());
+    $lftCol = DB::wrap($instance->getQualifiedLeftColumnName());
 
     return $instance->newNestedSetQuery()
                     ->whereRaw($rgtCol . ' - ' .$lftCol . ' = 1');
@@ -536,10 +535,8 @@ abstract class Node extends Model {
    * @return \Illuminate\Database\Query\Builder
    */
   public function leaves() {
-    $grammar = $this->getConnection()->getQueryGrammar();
-
-    $rgtCol = $grammar->wrap($this->getQualifiedRightColumnName());
-    $lftCol = $grammar->wrap($this->getQualifiedLeftColumnName());
+    $rgtCol = DB::wrap($this->getQualifiedRightColumnName());
+    $lftCol = DB::wrap($this->getQualifiedLeftColumnName());
 
     return $this->descendants()
                 ->whereRaw($rgtCol . ' - ' . $lftCol . ' = 1');
@@ -903,7 +900,7 @@ abstract class Node extends Model {
 
     $self = $this;
 
-    $this->getConnection()->transaction(function() use ($self) {
+    DB::transaction(function() use ($self) {
       $self->reload();
 
       $lftCol = $self->getLeftColumnName();

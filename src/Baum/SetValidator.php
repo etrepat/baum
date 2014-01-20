@@ -1,7 +1,7 @@
 <?php
 namespace Baum;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Baum\Helpers\DatabaseHelper as DB;
 
 class SetValidator {
 
@@ -102,8 +102,8 @@ class SetValidator {
 
     $parentColumn = $this->node->getQualifiedParentColumnName();
 
-    return $query->join(static::raw(static::wrap($tableName).' AS parent'),
-      $parentColumn, '=', static::raw('parent.'.static::wrap($primaryKeyName)),
+    return $query->join(DB::raw(DB::wrap($tableName).' AS parent'),
+      $parentColumn, '=', DB::raw('parent.'.DB::wrap($primaryKeyName)),
       'left outer');
   }
 
@@ -115,12 +115,12 @@ class SetValidator {
    * @return  Illuminate\Database\Eloquent\Builder
    */
   protected function checkBounds($query) {
-    $lftCol = static::wrap($this->node->getLeftColumnName());
-    $rgtCol = static::wrap($this->node->getRightColumnName());
+    $lftCol = DB::wrap($this->node->getLeftColumnName());
+    $rgtCol = DB::wrap($this->node->getRightColumnName());
 
-    $qualifiedLftCol    = static::wrap($this->node->getQualifiedLeftColumnName());
-    $qualifiedRgtCol    = static::wrap($this->node->getQualifiedRightColumnName());
-    $qualifiedParentCol = static::wrap($this->node->getQualifiedParentColumnName());
+    $qualifiedLftCol    = DB::wrap($this->node->getQualifiedLeftColumnName());
+    $qualifiedRgtCol    = DB::wrap($this->node->getQualifiedRightColumnName());
+    $qualifiedParentCol = DB::wrap($this->node->getQualifiedParentColumnName());
 
     $whereStm = "$qualifiedLftCol IS NULL OR
       $qualifiedRgtCol IS NULL OR
@@ -143,12 +143,12 @@ class SetValidator {
     $columns = array_merge($this->node->getQualifiedScopedColumns(), array($column));
 
     $columnsForSelect = implode(', ', array_map(function($col) {
-      return static::wrap($col); }, $columns));
+      return DB::wrap($col); }, $columns));
 
-    $wrappedColumn = static::wrap($column);
+    $wrappedColumn = DB::wrap($column);
 
     $query = $this->node->newQuery()
-      ->select(static::raw("$columnsForSelect, COUNT($wrappedColumn)"))
+      ->select(DB::raw("$columnsForSelect, COUNT($wrappedColumn)"))
       ->havingRaw("COUNT($wrappedColumn) > 1");
 
     foreach($columns as $col)
@@ -223,26 +223,6 @@ class SetValidator {
     }
 
     return $rootsGroupedByScope;
-  }
-
-  /**
-   * Get a new raw query expression (helper for calling Connection->raw)
-   *
-   * @param  mixed  $value
-   * @return \Illuminate\Database\Query\Expression
-   */
-  protected static function raw($value) {
-    return Capsule::connection()->raw($value);
-  }
-
-  /**
-   * Wrap a value in keyword identifiers (helper for calling Grammar->wrap)
-   *
-   * @param  string  $value
-   * @return string
-   */
-  protected static function wrap($value) {
-    return Capsule::connection()->getQueryGrammar()->wrap($value);
   }
 
 }
