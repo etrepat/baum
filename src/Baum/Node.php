@@ -239,10 +239,25 @@ abstract class Node extends Model {
    * @return array
    */
   public function getQualifiedScopedColumns() {
+    $scoped = $this->getScopedColumns();
+
+    if ( empty($scoped) )
+      return $scoped;
+
     $prefix = $this->getTable() . '.';
 
     return array_map(function($c) use ($prefix) {
-      return $prefix . $c; }, $this->getScopedColumns());
+      return $prefix . $c; }, $scoped);
+  }
+
+  /**
+   * Returns wether this particular node instance is scoped by certain fields
+   * or not.
+   *
+   * @return boolean
+   */
+  public function isScoped() {
+    return !empty($this->getScopedColumns());
   }
 
   /**
@@ -273,7 +288,7 @@ abstract class Node extends Model {
   public function newNestedSetQuery($excludeDeleted = true) {
     $builder = $this->newQuery($excludeDeleted)->orderBy($this->getLeftColumnName());
 
-    if ( !empty($this->scoped) ) {
+    if ( $this->isScoped() ) {
       foreach($this->scoped as $scopeFld)
         $builder->where($scopeFld, '=', $this->$scopeFld);
     }
@@ -807,7 +822,7 @@ abstract class Node extends Model {
    * @return boolean
    */
   public function inSameScope($other) {
-    foreach((array) $this->scoped as $fld) {
+    foreach($this->getScopedColumns() as $fld) {
       if ( $this->$fld != $other->$fld ) return false;
     }
 
