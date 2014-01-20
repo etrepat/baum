@@ -556,7 +556,6 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue(Category::isValid());
   }
 
-
   public function testMakeRoot() {
     $this->categories('Child 2')->makeRoot();
 
@@ -811,6 +810,8 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $menu2 = Menu::create(array('caption' => 'B', 'site_id' => 1, 'language' => 'en'));
     $menu3 = Menu::create(array('caption' => 'C', 'site_id' => 1, 'language' => 'es'));
 
+    $this->assertTrue(Menu::isValid());
+
     $menu1->reload();
     $menu2->reload();
     $menu3->reload();
@@ -827,6 +828,8 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $child1 = Menu::create(array('caption' => 'C1', 'site_id' => 1, 'language' => 'en'));
     $child2 = Menu::create(array('caption' => 'C2', 'site_id' => 1, 'language' => 'en'));
 
+    $this->assertTrue(Menu::isValid());
+
     $child1->makeChildOf($root);
     $child2->makeChildOf($root);
 
@@ -842,6 +845,8 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $root1  = Menu::create(array('caption' => 'Root 1'  , 'site_id' => 1, 'language' => 'en'));
     $child1 = Menu::create(array('caption' => 'Child 1' , 'site_id' => 1, 'language' => 'en'));
     $root2  = Menu::create(array('caption' => 'Raíz 1'  , 'site_id' => 1, 'language' => 'es'));
+
+    $this->assertTrue(Menu::isValid());
 
     $child1->makeChildOf($root1);
 
@@ -861,6 +866,8 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $root2  = Menu::create(array('caption' => 'Raíz 1'  , 'site_id' => 1, 'language' => 'es'));
     $child2 = Menu::create(array('caption' => 'Hijo 1'  , 'site_id' => 1, 'language' => 'es'));
 
+    $this->assertTrue(Menu::isValid());
+
     $child1->makeChildOf($root1);
     $child2->makeChildOf($root2);
 
@@ -871,6 +878,9 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $root1    = Menu::create(array('caption' => 'TL1', 'site_id' => 1, 'language' => 'en'));
     $child11  = Menu::create(array('caption' => 'C11', 'site_id' => 1, 'language' => 'en'));
     $child12  = Menu::create(array('caption' => 'C12', 'site_id' => 1, 'language' => 'en'));
+
+    $this->assertTrue(Menu::isValid());
+
     $child11->makeChildOf($root1);
     $child12->makeChildOf($root1);
 
