@@ -300,7 +300,9 @@ abstract class Node extends Model {
   public static function all($columns = array('*')) {
     $instance = new static;
 
-    return $instance->newNestedSetQuery()->get($columns);
+    return $instance->newQuery()
+                    ->orderBy($instance->getQualifiedLeftColumnName())
+                    ->get();
   }
 
   /**
@@ -320,7 +322,9 @@ abstract class Node extends Model {
   public static function roots() {
     $instance = new static;
 
-    return $instance->newNestedSetQuery()->whereNull($instance->getParentColumnName());
+    return $instance->newQuery()
+                    ->whereNull($instance->getParentColumnName())
+                    ->orderBy($instance->getQualifiedLeftColumnName());
   }
 
   /**
@@ -335,8 +339,9 @@ abstract class Node extends Model {
     $rgtCol = DB::wrap($instance->getQualifiedRightColumnName());
     $lftCol = DB::wrap($instance->getQualifiedLeftColumnName());
 
-    return $instance->newNestedSetQuery()
-                    ->whereRaw($rgtCol . ' - ' .$lftCol . ' = 1');
+    return $instance->newQuery()
+                    ->whereRaw($rgtCol . ' - ' . $lftCol . ' = 1')
+                    ->orderBy($instance->getQualifiedLeftColumnName());
   }
 
   /**
