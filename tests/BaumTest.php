@@ -522,16 +522,8 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertNull($this->categories('Child 2')->getLeftSibling());
 
     $this->assertEquals($this->categories('Child 1'), $this->categories('Child 2')->getRightSibling());
-  }
 
-  /**
-   * @expectedException Baum\MoveNotPossibleException
-   */
-  public function testMoveLeftRaisesAnExceptionWhenNotPossible() {
-    $node = $this->categories('Child 2');
-
-    $node->moveLeft();
-    $node->moveLeft();
+    $this->assertTrue(Category::isValid());
   }
 
   public function testMoveRight() {
@@ -540,16 +532,8 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertNull($this->categories('Child 2')->getRightSibling());
 
     $this->assertEquals($this->categories('Child 3'), $this->categories('Child 2')->getLeftSibling());
-  }
 
-  /**
-   * @expectedException Baum\MoveNotPossibleException
-   */
-  public function testMoveRightRaisesAnExceptionWhenNotPossible() {
-    $node = $this->categories('Child 2');
-
-    $node->moveRight();
-    $node->moveRight();
+    $this->assertTrue(Category::isValid());
   }
 
   public function testMoveToLeftOf() {
@@ -558,13 +542,8 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertNull($this->categories('Child 3')->getLeftSibling());
 
     $this->assertEquals($this->categories('Child 1'), $this->categories('Child 3')->getRightSibling());
-  }
 
-  /**
-   * @expectedException Baum\MoveNotPossibleException
-   */
-  public function testMoveToLeftOfRaisesAnExceptionWhenNotPossible() {
-    $this->categories('Child 1')->moveToLeftOf($this->categories('Child 1')->getLeftSibling());
+    $this->assertTrue(Category::isValid());
   }
 
   public function testMoveToRightOf() {
@@ -573,13 +552,8 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertNull($this->categories('Child 1')->getRightSibling());
 
     $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->getLeftSibling());
-  }
 
-  /**
-   * @expectedException Baum\MoveNotPossibleException
-   */
-  public function testMoveToRightOfRaisesAnExceptionWhenNotPossible() {
-    $this->categories('Child 3')->moveToRightOf($this->categories('Child 3')->getRightSibling());
+    $this->assertTrue(Category::isValid());
   }
 
   public function testMakeRoot() {
@@ -593,12 +567,16 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals(10, $newRoot->getRight());
 
     $this->assertEquals(1, $this->categories('Child 2.1')->getLevel());
+
+    $this->assertTrue(Category::isValid());
   }
 
   public function testMakeChildOf() {
     $this->categories('Child 1')->makeChildOf($this->categories('Child 3'));
 
     $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->parent()->first());
+
+    $this->assertTrue(Category::isValid());
   }
 
   public function testMakeChildOfAppendsAtTheEnd() {
@@ -608,10 +586,14 @@ class BaumTest extends PHPUnit_Framework_TestCase {
 
     $lastChild = $this->categories('Root 1')->children()->get()->last();
     $this->assertEquals($newChild, $lastChild);
+
+    $this->assertTrue(Category::isValid());
   }
 
   public function testMakeChildOfMovesWithSubtree() {
     $this->categories('Child 2')->makeChildOf($this->categories('Child 1'));
+
+    $this->assertTrue(Category::isValid());
 
     $this->assertEquals($this->categories('Child 1')->getKey(), $this->categories('Child 2')->getParentId());
 
@@ -630,6 +612,8 @@ class BaumTest extends PHPUnit_Framework_TestCase {
 
     $this->categories('Root 2')->makeChildOf($newRoot);
 
+    $this->assertTrue(Category::isValid());
+
     $this->assertEquals($newRoot->getKey(), $this->categories('Root 2')->getParentId());
 
     $this->assertEquals(12, $this->categories('Root 2')->getLeft());
@@ -643,6 +627,8 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $newRoot = Category::create(array('name' => 'Root 3'));
 
     $this->categories('Root 1')->makeChildOf($newRoot);
+
+    $this->assertTrue(Category::isValid());
 
     $this->assertEquals($newRoot->getKey(), $this->categories('Root 1')->getParentId());
 
@@ -754,6 +740,40 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $node->makeChildOf($this->categories('Child 2.1'));
   }
 
+  /**
+   * @expectedException Baum\MoveNotPossibleException
+   */
+  public function testMoveLeftRaisesAnExceptionWhenNotPossible() {
+    $node = $this->categories('Child 2');
+
+    $node->moveLeft();
+    $node->moveLeft();
+  }
+
+  /**
+   * @expectedException Baum\MoveNotPossibleException
+   */
+  public function testMoveRightRaisesAnExceptionWhenNotPossible() {
+    $node = $this->categories('Child 2');
+
+    $node->moveRight();
+    $node->moveRight();
+  }
+
+  /**
+   * @expectedException Baum\MoveNotPossibleException
+   */
+  public function testMoveToLeftOfRaisesAnExceptionWhenNotPossible() {
+    $this->categories('Child 1')->moveToLeftOf($this->categories('Child 1')->getLeftSibling());
+  }
+
+  /**
+   * @expectedException Baum\MoveNotPossibleException
+   */
+  public function testMoveToRightOfRaisesAnExceptionWhenNotPossible() {
+    $this->categories('Child 3')->moveToRightOf($this->categories('Child 3')->getRightSibling());
+  }
+
   public function testInSameScope() {
     $root   = ScopedCategory::root();
     $child  = $root->children()->first();
@@ -790,6 +810,8 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $menu2 = Menu::create(array('caption' => 'B', 'site_id' => 1, 'language' => 'en'));
     $menu3 = Menu::create(array('caption' => 'C', 'site_id' => 1, 'language' => 'es'));
 
+    $this->assertTrue(Menu::isValid());
+
     $menu1->reload();
     $menu2->reload();
     $menu3->reload();
@@ -806,8 +828,12 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $child1 = Menu::create(array('caption' => 'C1', 'site_id' => 1, 'language' => 'en'));
     $child2 = Menu::create(array('caption' => 'C2', 'site_id' => 1, 'language' => 'en'));
 
+    $this->assertTrue(Menu::isValid());
+
     $child1->makeChildOf($root);
     $child2->makeChildOf($root);
+
+    $this->assertTrue(Menu::isValid());
 
     $this->assertEquals($root, $this->menus('R'));
 
@@ -820,7 +846,11 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $child1 = Menu::create(array('caption' => 'Child 1' , 'site_id' => 1, 'language' => 'en'));
     $root2  = Menu::create(array('caption' => 'Raíz 1'  , 'site_id' => 1, 'language' => 'es'));
 
+    $this->assertTrue(Menu::isValid());
+
     $child1->makeChildOf($root1);
+
+    $this->assertTrue(Menu::isValid());
 
     $this->assertTrue($this->menus('Root 1')->inSameScope($this->menus('Child 1')));
     $this->assertTrue($this->menus('Child 1')->inSameScope($this->menus('Root 1')));
@@ -836,6 +866,8 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $root2  = Menu::create(array('caption' => 'Raíz 1'  , 'site_id' => 1, 'language' => 'es'));
     $child2 = Menu::create(array('caption' => 'Hijo 1'  , 'site_id' => 1, 'language' => 'es'));
 
+    $this->assertTrue(Menu::isValid());
+
     $child1->makeChildOf($root1);
     $child2->makeChildOf($root2);
 
@@ -846,8 +878,13 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $root1    = Menu::create(array('caption' => 'TL1', 'site_id' => 1, 'language' => 'en'));
     $child11  = Menu::create(array('caption' => 'C11', 'site_id' => 1, 'language' => 'en'));
     $child12  = Menu::create(array('caption' => 'C12', 'site_id' => 1, 'language' => 'en'));
+
+    $this->assertTrue(Menu::isValid());
+
     $child11->makeChildOf($root1);
     $child12->makeChildOf($root1);
+
+    $this->assertTrue(Menu::isValid());
 
     $root2    = Menu::create(array('caption' => 'TL2', 'site_id' => 2, 'language' => 'en'));
     $child21  = Menu::create(array('caption' => 'C21', 'site_id' => 2, 'language' => 'en'));
@@ -855,8 +892,12 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $child21->makeChildOf($root2);
     $child22->makeChildOf($root2);
 
+    $this->assertTrue(Menu::isValid());
+
     $child11->update(array('site_id' => 2));
     $child11->makeChildOf($root2);
+
+    $this->assertTrue(Menu::isValid());
 
     $expected = array($this->menus('C12'));
     $this->assertEquals($expected, $root1->children()->get()->all());
@@ -945,6 +986,8 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $ch = Category::create(array('name' => 'C.2'));
     $ch->makeChildOf($c);
 
+    $this->assertTrue(Category::isValid());
+
     // Simple function which aids in converting the tree hierarchy into something
     // more easily testable...
     function hmap(array $nodes) {
@@ -1009,6 +1052,85 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals($expectedSubtreeD, $subtreeD);
 
     $this->assertTrue($this->categories('D')->getDescendants()->toHierarchy()->isEmpty());
+  }
+
+  public function testTreeIsNotValidWithNullLefts() {
+    $this->assertTrue(Category::isValid());
+
+    Category::query()->update(array('lft' => null));
+    $this->assertFalse(Category::isValid());
+  }
+
+  public function testTreeIsNotValidWithNullRights() {
+    $this->assertTrue(Category::isValid());
+
+    Category::query()->update(array('rgt' => null));
+    $this->assertFalse(Category::isValid());
+  }
+
+  public function testTreeIsNotValidWhenRightsEqualLefts() {
+    $this->assertTrue(Category::isValid());
+
+    $child2 = $this->categories('Child 2');
+    $child2->rgt = $child2->lft;
+    $child2->save();
+
+    $this->assertFalse(Category::isValid());
+  }
+
+  public function testTreeIsNotValidWhenLeftEqualsParent() {
+    $this->assertTrue(Category::isValid());
+
+    $child2 = $this->categories('Child 2');
+    $child2->lft = $this->categories('Root 1')->getLeft();
+    $child2->save();
+
+    $this->assertFalse(Category::isValid());
+  }
+
+  public function testTreeIsNotValidWhenRightEqualsParent() {
+    $this->assertTrue(Category::isValid());
+
+    $child2 = $this->categories('Child 2');
+    $child2->rgt = $this->categories('Root 1')->getRight();
+    $child2->save();
+
+    $this->assertFalse(Category::isValid());
+  }
+
+  public function testTreeIsValidWithMissingMiddleNode() {
+    $this->assertTrue(Category::isValid());
+
+    Category::query()->delete($this->categories('Child 2')->getKey());
+    $this->assertTrue(Category::isValid());
+  }
+
+  public function testTreeIsNotValidWithOverlappingRoots() {
+    $this->assertTrue(Category::isValid());
+
+    // Force Root 2 to overlap with Root 1
+    $root = $this->categories('Root 2');
+    $root->lft = 0;
+    $root->save();
+
+    $this->assertFalse(Category::isValid());
+  }
+
+  public function testNodeDeletionDoesNotMakeTreeInvalid() {
+    $this->assertTrue(Category::isValid());
+
+    $this->categories('Root 2')->delete();
+    $this->assertTrue(Category::isValid());
+
+    $this->categories('Child 1')->delete();
+    $this->assertTrue(Category::isValid());
+  }
+
+  public function testNodeDeletionWithSubtreeDoesNotMakeTreeInvalid() {
+    $this->assertTrue(Category::isValid());
+
+    $this->categories('Child 2')->delete();
+    $this->assertTrue(Category::isValid());
   }
 
 }
