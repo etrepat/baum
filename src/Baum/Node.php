@@ -371,6 +371,17 @@ abstract class Node extends Model {
   }
 
   /**
+   * Rebuilds the structure of the current Nested Set.
+   *
+   * @return void
+   */
+  public static function rebuild() {
+    $builder = new SetBuilder(new static);
+
+    $builder->rebuild();
+  }
+
+  /**
    * Query scope which extracts a certain node object from the current query
    * expression.
    *
