@@ -1133,4 +1133,34 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue(Category::isValid());
   }
 
+  public function testRebuild() {
+    $this->assertTrue(Category::isValid());
+
+    Category::query()->update(array('lft' => null, 'rgt' => null));
+    $this->assertFalse(Category::isValid());
+
+    Category::rebuild();
+    $this->assertTrue(Category::isValid());
+  }
+
+  public function testRebuildWithScope() {
+    $root   = Menu::create(array('caption' => 'A', 'site_id' => 7, 'language' => 'es'));
+    $child1 = Menu::create(array('caption' => 'B', 'site_id' => 7, 'language' => 'es'));
+    $child2 = Menu::create(array('caption' => 'C', 'site_id' => 7, 'language' => 'es'));
+
+    $child1->makeChildOf($root);
+    $child2->makeChildOf($root);
+
+    Menu::query()->update(array('lft' => null, 'rgt' => null));
+    $this->assertFalse(Menu::isValid());
+
+    Menu::rebuild();
+    $this->assertTrue(Menu::isValid());
+
+    $this->assertEquals($root, $this->menus('A'));
+
+    $expected = array($child1, $child2);
+    $this->assertEquals($expected, $this->menus('A')->children()->get()->all());
+  }
+
 }
