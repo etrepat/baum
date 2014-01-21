@@ -652,7 +652,7 @@ abstract class Node extends Model {
     if ( is_null($this->getParentId()) )
       return 0;
 
-    return $this->ancestors()->count();
+    return $this->computeLevel();
   }
 
   /**
@@ -980,6 +980,40 @@ abstract class Node extends Model {
    */
   protected function moveTo($target, $position) {
     return Move::to($this, $target, $position);
+  }
+
+  /**
+   * Compute current node level. If could not move past ourseleves return
+   * our ancestor count, otherwhise get the first parent level + the computed
+   * nesting.
+   *
+   * @return integer
+   */
+  protected function computeLevel() {
+    list($node, $nesting) = $this->determineDepth($this);
+
+    if ( $node->equals($this) )
+      return $this->ancestors()->count();
+
+    return $node->getLevel() + $nesting;
+  }
+
+  /**
+   * Return an array with the last node we could reach and its nesting level
+   *
+   * @param   Baum\Node $node
+   * @param   integer   $nesting
+   * @return  array
+   */
+  protected function determineDepth($node, $nesting = 0) {
+    // Traverse back up the ancestry chain and add to the nesting level count
+    while( $parent = $node->parent()->first() ) {
+      $nesting = $nesting + 1;
+
+      $node = $parent;
+    }
+
+    return array($node, $nesting);
   }
 
 }
