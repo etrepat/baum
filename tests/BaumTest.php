@@ -1136,11 +1136,30 @@ class BaumTest extends PHPUnit_Framework_TestCase {
   public function testRebuild() {
     $this->assertTrue(Category::isValid());
 
+    $root = Category::root();
     Category::query()->update(array('lft' => null, 'rgt' => null));
     $this->assertFalse(Category::isValid());
 
     Category::rebuild();
     $this->assertTrue(Category::isValid());
+
+    $this->assertEquals($root, Category::root());
+  }
+
+  public function testRebuildPresevesRootNodes() {
+    $root1 = Category::create(array('name' => 'Test Root 1'));
+    $root2 = Category::create(array('name' => 'Test Root 2'));
+    $root3 = Category::create(array('name' => 'Test Root 3'));
+
+    $root2->makeChildOf($root1);
+    $root3->makeChildOf($root1);
+
+    $lastRoot = Category::roots()->reOrderBy($root1->getLeftColumnName(), 'desc')->first();
+
+    Category::query()->update(array('lft' => null, 'rgt' => null));
+    Category::rebuild();
+
+    $this->assertEquals($lastRoot, Category::roots()->reOrderBy($root1->getLeftColumnName(), 'desc')->first());
   }
 
   public function testRebuildWithScope() {
