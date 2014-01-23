@@ -12,6 +12,7 @@
   <testsuites>
     <testsuite name="Baum Test Suite">
       <file>tests/BaumTest.php</file>
+      <file>tests/QueryBuilderExtensionTest.php</file>
     </testsuite>
   </testsuites>
 </phpunit>
