@@ -120,6 +120,9 @@ class SetBuilder {
   protected function scopedAttributes($node) {
     $keys = $this->node->getScopedColumns();
 
+    if ( count($keys) == 0 )
+      return array();
+
     $values = array_map(function($column) use ($node) {
       return $node->getAttribute($column); }, $keys);
 
