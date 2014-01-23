@@ -61,7 +61,7 @@ class SetBuilder {
    *
    * @return Illuminate\Database\Eloquent\Collection
    */
-  protected function roots() {
+  public function roots() {
     return $this->node->newQuery()
       ->whereNull($this->node->getQualifiedParentColumnName())
       ->orderBy($this->node->getQualifiedLeftColumnName())
@@ -74,7 +74,7 @@ class SetBuilder {
    * Recompute left and right index bounds for the specified node and its
    * children (recursive call). Fill the depth column too.
    */
-  protected function rebuildBounds($node, $depth = 0) {
+  public function rebuildBounds($node, $depth = 0) {
     $k = $this->scopedKey($node);
 
     $node->setAttribute($node->getLeftColumnName(), $this->getNextBound($k));
@@ -94,7 +94,7 @@ class SetBuilder {
    * @param   Baum\Node $node
    * @return  Illuminate\Database\Eloquent\Collection
    */
-  protected function children($node) {
+  public function children($node) {
     $query = $this->node->newQuery();
 
     $query->where($this->node->getQualifiedParentColumnName(), '=', $node->getKey());
