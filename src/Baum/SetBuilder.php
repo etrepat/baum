@@ -52,7 +52,7 @@ class SetBuilder {
 
     DB::transaction(function() use ($self) {
       foreach($self->roots() as $root)
-        $self->rebuildBounds($root);
+        $self->rebuildBounds($root, 0);
     });
   }
 
@@ -72,15 +72,16 @@ class SetBuilder {
 
   /**
    * Recompute left and right index bounds for the specified node and its
-   * children (recursive call).
+   * children (recursive call). Fill the depth column too.
    */
-  protected function rebuildBounds($node) {
+  protected function rebuildBounds($node, $depth = 0) {
     $k = $this->scopedKey($node);
 
     $node->setAttribute($node->getLeftColumnName(), $this->getNextBound($k));
+    $node->setAttribute($node->getDepthColumnName(), $depth);
 
     foreach($this->children($node) as $child)
-      $this->rebuildBounds($child);
+      $this->rebuildBounds($child, $depth + 1);
 
     $node->setAttribute($node->getRightColumnName(), $this->getNextBound($k));
 
@@ -132,7 +133,7 @@ class SetBuilder {
    * @param   Baum\Node $node
    * @return  string
    */
-  protected function scopedKey(Node $node) {
+  protected function scopedKey($node) {
     $attributes = $this->scopedAttributes($node);
 
     $output = array();
