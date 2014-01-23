@@ -239,15 +239,13 @@ abstract class Node extends Model {
    * @return array
    */
   public function getQualifiedScopedColumns() {
-    $scoped = $this->getScopedColumns();
-
-    if ( empty($scoped) )
-      return $scoped;
+    if ( !$this->isScoped() )
+      return $this->getScopedColumns();
 
     $prefix = $this->getTable() . '.';
 
     return array_map(function($c) use ($prefix) {
-      return $prefix . $c; }, $scoped);
+      return $prefix . $c; }, $this->getScopedColumns());
   }
 
   /**
@@ -257,7 +255,7 @@ abstract class Node extends Model {
    * @return boolean
    */
   public function isScoped() {
-    return !empty($this->getScopedColumns());
+    return !!(count($this->getScopedColumns()) > 0);
   }
 
   /**
