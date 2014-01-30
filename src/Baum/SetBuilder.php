@@ -50,7 +50,7 @@ class SetBuilder {
     // setting the right indexes and saving the nodes...
     $self = $this;
 
-    DB::transaction(function() use ($self) {
+    $this->node->getConnection()->transaction(function() use ($self) {
       foreach($self->roots() as $root)
         $self->rebuildBounds($root, 0);
     });

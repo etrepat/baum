@@ -1,7 +1,7 @@
 <?php
 namespace Baum;
 
-use Baum\Helpers\DatabaseHelper as DB;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class SetValidator {
 
@@ -49,10 +49,32 @@ class SetValidator {
    * @return boolean
    */
   protected function validateBounds() {
-    $query = $this->node->newQuery();
+    $connection = $this->node->getConnection();
+    $grammar    = $connection->getQueryGrammar();
 
-    $this->joinWithParent($query);
-    $this->checkBounds($query);
+    $tableName      = $this->node->getTable();
+    $primaryKeyName = $this->node->getKeyName();
+    $parentColumn   = $this->node->getQualifiedParentColumnName();
+
+    $lftCol = $grammar->wrap($this->node->getLeftColumnName());
+    $rgtCol = $grammar->wrap($this->node->getRightColumnName());
+
+    $qualifiedLftCol    = $grammar->wrap($this->node->getQualifiedLeftColumnName());
+    $qualifiedRgtCol    = $grammar->wrap($this->node->getQualifiedRightColumnName());
+    $qualifiedParentCol = $grammar->wrap($this->node->getQualifiedParentColumnName());
+
+    $whereStm = "$qualifiedLftCol IS NULL OR
+      $qualifiedRgtCol IS NULL OR
+      $qualifiedLftCol >= $qualifiedRgtCol OR
+      ($qualifiedParentCol IS NOT NULL AND
+        ($qualifiedLftCol <= parent.$lftCol OR
+          $qualifiedRgtCol >= parent.$rgtCol))";
+
+    $query = $this->node->newQuery()
+      ->join($connection->raw($grammar->wrap($tableName).' AS parent'),
+             $parentColumn, '=', $connection->raw('parent.'.$grammar->wrap($primaryKeyName)),
+             'left outer')
+      ->whereRaw($whereStm);
 
     return ($query->count() == 0);
   }
@@ -87,52 +109,6 @@ class SetValidator {
   }
 
   /**
-   * Returns Eloquent\Builder object which joins the supplied query with
-   * itself by the parent column.
-   *
-   * Used to check for validity of the `parent_id` column values.
-   *
-   * @param   Illuminate\Database\Eloquent\Builder  $query
-   * @return  Illuminate\Database\Eloquent\Builder
-   */
-  protected function joinWithParent($query) {
-    $tableName = $this->node->getTable();
-
-    $primaryKeyName = $this->node->getKeyName();
-
-    $parentColumn = $this->node->getQualifiedParentColumnName();
-
-    return $query->join(DB::raw(DB::wrap($tableName).' AS parent'),
-      $parentColumn, '=', DB::raw('parent.'.DB::wrap($primaryKeyName)),
-      'left outer');
-  }
-
-  /**
-   * Adds a where statement into the supplied Eloquent\Builder object which checks
-   * that the value of the Nested Set index (or bounds) columns are correct.
-   *
-   * @param   Illuminate\Database\Eloquent\Builder  $query
-   * @return  Illuminate\Database\Eloquent\Builder
-   */
-  protected function checkBounds($query) {
-    $lftCol = DB::wrap($this->node->getLeftColumnName());
-    $rgtCol = DB::wrap($this->node->getRightColumnName());
-
-    $qualifiedLftCol    = DB::wrap($this->node->getQualifiedLeftColumnName());
-    $qualifiedRgtCol    = DB::wrap($this->node->getQualifiedRightColumnName());
-    $qualifiedParentCol = DB::wrap($this->node->getQualifiedParentColumnName());
-
-    $whereStm = "$qualifiedLftCol IS NULL OR
-      $qualifiedRgtCol IS NULL OR
-      $qualifiedLftCol >= $qualifiedRgtCol OR
-      ($qualifiedParentCol IS NOT NULL AND
-        ($qualifiedLftCol <= parent.$lftCol OR
-          $qualifiedRgtCol >= parent.$rgtCol))";
-
-    return $query->whereRaw($whereStm);
-  }
-
-  /**
    * Checks if duplicate values for the column specified exist. Takes
    * the Nested Set scope columns into account (if appropiate).
    *
@@ -140,15 +116,18 @@ class SetValidator {
    * @return  boolean
    */
   protected function duplicatesExistForColumn($column) {
+    $connection = $this->node->getConnection();
+    $grammar    = $connection->getQueryGrammar();
+
     $columns = array_merge($this->node->getQualifiedScopedColumns(), array($column));
 
-    $columnsForSelect = implode(', ', array_map(function($col) {
-      return DB::wrap($col); }, $columns));
+    $columnsForSelect = implode(', ', array_map(function($col) use ($grammar) {
+      return $grammar->wrap($col); }, $columns));
 
-    $wrappedColumn = DB::wrap($column);
+    $wrappedColumn = $grammar->wrap($column);
 
     $query = $this->node->newQuery()
-      ->select(DB::raw("$columnsForSelect, COUNT($wrappedColumn)"))
+      ->select($connection->raw("$columnsForSelect, COUNT($wrappedColumn)"))
       ->havingRaw("COUNT($wrappedColumn) > 1");
 
     foreach($columns as $col)
