@@ -246,12 +246,13 @@ abstract class Node extends Model {
    * Get a new "scoped" query builder for the Node's model.
    *
    * @param  bool  $excludeDeleted
+   * @param  bool  $currentScope
    * @return \Illuminate\Database\Eloquent\Builder|static
    */
-  public function newNestedSetQuery($excludeDeleted = true) {
+  public function newNestedSetQuery($excludeDeleted = true, $currentScope = true) {
     $builder = $this->newQuery($excludeDeleted)->orderBy($this->getLeftColumnName());
 
-    if ( !empty($this->scoped) ) {
+    if ( $currentScope && !empty($this->scoped) ) {
       foreach($this->scoped as $scopeFld)
         $builder->where($scopeFld, '=', $this->$scopeFld);
     }
@@ -298,7 +299,7 @@ abstract class Node extends Model {
   public static function roots() {
     $instance = new static;
 
-    return $instance->newNestedSetQuery()->whereNull($instance->getParentColumnName());
+    return $instance->newNestedSetQuery(true, false)->whereNull($instance->getParentColumnName());
   }
 
   /**
