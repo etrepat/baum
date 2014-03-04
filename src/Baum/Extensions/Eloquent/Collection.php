@@ -21,7 +21,7 @@ class Collection extends BaseCollection {
         if ( ! $sub->isLeaf() ){
           $new[$sub->getKey()]->setRelation('children', new BaseCollection($this->hierarchical($result,$cmp)));
 		}else{
-			$new[$sub->getKey()]->setRelation('children',array());	
+			$new[$sub->getKey()]->setRelation('children',new BaseCollection(array()));	
 		}
         $next_id = key($result);
 
