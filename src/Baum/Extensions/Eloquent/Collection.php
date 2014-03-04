@@ -18,9 +18,11 @@ class Collection extends BaseCollection {
       while( list($n, $sub) = each($result) ) {
         $new[$sub->getKey()] = $sub;
 
-        if ( ! $sub->isLeaf() )
+        if ( ! $sub->isLeaf() ){
           $new[$sub->getKey()]->setRelation('children', new BaseCollection($this->hierarchical($result,$cmp)));
-
+		}else{
+			$new[$sub->getKey()]->setRelation('children',array());	
+		}
         $next_id = key($result);
 
         if ( $next_id && $result[$next_id]->getParentId() != $sub->getParentId() ){
