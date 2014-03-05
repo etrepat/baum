@@ -922,4 +922,13 @@ abstract class Node extends Model {
     return Move::to($this, $target, $position);
   }
 
+  /**
+   * Eager load all descendants and set the children relation
+   *
+   * @return \Baum\Node
+   */
+  public function loadDescendants() {
+    return $this->setRelation('children', $this->getDescendants()->toHierarchy());
+  }
+
 }

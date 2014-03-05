@@ -215,7 +215,7 @@ to use Baum with your model. Below are some examples.
 * [Relations](#node-relations)
 * [Root and Leaf scopes](#node-basic-scopes)
 * [Accessing the ancestry/descendancy chain](#node-chains)
-* [Dumping the hierarchy tree](#hierarchy-tree)
+* [Dumping and eager-loading the hierarchy tree](#hierarchy-tree)
 * [Model events: `moving` and `moved`](#node-model-events)
 * [Scope support](#scope-support)
 * [Misc/Utility functions](#misc-utilities)
@@ -416,6 +416,19 @@ its children *properly nested* is as simple as:
 
 ```php
 $tree = Category::where('name', '=', Books)->getDescendantsAndSelf()->toHierarchy();
+```
+
+To eager-load the immediate children or the entire subtree starting from a given
+node the `loadDescendants` method can be used. This set the `children` relation
+of the node and returns the node object, so any calls for the node's children
+will use the already-loaded models. This internally uses the `toHierarchy`
+method.
+
+```php
+foreach ($node->loadDescendants()->children() as $child) {
+  // Logic recursively walking $subtree's children, with no extra database
+  // queries being made
+}
 ```
 
 <a name="node-model-events"></a>
