@@ -863,7 +863,7 @@ abstract class Node extends Model {
    * @return void
    */
   public function setDefaultLeftAndRight() {
-    $withHighestRight = $this->newQuery()->orderBy($this->getRightColumnName(), 'desc')->take(1)->first();
+    $withHighestRight = $this->newNestedSetQuery()->reOrderBy($this->getRightColumnName(), 'desc')->take(1)->first();
 
     $maxRgt = 0;
     if ( !is_null($withHighestRight) ) $maxRgt = $withHighestRight->getRight();
