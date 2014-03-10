@@ -25,6 +25,15 @@ abstract class Model extends BaseModel {
   }
 
   /**
+   * Get the observable event names.
+   *
+   * @return array
+   */
+  public function getObservableEvents() {
+    return array_merge(array('moving', 'moved'), parent::getObservableEvents());
+  }
+
+  /**
    * Register a moving model event with the dispatcher.
    *
    * @param  Closure|string  $callback
