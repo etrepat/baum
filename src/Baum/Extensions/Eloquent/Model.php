@@ -19,6 +19,7 @@ abstract class Model extends BaseModel {
       $fresh = static::find($this->getKey());
 
       $this->setRawAttributes($fresh->getAttributes(), true);
+      $this->setRelations($fresh->getRelations());
     }
 
     return $this;
