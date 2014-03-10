@@ -218,6 +218,8 @@ to use Baum with your model. Below are some examples.
 * [Dumping the hierarchy tree](#hierarchy-tree)
 * [Model events: `moving` and `moved`](#node-model-events)
 * [Scope support](#scope-support)
+* [Validation](#validation)
+* [Tree rebuilding](#rebuilding)
 * [Misc/Utility functions](#misc-utilities)
 
 <a name="creating-root-node"></a>
@@ -488,6 +490,53 @@ $root2->children()->get(); // <- returns $child2
 All methods which ask or traverse the Nested Set tree will use the `scoped`
 attribute (if provided).
 
+**Please note** that, for now, moving nodes between scopes is not supported.
+
+<a name="validation"></a>
+### Validation
+
+The `::isValid()` static method allows you to check if your underlying tree
+structure is correct. It mainly checks for these 3 things:
+
+* Check that the bound indexes `lft`, `rgt` are not null, `rgt` values greater
+than `lft` and within the bounds of the parent node (if set).
+* That there are no duplicates for the `lft` and `rgt` column values.
+* As the first check does not actually check root nodes, see if each root has
+the `lft` and `rgt` indexes within the bounds of its children.
+
+All of the checks are *scope aware* and will check each scope separately if needed.
+
+Example usage, given a `Category` node class:
+
+```php
+Category::isValid()
+=> true
+```
+
+<a name="rebuilding"></a>
+### Tree rebuilding
+
+Baum supports for complete tree-structure rebuilding (or reindexing) via the
+`::rebuild()` static method.
+
+This method will re-index all your `lft`, `rgt` and `depth` column values,
+inspecting your tree only from the parent <-> children relation
+standpoint. Which means that you only need a correctly filled `parent_id` column
+and Baum will try its best to recompute the rest.
+
+This can prove quite useful when something has gone horribly wrong with the index
+values or it may come quite handy when *converting* from another implementation
+(which would probably have a `parent_id` column).
+
+This operation is also *scope aware* and will rebuild all of the scopes
+separately if they are defined.
+
+Simple example usage, given a `Category` node class:
+
+```php
+Category::rebuild()
+```
+
 <a name="misc-utilities"></a>
 ### Misc/Utility functions
 
@@ -506,6 +555,33 @@ $node = Category::where('name', '=', 'Some category I do not want to see.')->fir
 $root = Category::where('name', '=', 'Old boooks')->first();
 var_dump($root->descendantsAndSelf()->withoutNode($node)->get());
 ... // <- This result set will not contain $node
+```
+
+#### Get a nested list of column values
+
+The `::getNestedList()` static method returns a key-value pair array indicating
+a node's depth. Useful for silling `select` elements, etc.
+
+It expects the column name to return, and optionally: the column
+to use for array keys (will use `id` if none supplied) and/or a separator:
+
+```php
+public static function getNestedList($column, $key = null, $seperator = ' ');
+```
+
+An example use case:
+
+```php
+$nestedList = Category::getNestedList('name');
+// $nestedList will contain an array like the following:
+// array(
+//   1 => 'Root 1',
+//   2 => ' Child 1',
+//   3 => ' Child 2',
+//   4 => '  Child 2.1',
+//   5 => ' Child 3',
+//   6 => 'Root 2'
+// );
 ```
 
 ## Contributing
