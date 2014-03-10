@@ -1,3 +1,16 @@
+* bug fixes
+  - Fix inserting a new model with a defined scope. Fixes [#27].
+  - Static methods now do not take into account scoped column values, which
+  would not make sense.
+  - Properly set a model's relations when reloading an instance via `reload()`.
+  - Fix `getObservableEvents()` function to include node's `moving` and `moved`
+  events.
+
+* enhancements
+  - Implement tree structure validation via `Node::isValid`.
+  - Implement tree index rebuilding via `Node::rebuild`. Very useful when a tree
+  structure has been messed up or to convert from a `parent_id` only table.
+
 ## 1.0.9
 _Jan 14 2014_
 
