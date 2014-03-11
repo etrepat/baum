@@ -12,6 +12,8 @@ pattern for [Laravel 4's](http://laravel.com/) Eloquent ORM.
 * [Installation](#installation)
 * [Getting started](#getting-started)
 * [Usage](#usage)
+* [Further information](#further-information)
+* [Contributing](#contributing)
 
 <a name="about"></a>
 ## About Nested Sets
@@ -584,6 +586,17 @@ $nestedList = Category::getNestedList('name');
 // );
 ```
 
+<a name="further-information"></a>
+## Further information
+
+You may find additional information, usage examples and/or frequently
+asked questions about Baum in the [wiki](https://github.com/etrepat/baum/wiki).
+
+Feel free to browse the wiki after finishing this README:
+
+[https://github.com/etrepat/baum/wiki](https://github.com/etrepat/baum/wiki)
+
+<a name="contributing"></a>
 ## Contributing
 
 Thinking of contributing? Maybe you've found some nasty bug? That's great news!
