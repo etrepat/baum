@@ -5,10 +5,12 @@
   - Properly set a model's relations when reloading an instance via `reload()`.
   - Fix `getObservableEvents()` function to include node's `moving` and `moved`
   events.
+  - Fix `reload()` to consider trashed node objects via soft-delete operations.
+  Fixes [#35].
 
 * enhancements
-  - Implement tree structure validation via `Node::isValid`.
-  - Implement tree index rebuilding via `Node::rebuild`. Very useful when a tree
+  - Implement tree *structure validation* via `Node::isValid`.
+  - Implement tree *index rebuilding* via `Node::rebuild`. Very useful when a tree
   structure has been messed up or to convert from a `parent_id` only table.
 
 ## 1.0.9

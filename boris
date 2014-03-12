@@ -49,6 +49,6 @@ $boris = new \Boris\Boris('> ');
 $boris->setInspector(new BaumNodeInspector);
 
 $boris->setLocal(array_filter(get_defined_vars(), function($var) {
-  return $var instanceof ScopedCategory; }));
+  return $var instanceof Baum\Node; }));
 
 $boris->start();

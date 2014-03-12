@@ -37,6 +37,22 @@ class BaumTest extends PHPUnit_Framework_TestCase {
       $t->integer('site_id')->unsigned()->nullable();
       $t->string('language', 3)->nullable();
     });
+
+    Capsule::schema()->dropIfExists('ranks');
+
+    Capsule::schema()->create('ranks', function($t) {
+      $t->increments('id');
+
+      $t->integer('parent_id')->nullable();
+      $t->integer('lft')->nullable();
+      $t->integer('rgt')->nullable();
+      $t->integer('depth')->nullable();
+
+      $t->string('name', 255);
+
+      $t->timestamps();
+      $t->softDeletes();
+    });
   }
 
   public function setUp() {
@@ -63,6 +79,7 @@ class BaumTest extends PHPUnit_Framework_TestCase {
   public function tearDown() {
     Capsule::table('categories')->delete();
     Capsule::table('menus')->delete();
+    Capsule::table('ranks')->delete();
 
     m::close();
   }
@@ -73,6 +90,13 @@ class BaumTest extends PHPUnit_Framework_TestCase {
 
   protected function menus($caption) {
     return Menu::where('caption', '=', $caption)->first();
+  }
+
+  protected function ranks($name, $withTrashed = false) {
+    if ( $withTrashed )
+      return Rank::withTrashed()->where('name', '=', $name)->first();
+
+    return Rank::where('name', '=', $name)->first();
   }
 
   public function testGetParentColumnName() {
@@ -211,6 +235,55 @@ class BaumTest extends PHPUnit_Framework_TestCase {
 
     $new = new Category;
     $this->assertFalse($new->isLeaf());
+  }
+
+  public function testReloadResetsChangesOnFreshNodes() {
+    $new = new Category;
+
+    $new->name = 'Some new category';
+
+    $new->reload();
+
+    $this->assertNull($new->name);
+  }
+
+  public function testReloadResetsChangesOnPersistedNodes() {
+    $node = $this->categories('Child 2.1');
+
+    $node->name = 'Better child';
+    $node->lft = 10;
+
+    $node->reload();
+
+    $this->assertEquals($this->categories('Child 2.1'), $node);
+  }
+
+  public function testReloadResetsChangesOnDeletedNodes() {
+    $node = $this->categories('Child 2.1');
+
+    $node->delete();
+
+    $this->assertNull($this->categories('Child 2.1'));
+
+    $node->name = 'Some other name';
+    $node->reload();
+
+    $this->assertEquals('Child 2.1', $node->name);
+  }
+
+  /**
+   * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
+   */
+  public function testReloadThrowsExceptionIfNodeCannotBeLocated() {
+    $node = $this->categories('Child 2');
+
+    $node->delete();
+
+    $this->assertFalse($node->exists);
+
+    // Fake persisted state & reload
+    $node->exists = true;
+    $node->reload();
   }
 
   public function testParentRelation() {
@@ -1219,6 +1292,20 @@ class BaumTest extends PHPUnit_Framework_TestCase {
 
     $this->assertTrue(Menu::isValid());
     $this->assertEquals($tree, Menu::query()->orderBy($root1->getKeyName())->get()->all());
+  }
+
+  public function testRebuildReloadsSoftDeletedNodes() {
+    $private = Rank::create(array('name' => 'private'));
+
+    $private->delete();
+
+    $this->assertTrue($private->trashed());
+    $this->assertFalse($private->exists);
+
+    $private->reload();
+
+    $this->assertTrue($private->trashed());
+    $this->assertTrue($private->exists);
   }
 
 }
