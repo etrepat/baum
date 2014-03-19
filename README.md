@@ -548,6 +548,11 @@ by *limited* is that the testing is still limited and the *soft delete*
 functionality is changing in the upcoming 4.2 version of the framework, so use
 this feature wisely.
 
+For now, you may consider a **safe** `restore()` operation to be one of:
+
+* Restoring a leaf node
+* Restoring a whole sub-tree in which the parent is not soft-deleted
+
 <a name="misc-utilities"></a>
 ### Misc/Utility functions
 
