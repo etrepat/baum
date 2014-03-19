@@ -16,7 +16,7 @@ abstract class Model extends BaseModel {
    * @throws ModelNotFoundException
    */
   public function reload() {
-    if ( $this->exists || ($this->softDeletesEnabled() && $this->trashed()) ) {
+    if ( $this->exists || ($this->areSoftDeletesEnabled() && $this->trashed()) ) {
       $fresh = $this->getFreshInstance();
 
       if ( is_null($fresh) )
@@ -83,7 +83,7 @@ abstract class Model extends BaseModel {
    * @return \Baum\Node
    */
   protected function getFreshInstance() {
-    if ( $this->softDeletesEnabled() )
+    if ( $this->areSoftDeletesEnabled() )
       return static::withTrashed()->find($this->getKey());
 
     return static::find($this->getKey());
@@ -94,7 +94,7 @@ abstract class Model extends BaseModel {
    *
    * @return boolean
    */
-  protected function softDeletesEnabled() {
+  public function areSoftDeletesEnabled() {
     // Soft-delete functionality in 4.2 has been moved into a trait.
     // The proper way to check if a model includes a global scope in >= 4.2
     // should look similar to the following:
@@ -107,6 +107,16 @@ abstract class Model extends BaseModel {
       (property_exists($this, 'softDelete') && $this->softDelete == true) ||
       (!property_exists($this, 'softDelete') && method_exists($this, 'getDeletedAtColumn'))
     );
+  }
+
+  /**
+   * Static method which returns wether soft delete functionality is enabled
+   * on the model.
+   *
+   * @return boolean
+   */
+  public static function softDeletesEnabled() {
+    return with(new static)->areSoftDeletesEnabled();
   }
 
 }

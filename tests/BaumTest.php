@@ -1308,4 +1308,69 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue($private->exists);
   }
 
+  public function testNodesWhichAreSoftDeletedDoNotInvalidateATree() {
+    $root1 = Rank::create(array('name' => 'Admiral'));
+
+    $child11 = Rank::create(array('name' => 'Lieutenant'));
+    $child11->makeChildOf($root1);
+
+    $child12 = Rank::create(array('name' => 'Colonel'));
+    $child12->makeChildOf($root1);
+
+    $root2 = Rank::create(array('name' => 'Sergeant'));
+
+    $child21  = Rank::create(array('name' => 'Private'));
+    $child21->makeChildOf($root2);
+
+    $child22 = Rank::create(array('name' => 'Corporate'));
+    $child22->makeChildOf($root2);
+
+    $this->assertTrue(Rank::isValid());
+
+    $child11->delete();
+
+    $this->assertTrue(Rank::isValid());
+  }
+
+  public function testSoftDeletedNodesRestoreCorrectly() {
+    $r1 = Rank::create(array('name' => 'A'));
+
+    $r2 = Rank::create(array('name' => 'B'));
+
+    $r21 = Rank::create(array('name' => 'B.1'));
+    $r21->makeChildOf($r2);
+
+    $r22 = Rank::create(array('name' => 'B.2'));
+    $r22->makeChildOf($r2);
+
+    $r221 = Rank::create(array('name' => 'B.2.1'));
+    $r221->makeChildOf($r22);
+    $r222 = Rank::create(array('name' => 'B.2.2'));
+    $r222->makeChildOf($r22);
+    $r223 = Rank::create(array('name' => 'B.2.3'));
+    $r223->makeChildOf($r22);
+
+    $r3 = Rank::create(array('name' => 'C'));
+
+    $this->assertTrue(Rank::isValid());
+
+    $r22->reload();
+    $r22->delete();
+
+    $this->assertTrue(Rank::isValid());
+
+    $r3->reload();
+    $this->assertEquals(7, $r3->getLeft());
+    $this->assertEquals(8, $r3->getRight());
+
+    $r22->reload();
+    $r22->restore();
+
+    $this->assertTrue(Rank::isValid());
+
+    $r3->reload();
+    $this->assertEquals(15, $r3->getLeft());
+    $this->assertEquals(16, $r3->getRight());
+  }
+
 }
