@@ -7,11 +7,13 @@
   events.
   - Fix `reload()` to consider trashed node objects via soft-delete operations.
   Fixes [#35].
+  - Preliminar support for soft-delete operations. Should fix [#23].
 
 * enhancements
   - Implement tree *structure validation* via `Node::isValid`.
   - Implement tree *index rebuilding* via `Node::rebuild`. Very useful when a tree
   structure has been messed up or to convert from a `parent_id` only table.
+  - Preliminar support for soft-delete operations.
 
 ## 1.0.9
 _Jan 14 2014_
