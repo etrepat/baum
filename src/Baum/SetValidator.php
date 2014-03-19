@@ -63,12 +63,12 @@ class SetValidator {
     $qualifiedRgtCol    = $grammar->wrap($this->node->getQualifiedRightColumnName());
     $qualifiedParentCol = $grammar->wrap($this->node->getQualifiedParentColumnName());
 
-    $whereStm = "$qualifiedLftCol IS NULL OR
+    $whereStm = "($qualifiedLftCol IS NULL OR
       $qualifiedRgtCol IS NULL OR
       $qualifiedLftCol >= $qualifiedRgtCol OR
       ($qualifiedParentCol IS NOT NULL AND
         ($qualifiedLftCol <= parent.$lftCol OR
-          $qualifiedRgtCol >= parent.$rgtCol))";
+          $qualifiedRgtCol >= parent.$rgtCol)))";
 
     $query = $this->node->newQuery()
       ->join($connection->raw($grammar->wrap($tableName).' AS parent'),
