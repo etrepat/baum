@@ -24,3 +24,4 @@ $capsule->setAsGlobal();
 require __DIR__.'/tests/models/Category.php';
 require __DIR__.'/tests/models/ScopedCategory.php';
 require __DIR__.'/tests/models/Menu.php';
+require __DIR__.'/tests/models/Rank.php';

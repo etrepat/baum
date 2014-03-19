@@ -222,6 +222,7 @@ to use Baum with your model. Below are some examples.
 * [Scope support](#scope-support)
 * [Validation](#validation)
 * [Tree rebuilding](#rebuilding)
+* [Soft deletes](#soft-deletes)
 * [Misc/Utility functions](#misc-utilities)
 
 <a name="creating-root-node"></a>
@@ -538,6 +539,14 @@ Simple example usage, given a `Category` node class:
 ```php
 Category::rebuild()
 ```
+
+<a name="soft-deletes"></a>
+### Soft deletes
+
+Baum comes with **limited support** for soft-delete operations. What I mean
+by *limited* is that the testing is still limited and the *soft delete*
+functionality is changing in the upcoming 4.2 version of the framework, so use
+this feature wisely.
 
 <a name="misc-utilities"></a>
 ### Misc/Utility functions

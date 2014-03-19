@@ -92,6 +92,12 @@ abstract class Node extends Model {
    *    4. "deleting": Before delete we should prune all children and update
    *    the left and right indexes for the remaining nodes.
    *
+   *    5. (optional) "restoring": Before a soft-delete node restore operation,
+   *    shift its siblings.
+   *
+   *    6. (optional) "restore": After having restored a soft-deleted node,
+   *    restore all of its descendants.
+   *
    * @return void
    */
   protected static function boot() {
@@ -113,6 +119,16 @@ abstract class Node extends Model {
     static::deleting(function($node) {
       $node->destroyDescendants();
     });
+
+    if ( static::softDeletesEnabled() ) {
+      static::restoring(function($node) {
+        $node->shiftSiblingsForRestore();
+      });
+
+      static::restored(function($node) {
+        $node->restoreDescendants();
+      });
+    }
   }
 
   /**
@@ -948,6 +964,51 @@ abstract class Node extends Model {
 
       $self->newNestedSetQuery()->where($lftCol, '>', $rgt)->decrement($lftCol, $diff);
       $self->newNestedSetQuery()->where($rgtCol, '>', $rgt)->decrement($rgtCol, $diff);
+    });
+  }
+
+  /**
+   * "Makes room" for the the current node between its siblings.
+   *
+   * @return void
+   */
+  public function shiftSiblingsForRestore() {
+    if ( is_null($this->getRight()) || is_null($this->getLeft()) ) return;
+
+    $self = $this;
+
+    $this->getConnection()->transaction(function() use ($self) {
+      $lftCol = $self->getLeftColumnName();
+      $rgtCol = $self->getRightColumnName();
+      $lft    = $self->getLeft();
+      $rgt    = $self->getRight();
+
+      $diff = $rgt - $lft + 1;
+
+      $self->newNestedSetQuery()->where($lftCol, '>=', $lft)->increment($lftCol, $diff);
+      $self->newNestedSetQuery()->where($rgtCol, '>=', $lft)->increment($rgtCol, $diff);
+    });
+  }
+
+  /**
+   * Restores all of the current node's descendants.
+   *
+   * @return void
+   */
+  public function restoreDescendants() {
+    if ( is_null($this->getRight()) || is_null($this->getLeft()) ) return;
+
+    $self = $this;
+
+    $this->getConnection()->transaction(function() use ($self) {
+      $self->newNestedSetQuery()
+        ->withTrashed()
+        ->where($self->getLeftColumnName(), '>', $self->getLeft())
+        ->where($self->getRightColumnName(), '<', $self->getRight())
+        ->update(array(
+          $self->getDeletedAtColumn() => null,
+          $self->getUpdatedAtColumn() => $self->{$self->getUpdatedAtColumn()}
+        ));
     });
   }
 
