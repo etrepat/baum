@@ -18,32 +18,39 @@ use Baum\Extensions\Eloquent\Model;
 abstract class Node extends Model {
 
   /**
-  * Column name to store the reference to parent's node.
-  *
-  * @var int
-  */
+   * Column name to store the reference to parent's node.
+   *
+   * @var string
+   */
   protected $parentColumn = 'parent_id';
 
   /**
-  * Column name for left index.
-  *
-  * @var int
-  */
+   * Column name for left index.
+   *
+   * @var string
+   */
   protected $leftColumn = 'lft';
 
   /**
-  * Column name for right index.
-  *
-  * @var int
-  */
+   * Column name for right index.
+   *
+   * @var string
+   */
   protected $rightColumn = 'rgt';
 
   /**
-  * Column name for depth field.
-  *
-  * @var int
-  */
+   * Column name for depth field.
+   *
+   * @var string
+   */
   protected $depthColumn = 'depth';
+
+  /**
+   * Column to perform the default sorting
+   *
+   * @var string
+   */
+  protected $orderColumn = null;
 
   /**
   * Guard NestedSet fields from mass-assignment.
@@ -240,6 +247,33 @@ abstract class Node extends Model {
   }
 
   /**
+   * Get the "order" field column name.
+   *
+   * @return string
+   */
+  public function getOrderColumnName() {
+    return is_null($this->orderColumn) ? $this->getLeftColumnName() : $this->orderColumn;
+  }
+
+  /**
+   * Get the table qualified "order" field column name.
+   *
+   * @return string
+   */
+  public function getQualifiedOrderColumnName() {
+    return $this->getTable() . '.' . $this->getOrderColumnName();
+  }
+
+  /**
+   * Get the model's "order" value.
+   *
+   * @return mixed
+   */
+  public function getOrder() {
+    return $this->getAttribute($this->getOrderColumnName());
+  }
+
+  /**
    * Get the column names which define our scope
    *
    * @return array
@@ -289,7 +323,7 @@ abstract class Node extends Model {
   */
   public function children() {
     return $this->hasMany(get_class($this), $this->getParentColumnName())
-                ->orderBy($this->getLeftColumnName());
+                ->orderBy($this->getOrderColumnName());
   }
 
   /**
@@ -299,7 +333,7 @@ abstract class Node extends Model {
    * @return \Illuminate\Database\Eloquent\Builder|static
    */
   public function newNestedSetQuery($excludeDeleted = true) {
-    $builder = $this->newQuery($excludeDeleted)->orderBy($this->getLeftColumnName());
+    $builder = $this->newQuery($excludeDeleted)->orderBy($this->getOrderColumnName());
 
     if ( $this->isScoped() ) {
       foreach($this->scoped as $scopeFld)
@@ -329,7 +363,7 @@ abstract class Node extends Model {
     $instance = new static;
 
     return $instance->newQuery()
-                    ->orderBy($instance->getQualifiedLeftColumnName())
+                    ->orderBy($instance->getQualifiedOrderColumnName())
                     ->get();
   }
 
@@ -352,7 +386,7 @@ abstract class Node extends Model {
 
     return $instance->newQuery()
                     ->whereNull($instance->getParentColumnName())
-                    ->orderBy($instance->getQualifiedLeftColumnName());
+                    ->orderBy($instance->getQualifiedOrderColumnName());
   }
 
   /**
@@ -371,7 +405,7 @@ abstract class Node extends Model {
 
     return $instance->newQuery()
                     ->whereRaw($rgtCol . ' - ' . $lftCol . ' = 1')
-                    ->orderBy($instance->getQualifiedLeftColumnName());
+                    ->orderBy($instance->getQualifiedOrderColumnName());
   }
 
   /**
@@ -736,7 +770,7 @@ abstract class Node extends Model {
   public function getLeftSibling() {
     return $this->siblings()
                 ->where($this->getLeftColumnName(), '<', $this->getLeft())
-                ->orderBy($this->getLeftColumnName(), 'desc')
+                ->orderBy($this->getOrderColumnName(), 'desc')
                 ->get()
                 ->last();
   }
