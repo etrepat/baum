@@ -1373,4 +1373,39 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals(16, $r3->getRight());
   }
 
+  public function testDefaultSortColumnShouldBeLft() {
+    $category = new Category;
+
+    $this->assertEquals('lft', $category->getOrderColumnName());
+  }
+
+  public function testSortColumnShouldBeWhatUserSpecifies() {
+    $category = new OrderedCategory;
+
+    $this->assertEquals('name', $category->getOrderColumnName());
+  }
+
+  public function testAllStaticRespectsSpecificedSorting() {
+    $results = Category::all();
+    $check = Category::query()->orderBy('lft')->get();
+
+    $this->assertEquals($results, $check);
+
+    $results = OrderedCategory::all();
+    $check = OrderedCategory::query()->orderBy('name')->get();
+
+    $this->assertEquals($results, $check);
+  }
+
+  public function testChildrenRespectSpecifiedOrdering() {
+    $this->categories('Child 2')->moveLeft();
+
+    $root1 = OrderedCategory::where('name', '=', 'Root 1')->first();
+
+    $children = $root1->children()->get()->all();
+
+    $this->assertEquals($children[0]->name, 'Child 1');
+    $this->assertEquals($children[1]->name, 'Child 2');
+    $this->assertEquals($children[2]->name, 'Child 3');
+  }
 }
