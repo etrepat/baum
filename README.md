@@ -217,6 +217,7 @@ to use Baum with your model. Below are some examples.
 * [Relations](#node-relations)
 * [Root and Leaf scopes](#node-basic-scopes)
 * [Accessing the ancestry/descendancy chain](#node-chains)
+* [Custom sorting column](#custom-sorting-column)
 * [Dumping the hierarchy tree](#hierarchy-tree)
 * [Model events: `moving` and `moved`](#node-model-events)
 * [Scope support](#scope-support)
@@ -407,6 +408,19 @@ $node = Category::where('name', '=', 'Books')->first();
 foreach($node->getDescendantsAndSelf() as $descendant) {
   echo "{$descendant->name}";
 }
+```
+
+<a name="custom-sorting-column"></a>
+### Custom sorting column
+
+By default in Baum all results are returned sorted by the `lft` index column
+value for consistency.
+
+If you wish to change this default behaviour you need to specify in your model
+the name of the column you wish to use to sort your results like this:
+
+```php
+protected $sortColumn = 'name';
 ```
 
 <a name="hierarchy-tree"></a>
