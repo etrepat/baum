@@ -242,6 +242,14 @@ into a *root node*:
 $node->makeRoot();
 ```
 
+You may also nullify it's `parent_id` column to accomplish the same behaviour:
+
+```php
+// This works the same as makeRoot()
+$node->parent_id = null;
+$node->save();
+```
+
 <a name="inserting-nodes"></a>
 ### Inserting nodes
 

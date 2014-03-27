@@ -8,6 +8,8 @@
   - Fix `reload()` to consider trashed node objects via soft-delete operations.
   Fixes [#35].
   - Preliminar support for soft-delete operations. Should fix [#23].
+  - Assigning `null` to the `parent_id` column value and saving the node now
+  performs the same operation as `makeRoot()`. Fixes [#54].
 
 * enhancements
   - Implement tree *structure validation* via `Node::isValid`.
