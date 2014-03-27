@@ -644,6 +644,23 @@ class BaumTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue(Category::isValid());
   }
 
+  public function testNullifyParentColumnMakesItRoot() {
+    $node = $this->categories('Child 2');
+
+    $node->parent_id = null;
+
+    $node->save();
+
+    $this->assertNull($node->parent()->first());
+    $this->assertEquals(0, $node->getLevel());
+    $this->assertEquals(7, $node->getLeft());
+    $this->assertEquals(10, $node->getRight());
+
+    $this->assertEquals(1, $this->categories('Child 2.1')->getLevel());
+
+    $this->assertTrue(Category::isValid());
+  }
+
   public function testMakeChildOf() {
     $this->categories('Child 1')->makeChildOf($this->categories('Child 3'));
 
