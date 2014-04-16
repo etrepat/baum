@@ -11,8 +11,9 @@
          syntaxCheck="false">
   <testsuites>
     <testsuite name="Baum Test Suite">
-      <file>tests/BaumTest.php</file>
-      <file>tests/QueryBuilderExtensionTest.php</file>
+      <file>tests/suite/QueryBuilderExtensionTest.php</file>
+      <file>tests/suite/NodeModelExtensionsTest.php</file>
+      <directory>tests/suite/Category</directory>
     </testsuite>
   </testsuites>
 </phpunit>

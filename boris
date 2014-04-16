@@ -4,34 +4,11 @@
 require __DIR__.'/bootstrap.php';
 
 // Prepare the DB
-require __DIR__.'/tests/BaumTest.php';
-BaumTest::setUpBeforeClass();
+with(new CategoryMigrator)->up();
+with(new ClusterMigrator)->up();
 
 // Seed the database with some data
-ScopedCategory::unguard();
-
-$root1    = ScopedCategory::create(array('id' => 1 , 'company_id' => 1, 'name' => 'Root 1'   , 'lft' => 1  , 'rgt' => 10 , 'depth' => 0));
-$child1   = ScopedCategory::create(array('id' => 2 , 'company_id' => 1, 'name' => 'Child 1'  , 'lft' => 2  , 'rgt' => 3  , 'depth' => 1, 'parent_id' => 1));
-$child2   = ScopedCategory::create(array('id' => 3 , 'company_id' => 1, 'name' => 'Child 2'  , 'lft' => 4  , 'rgt' => 7  , 'depth' => 1, 'parent_id' => 1));
-$child21  = ScopedCategory::create(array('id' => 4 , 'company_id' => 1, 'name' => 'Child 2.1', 'lft' => 5  , 'rgt' => 6  , 'depth' => 2, 'parent_id' => 3));
-$child3   = ScopedCategory::create(array('id' => 5 , 'company_id' => 1, 'name' => 'Child 3'  , 'lft' => 8  , 'rgt' => 9  , 'depth' => 1, 'parent_id' => 1));
-$root2    = ScopedCategory::create(array('id' => 6 , 'company_id' => 2, 'name' => 'Root 2'   , 'lft' => 1  , 'rgt' => 10 , 'depth' => 0));
-$child4   = ScopedCategory::create(array('id' => 7 , 'company_id' => 2, 'name' => 'Child 4'  , 'lft' => 2  , 'rgt' => 3  , 'depth' => 1, 'parent_id' => 6));
-$child5   = ScopedCategory::create(array('id' => 8 , 'company_id' => 2, 'name' => 'Child 5'  , 'lft' => 4  , 'rgt' => 7  , 'depth' => 1, 'parent_id' => 6));
-$child51  = ScopedCategory::create(array('id' => 9 , 'company_id' => 2, 'name' => 'Child 5.1', 'lft' => 5  , 'rgt' => 6  , 'depth' => 2, 'parent_id' => 8));
-$child6   = ScopedCategory::create(array('id' => 10, 'company_id' => 2, 'name' => 'Child 6'  , 'lft' => 8  , 'rgt' => 9  , 'depth' => 1, 'parent_id' => 6));
-
-ScopedCategory::reguard();
-
-$connection = $root1->getConnection();
-
-if ( $connection->getDriverName() === 'pgsql' ) {
-  $tablePrefix = $connection->getTablePrefix();
-
-  $sequenceName = $tablePrefix . 'categories_id_seq';
-
-  $connection->statement('ALTER SEQUENCE ' . $sequenceName . ' RESTART WITH 11');
-}
+// ...
 
 // Set up a custom inspector for our models
 class BaumNodeInspector extends \Boris\ColoredInspector {
@@ -43,7 +20,8 @@ class BaumNodeInspector extends \Boris\ColoredInspector {
   }
 }
 
-// Start-up boris REPL and import our nodes into the context
+// Start-up boris REPL and import any defined var (in scope) which happens to be
+// a Baum\Node instance into the context
 $boris = new \Boris\Boris('> ');
 
 $boris->setInspector(new BaumNodeInspector);

@@ -19,10 +19,18 @@ $capsule->bootEloquent();
 $capsule->setAsGlobal();
 
 /**
- * Manually load some required models
+ * Autoload required libraries
  */
-require __DIR__.'/tests/models/Category.php';
-require __DIR__.'/tests/models/OrderedCategory.php';
-require __DIR__.'/tests/models/ScopedCategory.php';
-require __DIR__.'/tests/models/Menu.php';
-require __DIR__.'/tests/models/Rank.php';
+$__autoload_paths = array('models', 'migrators', 'seeders');
+
+foreach($__autoload_paths as $path) {
+  foreach(glob(__DIR__ . "/tests/$path/*.php") as $dep) {
+    require_once $dep;
+  }
+}
+
+/**
+ * Require test helpers
+ */
+require __DIR__ . '/tests/suite/CategoryTestCase.php';
+require __DIR__ . '/tests/suite/ClusterTestCase.php';
