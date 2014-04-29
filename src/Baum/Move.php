@@ -51,13 +51,6 @@ class Move {
   protected $_boundaries = NULL;
 
   /**
-  * Memoized new parent id for the node being moved.
-  *
-  * @var int
-  */
-  protected $_parentId = NULL;
-
-  /**
    * The event dispatcher instance.
    *
    * @var \Illuminate\Events\Dispatcher
@@ -139,8 +132,8 @@ class Move {
     $connection = $this->node->getConnection();
     $grammar    = $connection->getQueryGrammar();
 
-    $currentId      = $this->node->getKey();
-    $parentId       = $this->parentId();
+    $currentId      = $this->quoteIdentifier($this->node->getKey());
+    $parentId       = $this->quoteIdentifier($this->parentId());
     $leftColumn     = $this->node->getLeftColumnName();
     $rightColumn    = $this->node->getRightColumnName();
     $parentColumn   = $this->node->getParentColumnName();
@@ -285,16 +278,10 @@ class Move {
    * @return int
    */
   protected function parentId() {
-    if ( !is_null($this->_parentId) ) return $this->_parentId;
-
-    $this->_parentId = $this->target->getParentId();
     if ( $this->position == 'child' )
-      $this->_parentId = $this->target->getKey();
+      return $this->target->getKey();
 
-    // We are probably dealing with a root node here
-    if ( is_null($this->_parentId) ) $this->_parentId = 'NULL';
-
-    return $this->_parentId;
+    return $this->target->getParentId();
   }
 
   /**
@@ -342,6 +329,23 @@ class Move {
     $method = $halt ? 'until' : 'fire';
 
     return static::$dispatcher->$method($event, $this->node);
+  }
+
+  /**
+   * Quotes an identifier for being used in a database query.
+   *
+   * @param mixed $value
+   * @return string
+   */
+  protected function quoteIdentifier($value) {
+    if ( is_null($value) )
+      return 'NULL';
+
+    $connection = $this->node->getConnection();
+
+    $pdo = $connection->getPdo();
+
+    return $pdo->quote($value);
   }
 
 }
