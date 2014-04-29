@@ -32,5 +32,6 @@ foreach($__autoload_paths as $path) {
 /**
  * Require test helpers
  */
+require __DIR__ . '/tests/suite/support.php';
 require __DIR__ . '/tests/suite/CategoryTestCase.php';
 require __DIR__ . '/tests/suite/ClusterTestCase.php';

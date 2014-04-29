@@ -422,17 +422,6 @@ class CategoryHierarchyTest extends CategoryTestCase {
 
     $this->assertTrue(Category::isValid());
 
-    // Simple function which aids in converting the tree hierarchy into something
-    // more easily testable...
-    function hmap(array $nodes) {
-      $output = array();
-
-      foreach($nodes as $node)
-        $output[$node['name']] = empty($node['children']) ? null : hmap($node['children']);
-
-      return $output;
-    }
-
     // Build expectations (expected trees/subtrees)
     $expectedWholeTree = array(
       'A' =>  array ( 'A.1' => null, 'A.2' => null ),
