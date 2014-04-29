@@ -14,6 +14,7 @@
       <file>tests/suite/QueryBuilderExtensionTest.php</file>
       <file>tests/suite/NodeModelExtensionsTest.php</file>
       <directory>tests/suite/Category</directory>
+      <directory>tests/suite/Cluster</directory>
     </testsuite>
   </testsuites>
 </phpunit>
