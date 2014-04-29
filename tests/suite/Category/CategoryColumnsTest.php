@@ -1,6 +1,6 @@
 <?php
 
-class CategoryColumsTest extends CategoryTestCase {
+class CategoryColumnsTest extends CategoryTestCase {
 
   public function testGetParentColumnName() {
     $category = new Category;
