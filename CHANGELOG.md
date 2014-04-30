@@ -10,6 +10,7 @@
   - Preliminar support for soft-delete operations. Should fix [#23].
   - Assigning `null` to the `parent_id` column value and saving the node now
   performs the same operation as `makeRoot()`. Fixes [#54].
+  - Reimplement `toHierarchy` as yielded inconsistent results, even worse with custom sorting of the collection results. Merges [#61], fixes [#63].
 
 * enhancements
   - Implement tree *structure validation* via `Node::isValid`.
@@ -18,6 +19,7 @@
   - Preliminar support for soft-delete operations.
   - Allow the user to change the default sorting column name (defaulting to `lft`).
   - Add support for non-numeric keys. Merges & fixes [#52].
+
 
 ## 1.0.9
 _Jan 14 2014_

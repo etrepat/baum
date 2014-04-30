@@ -6,29 +6,31 @@ use Illuminate\Database\Eloquent\Collection as BaseCollection;
 class Collection extends BaseCollection {
 
   public function toHierarchy() {
-    $tree = $this->items;
+    $dict = $this->getDictionary();
 
-    return new BaseCollection($this->hierarchical($tree));
+    return new BaseCollection($this->hierarchical($dict));
   }
 
-  protected function hierarchical(&$result) {
-    $new = array();
+  protected function hierarchical($result) {
+    foreach($result as $key => $node)
+      $node->setRelation('children', new BaseCollection);
 
-    if ( is_array($result) ) {
-      while( list($n, $sub) = each($result) ) {
-        $new[$sub->getKey()] = $sub;
+    $nestedKeys = array();
 
-        if ( ! $sub->isLeaf() )
-          $new[$sub->getKey()]->setRelation('children', new BaseCollection($this->hierarchical($result)));
+    foreach($result as $key => $node) {
+      $parentKey = $node->getParentId();
 
-        $next_id = key($result);
+      if ( !is_null($parentKey) && array_key_exists($parentKey, $result) ) {
+        $result[$parentKey]->children[] = $node;
 
-        if ( $next_id && $result[$next_id]->getParentId() != $sub->getParentId() )
-          return $new;
+        $nestedKeys[] = $node->getKey();
       }
     }
 
-    return $new;
+    foreach($nestedKeys as $key)
+      unset($result[$key]);
+
+    return $result;
   }
 
 }
