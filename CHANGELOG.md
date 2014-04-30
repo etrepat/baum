@@ -17,6 +17,7 @@
   structure has been messed up or to convert from a `parent_id` only table.
   - Preliminar support for soft-delete operations.
   - Allow the user to change the default sorting column name (defaulting to `lft`).
+  - Add support for non-numeric keys. Merges & fixes [#52].
 
 ## 1.0.9
 _Jan 14 2014_
