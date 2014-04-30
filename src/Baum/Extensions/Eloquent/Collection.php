@@ -16,10 +16,10 @@ class Collection extends BaseCollection {
 
     if ( is_array($result) ) {
       while( list($n, $sub) = each($result) ) {
-        $new[$sub->getKey()] = $sub;
+        $new[$n] = $sub;
 
         if ( ! $sub->isLeaf() )
-          $new[$sub->getKey()]->setRelation('children', new BaseCollection($this->hierarchical($result)));
+          $new[$n]->setRelation('children', new BaseCollection($this->hierarchical($result)));
 
         $next_id = key($result);
 
