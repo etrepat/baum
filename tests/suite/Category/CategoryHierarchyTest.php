@@ -477,6 +477,26 @@ class CategoryHierarchyTest extends CategoryTestCase {
     $this->assertTrue($this->categories('D')->getDescendants()->toHierarchy()->isEmpty());
   }
 
+  public function testToHierarchyNestsCorrectlyNotSequential() {
+    $parent = $this->categories('Child 1');
+
+    $parent->children()->create(array('name' => 'Child 1.1'));
+
+    $parent->children()->create(array('name' => 'Child 1.2'));
+
+    $this->assertTrue(Category::isValid());
+
+    $expected = array(
+      'Child 1' => array(
+        'Child 1.1' => null,
+        'Child 1.2' => null
+      )
+    );
+
+    $parent->reload();
+    $this->assertEquals($expected, hmap($parent->getDescendantsAndSelf()->toHierarchy()->toArray()));
+  }
+
   public function testGetNestedList() {
     $seperator = ' ';
     $nestedList = Category::getNestedList('name', 'id', $seperator);

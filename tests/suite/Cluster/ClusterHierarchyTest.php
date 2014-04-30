@@ -481,6 +481,26 @@ class ClusterHierarchyTest extends ClusterTestCase {
     $this->assertTrue($this->clusters('D')->getDescendants()->toHierarchy()->isEmpty());
   }
 
+  public function testToHierarchyNestsCorrectlyNotSequential() {
+    $parent = $this->clusters('Child 1');
+
+    $parent->children()->create(array('name' => 'Child 1.1'));
+
+    $parent->children()->create(array('name' => 'Child 1.2'));
+
+    $this->assertTrue(Cluster::isValid());
+
+    $expected = array(
+      'Child 1' => array(
+        'Child 1.1' => null,
+        'Child 1.2' => null
+      )
+    );
+
+    $parent->reload();
+    $this->assertEquals($expected, hmap($parent->getDescendantsAndSelf()->toHierarchy()->toArray()));
+  }
+
   public function testGetNestedList() {
     $seperator = ' ';
     $nestedList = Cluster::getNestedList('name', 'id', $seperator);
