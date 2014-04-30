@@ -501,6 +501,28 @@ class ClusterHierarchyTest extends ClusterTestCase {
     $this->assertEquals($expected, hmap($parent->getDescendantsAndSelf()->toHierarchy()->toArray()));
   }
 
+  public function testToHierarchyNestsCorrectlyWithOrder() {
+    with(new OrderedClusterSeeder)->run();
+
+    $expectedWhole = array(
+      'Root A' => null,
+      'Root Z' => array(
+        'Child A' => null,
+        'Child C' => null,
+        'Child G' => array( 'Child G.1' => null )
+      )
+    );
+    $this->assertEquals($expectedWhole, hmap(OrderedCluster::all()->toHierarchy()->toArray()));
+
+    $expectedSubtreeZ = array(
+      'Root Z' => array(
+        'Child A' => null,
+        'Child C' => null,
+        'Child G' => array( 'Child G.1' => null )
+      )
+    );
+    $this->assertEquals($expectedSubtreeZ, hmap($this->clusters('Root Z', 'OrderedCluster')->getDescendantsAndSelf()->toHierarchy()->toArray()));
+  }
   public function testGetNestedList() {
     $seperator = ' ';
     $nestedList = Cluster::getNestedList('name', 'id', $seperator);
