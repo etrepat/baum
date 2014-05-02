@@ -1,3 +1,5 @@
+## 1.0.10
+_May 2 2014_
 * bug fixes
   - Fix inserting a new model with a defined scope. Fixes [#27].
   - Static methods now do not take into account scoped column values, which
