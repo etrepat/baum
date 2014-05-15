@@ -428,7 +428,7 @@ If you wish to change this default behaviour you need to specify in your model
 the name of the column you wish to use to sort your results like this:
 
 ```php
-protected $sortColumn = 'name';
+protected $orderColumn = 'name';
 ```
 
 <a name="hierarchy-tree"></a>
