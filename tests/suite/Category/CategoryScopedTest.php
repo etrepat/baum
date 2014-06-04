@@ -224,6 +224,32 @@ class CategoryScopedTest extends CategoryTestCase {
     );
     $this->assertEquals($expected, $root2->getDescendants()->all());
   }
+  
+  public function testToHierarchyNestsCorrectlyWithScopedOrder() {
+    with(new OrderedScopedCategorySeeder)->run();
+
+    $expectedWhole1 = array(
+      'Root 1' => array(
+          'Child 1' => null,
+          'Child 2' => array (
+              'Child 2.1' => null
+          ),
+          'Child 3' => null
+      )
+    );
+    $expectedWhole2 = array(
+      'Root 2' => array(
+          'Child 4' => null,
+          'Child 5' => array (
+              'Child 5.1' => null
+          ),
+          'Child 6' => null
+      )
+    );
+
+    $this->assertEquals(json_encode($expectedWhole1), json_encode(hmap(OrderedScopedCategory::where('company_id', 1)->get()->toHierarchy()->toArray())));
+    $this->assertEquals(json_encode($expectedWhole2), json_encode(hmap(OrderedScopedCategory::where('company_id', 2)->get()->toHierarchy()->toArray())));
+  }
 
   /**
    * @expectedException Baum\MoveNotPossibleException
