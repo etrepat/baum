@@ -138,7 +138,8 @@ class NodeModelExtensionsTest extends PHPUnit_Framework_TestCase {
     $this->assertNull($query->wheres);
     $this->assertNotEmpty($query->orders);
     $this->assertEquals($category->getLeftColumnName(), $category->getOrderColumnName());
-    $this->assertEquals($category->getOrderColumnName(), $query->orders[0]['column']);
+    $this->assertEquals($category->getQualifiedLeftColumnName(), $category->getQualifiedOrderColumnName());
+    $this->assertEquals($category->getQualifiedOrderColumnName(), $query->orders[0]['column']);
   }
 
   public function testNewNestedSetQueryIsOrderedByCustom() {
@@ -149,7 +150,8 @@ class NodeModelExtensionsTest extends PHPUnit_Framework_TestCase {
     $this->assertNull($query->wheres);
     $this->assertNotEmpty($query->orders);
     $this->assertEquals('name', $category->getOrderColumnName());
-    $this->assertEquals($category->getOrderColumnName(), $query->orders[0]['column']);
+    $this->assertEquals('categories.name', $category->getQualifiedOrderColumnName());
+    $this->assertEquals($category->getQualifiedOrderColumnName(), $query->orders[0]['column']);
   }
 
   public function testNewNestedSetQueryIncludesScopedColumns() {
