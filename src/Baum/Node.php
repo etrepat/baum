@@ -333,7 +333,7 @@ abstract class Node extends Model {
    * @return \Illuminate\Database\Eloquent\Builder|static
    */
   public function newNestedSetQuery($excludeDeleted = true) {
-    $builder = $this->newQuery($excludeDeleted)->orderBy($this->getOrderColumnName());
+    $builder = $this->newQuery($excludeDeleted)->orderBy($this->getQualifiedOrderColumnName());
 
     if ( $this->isScoped() ) {
       foreach($this->scoped as $scopeFld)
