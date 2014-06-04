@@ -312,7 +312,6 @@ class CategoryMovementTest extends CategoryTestCase {
     $this->assertEquals(9, $this->categories('Child 2.1')->getRight());
   }
 
-
   /**
    * @expectedException Baum\MoveNotPossibleException
    */
