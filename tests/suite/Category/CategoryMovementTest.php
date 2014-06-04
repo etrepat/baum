@@ -176,6 +176,143 @@ class CategoryMovementTest extends CategoryTestCase {
     $this->assertEquals(9, $this->categories('Child 2.1')->getRight());
   }
 
+  public function testMakeFirstChildOf() {
+    $this->categories('Child 1')->makeFirstChildOf($this->categories('Child 3'));
+
+    $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->parent()->first());
+
+    $this->assertTrue(Category::isValid());
+  }
+
+  public function testMakeFirstChildOfAppendsAtTheBeginning() {
+    $newChild = Category::create(array('name' => 'Child 4'));
+
+    $newChild->makeFirstChildOf($this->categories('Root 1'));
+
+    $lastChild = $this->categories('Root 1')->children()->get()->first();
+    $this->assertEquals($newChild, $lastChild);
+
+    $this->assertTrue(Category::isValid());
+  }
+
+  public function testMakeFirstChildOfMovesWithSubtree() {
+    $this->categories('Child 2')->makeFirstChildOf($this->categories('Child 1'));
+
+    $this->assertTrue(Category::isValid());
+
+    $this->assertEquals($this->categories('Child 1')->getKey(), $this->categories('Child 2')->getParentId());
+
+    $this->assertEquals(3, $this->categories('Child 2')->getLeft());
+    $this->assertEquals(6, $this->categories('Child 2')->getRight());
+
+    $this->assertEquals(2, $this->categories('Child 1')->getLeft());
+    $this->assertEquals(7, $this->categories('Child 1')->getRight());
+  }
+
+  public function testMakeFirstChildOfSwappingRoots() {
+    $newRoot = Category::create(array('name' => 'Root 3'));
+
+    $this->assertEquals(13, $newRoot->getLeft());
+    $this->assertEquals(14, $newRoot->getRight());
+
+    $this->categories('Root 2')->makeFirstChildOf($newRoot);
+
+    $this->assertTrue(Category::isValid());
+
+    $this->assertEquals($newRoot->getKey(), $this->categories('Root 2')->getParentId());
+
+    $this->assertEquals(12, $this->categories('Root 2')->getLeft());
+    $this->assertEquals(13, $this->categories('Root 2')->getRight());
+
+    $this->assertEquals(11, $newRoot->getLeft());
+    $this->assertEquals(14, $newRoot->getRight());
+  }
+
+  public function testMakeFirstChildOfSwappingRootsWithSubtrees() {
+    $newRoot = Category::create(array('name' => 'Root 3'));
+
+    $this->categories('Root 1')->makeFirstChildOf($newRoot);
+
+    $this->assertTrue(Category::isValid());
+
+    $this->assertEquals($newRoot->getKey(), $this->categories('Root 1')->getParentId());
+
+    $this->assertEquals(4, $this->categories('Root 1')->getLeft());
+    $this->assertEquals(13, $this->categories('Root 1')->getRight());
+
+    $this->assertEquals(8, $this->categories('Child 2.1')->getLeft());
+    $this->assertEquals(9, $this->categories('Child 2.1')->getRight());
+  }
+
+  public function testMakeLastChildOf() {
+    $this->categories('Child 1')->makeLastChildOf($this->categories('Child 3'));
+
+    $this->assertEquals($this->categories('Child 3'), $this->categories('Child 1')->parent()->first());
+
+    $this->assertTrue(Category::isValid());
+  }
+
+  public function testMakeLastChildOfAppendsAtTheEnd() {
+    $newChild = Category::create(array('name' => 'Child 4'));
+
+    $newChild->makeLastChildOf($this->categories('Root 1'));
+
+    $lastChild = $this->categories('Root 1')->children()->get()->last();
+    $this->assertEquals($newChild, $lastChild);
+
+    $this->assertTrue(Category::isValid());
+  }
+
+  public function testMakeLastChildOfMovesWithSubtree() {
+    $this->categories('Child 2')->makeLastChildOf($this->categories('Child 1'));
+
+    $this->assertTrue(Category::isValid());
+
+    $this->assertEquals($this->categories('Child 1')->getKey(), $this->categories('Child 2')->getParentId());
+
+    $this->assertEquals(3, $this->categories('Child 2')->getLeft());
+    $this->assertEquals(6, $this->categories('Child 2')->getRight());
+
+    $this->assertEquals(2, $this->categories('Child 1')->getLeft());
+    $this->assertEquals(7, $this->categories('Child 1')->getRight());
+  }
+
+  public function testMakeLastChildOfSwappingRoots() {
+    $newRoot = Category::create(array('name' => 'Root 3'));
+
+    $this->assertEquals(13, $newRoot->getLeft());
+    $this->assertEquals(14, $newRoot->getRight());
+
+    $this->categories('Root 2')->makeLastChildOf($newRoot);
+
+    $this->assertTrue(Category::isValid());
+
+    $this->assertEquals($newRoot->getKey(), $this->categories('Root 2')->getParentId());
+
+    $this->assertEquals(12, $this->categories('Root 2')->getLeft());
+    $this->assertEquals(13, $this->categories('Root 2')->getRight());
+
+    $this->assertEquals(11, $newRoot->getLeft());
+    $this->assertEquals(14, $newRoot->getRight());
+  }
+
+  public function testMakeLastChildOfSwappingRootsWithSubtrees() {
+    $newRoot = Category::create(array('name' => 'Root 3'));
+
+    $this->categories('Root 1')->makeLastChildOf($newRoot);
+
+    $this->assertTrue(Category::isValid());
+
+    $this->assertEquals($newRoot->getKey(), $this->categories('Root 1')->getParentId());
+
+    $this->assertEquals(4, $this->categories('Root 1')->getLeft());
+    $this->assertEquals(13, $this->categories('Root 1')->getRight());
+
+    $this->assertEquals(8, $this->categories('Child 2.1')->getLeft());
+    $this->assertEquals(9, $this->categories('Child 2.1')->getRight());
+  }
+
+
   /**
    * @expectedException Baum\MoveNotPossibleException
    */
