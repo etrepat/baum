@@ -217,6 +217,7 @@ to use Baum with your model. Below are some examples.
 * [Relations](#node-relations)
 * [Root and Leaf scopes](#node-basic-scopes)
 * [Accessing the ancestry/descendancy chain](#node-chains)
+* [Limiting levels of children returned](#limiting-depth)
 * [Custom sorting column](#custom-sorting-column)
 * [Dumping the hierarchy tree](#hierarchy-tree)
 * [Model events: `moving` and `moved`](#node-model-events)
@@ -418,6 +419,34 @@ $node = Category::where('name', '=', 'Books')->first();
 foreach($node->getDescendantsAndSelf() as $descendant) {
   echo "{$descendant->name}";
 }
+```
+
+<a name="limiting-depth"></a>
+### Limiting the levels of children returned
+
+In some situations where the hierarchy depth is huge it might be desirable to limit the number of levels of children returned (depth). You can do this in Baum by using the `limitDepth` query scope.
+
+The following snippet will get the current node's descendants up to a maximum
+of 5 depth levels below it:
+
+```php
+$node->descendants()->limitDepth(5)->get();
+```
+
+Similarly, you can limit the descendancy levels with both the `getDescendants` and `getDescendantsAndSelf` methods by supplying the desired depth limit as the first argument:
+
+```php
+// This will work without depth limiting
+// 1. As usual
+$node->getDescendants();
+// 2. Selecting only some attributes
+$other->getDescendants(array('id', 'parent_id', 'name'));
+...
+// With depth limiting
+// 1. A maximum of 5 levels of children will be returned
+$node->getDescendants(5);
+// 2. A max. of 5 levels of children will be returned selecting only some attrs
+$other->getDescendants(5, array('id', 'parent_id', 'name'));
 ```
 
 <a name="custom-sorting-column"></a>

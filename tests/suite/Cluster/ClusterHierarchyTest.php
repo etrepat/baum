@@ -146,6 +146,23 @@ class ClusterHierarchyTest extends ClusterTestCase {
     $this->assertEquals($expected, $child->ancestorsAndSelf()->withoutRoot()->get()->all());
   }
 
+  public function testLimitDepthScope() {
+    with(new ClusterSeeder)->nestUptoAt($this->clusters('Child 2.1'), 10);
+
+    $node = $this->clusters('Child 2');
+
+    $descendancy = $node->descendants()->lists('id');
+
+    $this->assertEmpty($node->descendants()->limitDepth(0)->lists('id'));
+    $this->assertEquals($node, $node->descendantsAndSelf()->limitDepth(0)->first());
+
+    $this->assertEquals(array_slice($descendancy, 0, 3), $node->descendants()->limitDepth(3)->lists('id'));
+    $this->assertEquals(array_slice($descendancy, 0, 5), $node->descendants()->limitDepth(5)->lists('id'));
+    $this->assertEquals(array_slice($descendancy, 0, 7), $node->descendants()->limitDepth(7)->lists('id'));
+
+    $this->assertEquals($descendancy, $node->descendants()->limitDepth(1000)->lists('id'));
+  }
+
   public function testGetAncestorsAndSelf() {
     $child = $this->clusters('Child 2.1');
 
@@ -194,6 +211,59 @@ class ClusterHierarchyTest extends ClusterTestCase {
     $this->assertEquals($expected, $parent->getDescendantsAndSelf()->all());
   }
 
+  public function testGetDescendantsAndSelfWithLimit() {
+    with(new ClusterSeeder)->nestUptoAt($this->clusters('Child 2.1'), 3);
+
+    $parent = $this->clusters('Root 1');
+
+    $this->assertEquals(array($parent), $parent->getDescendantsAndSelf(0)->all());
+
+    $this->assertEquals(array(
+      $parent,
+      $this->clusters('Child 1'),
+      $this->clusters('Child 2'),
+      $this->clusters('Child 3')
+    ), $parent->getDescendantsAndSelf(1)->all());
+
+    $this->assertEquals(array(
+      $parent,
+      $this->clusters('Child 1'),
+      $this->clusters('Child 2'),
+      $this->clusters('Child 2.1'),
+      $this->clusters('Child 3')
+    ), $parent->getDescendantsAndSelf(2)->all());
+
+    $this->assertEquals(array(
+      $parent,
+      $this->clusters('Child 1'),
+      $this->clusters('Child 2'),
+      $this->clusters('Child 2.1'),
+      $this->clusters('Child 2.1.1'),
+      $this->clusters('Child 3')
+    ), $parent->getDescendantsAndSelf(3)->all());
+
+    $this->assertEquals(array(
+      $parent,
+      $this->clusters('Child 1'),
+      $this->clusters('Child 2'),
+      $this->clusters('Child 2.1'),
+      $this->clusters('Child 2.1.1'),
+      $this->clusters('Child 2.1.1.1'),
+      $this->clusters('Child 3')
+    ), $parent->getDescendantsAndSelf(4)->all());
+
+    $this->assertEquals(array(
+      $parent,
+      $this->clusters('Child 1'),
+      $this->clusters('Child 2'),
+      $this->clusters('Child 2.1'),
+      $this->clusters('Child 2.1.1'),
+      $this->clusters('Child 2.1.1.1'),
+      $this->clusters('Child 2.1.1.1.1'),
+      $this->clusters('Child 3')
+    ), $parent->getDescendantsAndSelf(10)->all());
+  }
+
   public function testGetDescendants() {
     $parent = $this->clusters('Root 1');
 
@@ -207,6 +277,64 @@ class ClusterHierarchyTest extends ClusterTestCase {
     $this->assertCount(count($expected), $parent->getDescendants());
 
     $this->assertEquals($expected, $parent->getDescendants()->all());
+  }
+
+  public function testGetDescendantsWithLimit() {
+    with(new ClusterSeeder)->nestUptoAt($this->clusters('Child 2.1'), 3);
+
+    $parent = $this->clusters('Root 1');
+
+    $this->assertEmpty($parent->getDescendants(0)->all());
+
+    $this->assertEquals(array(
+      $this->clusters('Child 1'),
+      $this->clusters('Child 2'),
+      $this->clusters('Child 3')
+    ), $parent->getDescendants(1)->all());
+
+    $this->assertEquals(array(
+      $this->clusters('Child 1'),
+      $this->clusters('Child 2'),
+      $this->clusters('Child 2.1'),
+      $this->clusters('Child 3')
+    ), $parent->getDescendants(2)->all());
+
+    $this->assertEquals(array(
+      $this->clusters('Child 1'),
+      $this->clusters('Child 2'),
+      $this->clusters('Child 2.1'),
+      $this->clusters('Child 2.1.1'),
+      $this->clusters('Child 3')
+    ), $parent->getDescendants(3)->all());
+
+    $this->assertEquals(array(
+      $this->clusters('Child 1'),
+      $this->clusters('Child 2'),
+      $this->clusters('Child 2.1'),
+      $this->clusters('Child 2.1.1'),
+      $this->clusters('Child 2.1.1.1'),
+      $this->clusters('Child 3')
+    ), $parent->getDescendants(4)->all());
+
+    $this->assertEquals(array(
+      $this->clusters('Child 1'),
+      $this->clusters('Child 2'),
+      $this->clusters('Child 2.1'),
+      $this->clusters('Child 2.1.1'),
+      $this->clusters('Child 2.1.1.1'),
+      $this->clusters('Child 2.1.1.1.1'),
+      $this->clusters('Child 3')
+    ), $parent->getDescendants(5)->all());
+
+    $this->assertEquals(array(
+      $this->clusters('Child 1'),
+      $this->clusters('Child 2'),
+      $this->clusters('Child 2.1'),
+      $this->clusters('Child 2.1.1'),
+      $this->clusters('Child 2.1.1.1'),
+      $this->clusters('Child 2.1.1.1.1'),
+      $this->clusters('Child 3')
+    ), $parent->getDescendants(10)->all());
   }
 
   public function testDescendantsRecursesChildren() {

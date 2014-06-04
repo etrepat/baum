@@ -27,6 +27,13 @@ class CategorySeeder {
     }
   }
 
+  public function nestUptoAt($node, $levels=10, $attrs=array()) {
+    for($i=0; $i < $levels; $i++, $node=$new) {
+      $new = Category::create(array_merge($attrs, array('name' => "{$node->name}.1")));
+      $new->makeChildOf($node);
+    }
+  }
+
 }
 
 class ScopedCategorySeeder {

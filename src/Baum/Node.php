@@ -460,6 +460,20 @@ abstract class Node extends Model {
   }
 
   /**
+   * Provides a depth level limit for the query.
+   *
+   * @param   query   \Illuminate\Database\Query\Builder
+   * @param   limit   integer
+   * @return  \Illuminate\Database\Query\Builder
+   */
+  public function scopeLimitDepth($query, $limit) {
+    $depth  = $this->exists ? $this->getDepth() : $this->getLevel();
+    $max    = $depth + $limit;
+
+    return $query->whereBetween($this->getDepthColumnName(), array($depth, $max));
+  }
+
+  /**
    * Returns true if this is a root node.
    *
    * @return boolean
@@ -652,7 +666,15 @@ abstract class Node extends Model {
    * @return \Illuminate\Database\Eloquent\Collection
    */
   public function getDescendantsAndSelf($columns = array('*')) {
-    return $this->descendantsAndSelf()->get($columns);
+    if ( is_array($columns) )
+      return $this->descendantsAndSelf()->get($columns);
+
+    $arguments = func_get_args();
+
+    $limit    = intval(array_shift($arguments));
+    $columns  = array_shift($arguments) ?: array('*');
+
+    return $this->descendantsAndSelf()->limitDepth($limit)->get($columns);
   }
 
   /**
@@ -671,7 +693,15 @@ abstract class Node extends Model {
    * @return \Illuminate\Database\Eloquent\Collection
    */
   public function getDescendants($columns = array('*')) {
-    return $this->descendants()->get($columns);
+    if ( is_array($columns) )
+      return $this->descendants()->get($columns);
+
+    $arguments = func_get_args();
+
+    $limit    = intval(array_shift($arguments));
+    $columns  = array_shift($arguments) ?: array('*');
+
+    return $this->descendants()->limitDepth($limit)->get($columns);
   }
 
   /**
