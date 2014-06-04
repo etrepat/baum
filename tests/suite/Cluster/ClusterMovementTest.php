@@ -176,6 +176,142 @@ class ClusterMovementTest extends ClusterTestCase {
     $this->assertEquals(9, $this->clusters('Child 2.1')->getRight());
   }
 
+  public function testMakeFirstChildOf() {
+    $this->clusters('Child 1')->makeFirstChildOf($this->clusters('Child 3'));
+
+    $this->assertEquals($this->clusters('Child 3'), $this->clusters('Child 1')->parent()->first());
+
+    $this->assertTrue(Cluster::isValid());
+  }
+
+  public function testMakeFirstChildOfAppendsAtTheBeginning() {
+    $newChild = Cluster::create(array('name' => 'Child 4'));
+
+    $newChild->makeFirstChildOf($this->clusters('Root 1'));
+
+    $lastChild = $this->clusters('Root 1')->children()->get()->first();
+    $this->assertEquals($newChild, $lastChild);
+
+    $this->assertTrue(Cluster::isValid());
+  }
+
+  public function testMakeFirstChildOfMovesWithSubtree() {
+    $this->clusters('Child 2')->makeFirstChildOf($this->clusters('Child 1'));
+
+    $this->assertTrue(Cluster::isValid());
+
+    $this->assertEquals($this->clusters('Child 1')->getKey(), $this->clusters('Child 2')->getParentId());
+
+    $this->assertEquals(3, $this->clusters('Child 2')->getLeft());
+    $this->assertEquals(6, $this->clusters('Child 2')->getRight());
+
+    $this->assertEquals(2, $this->clusters('Child 1')->getLeft());
+    $this->assertEquals(7, $this->clusters('Child 1')->getRight());
+  }
+
+  public function testMakeFirstChildOfSwappingRoots() {
+    $newRoot = Cluster::create(array('name' => 'Root 3'));
+
+    $this->assertEquals(13, $newRoot->getLeft());
+    $this->assertEquals(14, $newRoot->getRight());
+
+    $this->clusters('Root 2')->makeFirstChildOf($newRoot);
+
+    $this->assertTrue(Cluster::isValid());
+
+    $this->assertEquals($newRoot->getKey(), $this->clusters('Root 2')->getParentId());
+
+    $this->assertEquals(12, $this->clusters('Root 2')->getLeft());
+    $this->assertEquals(13, $this->clusters('Root 2')->getRight());
+
+    $this->assertEquals(11, $newRoot->getLeft());
+    $this->assertEquals(14, $newRoot->getRight());
+  }
+
+  public function testMakeFirstChildOfSwappingRootsWithSubtrees() {
+    $newRoot = Cluster::create(array('name' => 'Root 3'));
+
+    $this->clusters('Root 1')->makeFirstChildOf($newRoot);
+
+    $this->assertTrue(Cluster::isValid());
+
+    $this->assertEquals($newRoot->getKey(), $this->clusters('Root 1')->getParentId());
+
+    $this->assertEquals(4, $this->clusters('Root 1')->getLeft());
+    $this->assertEquals(13, $this->clusters('Root 1')->getRight());
+
+    $this->assertEquals(8, $this->clusters('Child 2.1')->getLeft());
+    $this->assertEquals(9, $this->clusters('Child 2.1')->getRight());
+  }
+
+  public function testMakeLastChildOf() {
+    $this->clusters('Child 1')->makeLastChildOf($this->clusters('Child 3'));
+
+    $this->assertEquals($this->clusters('Child 3'), $this->clusters('Child 1')->parent()->first());
+
+    $this->assertTrue(Cluster::isValid());
+  }
+
+  public function testMakeLastChildOfAppendsAtTheEnd() {
+    $newChild = Cluster::create(array('name' => 'Child 4'));
+
+    $newChild->makeLastChildOf($this->clusters('Root 1'));
+
+    $lastChild = $this->clusters('Root 1')->children()->get()->last();
+    $this->assertEquals($newChild, $lastChild);
+
+    $this->assertTrue(Cluster::isValid());
+  }
+
+  public function testMakeLastChildOfMovesWithSubtree() {
+    $this->clusters('Child 2')->makeLastChildOf($this->clusters('Child 1'));
+
+    $this->assertTrue(Cluster::isValid());
+
+    $this->assertEquals($this->clusters('Child 1')->getKey(), $this->clusters('Child 2')->getParentId());
+
+    $this->assertEquals(3, $this->clusters('Child 2')->getLeft());
+    $this->assertEquals(6, $this->clusters('Child 2')->getRight());
+
+    $this->assertEquals(2, $this->clusters('Child 1')->getLeft());
+    $this->assertEquals(7, $this->clusters('Child 1')->getRight());
+  }
+
+  public function testMakeLastChildOfSwappingRoots() {
+    $newRoot = Cluster::create(array('name' => 'Root 3'));
+
+    $this->assertEquals(13, $newRoot->getLeft());
+    $this->assertEquals(14, $newRoot->getRight());
+
+    $this->clusters('Root 2')->makeLastChildOf($newRoot);
+
+    $this->assertTrue(Cluster::isValid());
+
+    $this->assertEquals($newRoot->getKey(), $this->clusters('Root 2')->getParentId());
+
+    $this->assertEquals(12, $this->clusters('Root 2')->getLeft());
+    $this->assertEquals(13, $this->clusters('Root 2')->getRight());
+
+    $this->assertEquals(11, $newRoot->getLeft());
+    $this->assertEquals(14, $newRoot->getRight());
+  }
+
+  public function testMakeLastChildOfSwappingRootsWithSubtrees() {
+    $newRoot = Cluster::create(array('name' => 'Root 3'));
+
+    $this->clusters('Root 1')->makeLastChildOf($newRoot);
+
+    $this->assertTrue(Cluster::isValid());
+
+    $this->assertEquals($newRoot->getKey(), $this->clusters('Root 1')->getParentId());
+
+    $this->assertEquals(4, $this->clusters('Root 1')->getLeft());
+    $this->assertEquals(13, $this->clusters('Root 1')->getRight());
+
+    $this->assertEquals(8, $this->clusters('Child 2.1')->getLeft());
+    $this->assertEquals(9, $this->clusters('Child 2.1')->getRight());
+  }
+
   /**
    * @expectedException Baum\MoveNotPossibleException
    */

@@ -295,6 +295,8 @@ Baum provides several methods for moving nodes around:
 * `makeSiblingOf($otherNode)`: Alias for `makeNextSiblingOf`.
 * `makePreviousSiblingOf($otherNode)`: Alias for `moveToLeftOf`.
 * `makeChildOf($otherNode)`: Make the node a child of ...
+* `makeFirstChildOf($otherNode)`: Make the node the first child of ...
+* `makeLastChildOf($otherNode)`: Alias for `makeChildOf`.
 * `makeRoot()`: Make current node a root node.
 
 For example:

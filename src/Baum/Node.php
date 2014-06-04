@@ -859,6 +859,27 @@ abstract class Node extends Model {
   }
 
   /**
+   * Make the node the first child of ...
+   *
+   * @return \Baum\Node
+   */
+  public function makeFirstChildOf($node) {
+    if ( $node->children()->count() == 0 )
+      return $this->makeChildOf($node);
+
+    return $this->moveToLeftOf($node->children()->first());
+  }
+
+  /**
+   * Make the node the last child of ...
+   *
+   * @return \Baum\Node
+   */
+  public function makeLastChildOf($node) {
+    return $this->makeChildOf($node);
+  }
+
+  /**
    * Make current node a root node.
    *
    * @return \Baum\Node
