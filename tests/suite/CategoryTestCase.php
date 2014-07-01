@@ -1,6 +1,6 @@
 <?php
 
-class CategoryTestCase extends PHPUnit_Framework_TestCase {
+class CategoryTestCase extends BaumTestCase {
 
   public static function setUpBeforeClass() {
     with(new CategoryMigrator)->up();
