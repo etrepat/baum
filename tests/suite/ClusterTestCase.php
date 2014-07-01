@@ -1,6 +1,6 @@
 <?php
 
-class ClusterTestCase extends PHPUnit_Framework_TestCase {
+class ClusterTestCase extends BaumTestCase {
 
   public static function setUpBeforeClass() {
     with(new ClusterMigrator)->up();

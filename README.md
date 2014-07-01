@@ -225,6 +225,7 @@ to use Baum with your model. Below are some examples.
 * [Validation](#validation)
 * [Tree rebuilding](#rebuilding)
 * [Soft deletes](#soft-deletes)
+* [Seeding/Mass assignment](#seeding)
 * [Misc/Utility functions](#misc-utilities)
 
 <a name="creating-root-node"></a>
@@ -605,6 +606,124 @@ For now, you may consider a **safe** `restore()` operation to be one of:
 
 * Restoring a leaf node
 * Restoring a whole sub-tree in which the parent is not soft-deleted
+
+<a name="seeding"></a>
+### Seeding/Mass-assignment
+
+Because Nested Set structures usually involve a number of method calls to build a hierarchy structure (which result in several database queries), Baum provides two convenient methods which will map the supplied array of node attributes and create a hierarchy tree from them:
+
+* `buildTree($nodeList)`: (static method) Maps the supplied array of node attributes into the database.
+* `makeTree($nodeList)`: (instance method) Maps the supplied array of node attributes into the database using the current node instance as the parent for the provided subtree.
+
+Both methods will *create* new nodes when the primary key is not supplied, *update* or *create* if it is, and *delete* all nodes which are not present in the *affecting scope*. Understand that the *affecting scope* for the `buildTree` static method is the whole nested set tree and for the `makeTree` instance method are all of the current node's descendants.
+
+For example, imagine we wanted to map the following category hierarchy into our database:
+
+- TV & Home Theater
+- Tablets & E-Readers
+- Computers
+  + Laptops
+    * PC Laptops
+    * Macbooks (Air/Pro)
+  + Desktops
+  + Monitors
+- Cell Phones
+
+This could be easily accomplished with the following code:
+
+```php
+$categories = [
+  ['id' => 1, 'name' => 'TV & Home Theather'],
+  ['id' => 2, 'name' => 'Tablets & E-Readers'],
+  ['id' => 3, 'name' => 'Computers', 'children' => [
+    ['id' => 4, 'name' => 'Laptops', 'children' => [
+      ['id' => 5, 'name' => 'PC Laptops'],
+      ['id' => 6, 'name' => 'Macbooks (Air/Pro)']
+    ]],
+    ['id' => 7, 'name' => 'Desktops'],
+    ['id' => 8, 'name' => 'Monitors']
+  ]],
+  ['id' => 9, 'name' => 'Cell Phones']
+];
+
+Category::buildTree($categories) // => true
+```
+
+After that, we may just update the hierarchy as needed:
+
+```php
+$categories = [
+  ['id' => 1, 'name' => 'TV & Home Theather'],
+  ['id' => 2, 'name' => 'Tablets & E-Readers'],
+  ['id' => 3, 'name' => 'Computers', 'children' => [
+    ['id' => 4, 'name' => 'Laptops', 'children' => [
+      ['id' => 5, 'name' => 'PC Laptops'],
+      ['id' => 6, 'name' => 'Macbooks (Air/Pro)']
+    ]],
+    ['id' => 7, 'name' => 'Desktops', 'children' => [
+      // These will be created
+      ['name' => 'Towers Only'],
+      ['name' => 'Desktop Packages'],
+      ['name' => 'All-in-One Computers'],
+      ['name' => 'Gaming Desktops']
+    ]]
+    // This one, as it's not present, will be deleted
+    // ['id' => 8, 'name' => 'Monitors'],
+  ]],
+  ['id' => 9, 'name' => 'Cell Phones']
+];
+
+Category::buildTree($categories); // => true
+```
+
+The `makeTree` instance method works in a similar fashion. The only difference
+is that it will only perform operations on the *descendants* of the calling node instance.
+
+So now imagine we already have the following hierarchy in the database:
+
+- Electronics
+- Health Fitness & Beaty
+- Small Appliances
+- Major Appliances
+
+If we execute the following code:
+
+```php
+$children = [
+  ['name' => 'TV & Home Theather'],
+  ['name' => 'Tablets & E-Readers'],
+  ['name' => 'Computers', 'children' => [
+    ['name' => 'Laptops', 'children' => [
+      ['name' => 'PC Laptops'],
+      ['name' => 'Macbooks (Air/Pro)']
+    ]],
+    ['name' => 'Desktops'],
+    ['name' => 'Monitors']
+  ]],
+  ['name' => 'Cell Phones']
+];
+
+$electronics = Category::where('name', '=', 'Electronics')->first();
+$electronics->makeTree($children); // => true
+```
+
+Would result in:
+
+- Electronics
+  + TV & Home Theater
+  + Tablets & E-Readers
+  + Computers
+    * Laptops
+      - PC Laptops
+      - Macbooks (Air/Pro)
+    * Desktops
+    * Monitors
+  + Cell Phones
+- Health Fitness & Beaty
+- Small Appliances
+- Major Appliances
+
+Updating and deleting nodes from the subtree works the same way.
 
 <a name="misc-utilities"></a>
 ### Misc/Utility functions
