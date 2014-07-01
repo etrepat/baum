@@ -1,3 +1,14 @@
+* bug fixes
+  - Target Laravel stable version in `composer.json` file. Merges [#67].
+  - Use qualified order column name on `newNestedSetQuery` method. Merges [#70].
+  - Cleaned up migration stub. Merges [#84].
+
+* enhancements
+  - [#77] Add `makeFirstChildOf` and `makeLastChildOf` helper methods.
+  - [#62] Implement `limitDepth` query scope to allow query depth limiting for huge descendancy chains. Also allow to pass the depth limit as the first parameter of `getDescendants` and `getDescendantsAndSelf`.
+  - [#67] Should work with Laravel 4.2
+  - [#68] Implement `buildTree`, `makeTree` mass-assignment (seeding) methods.
+
 ## 1.0.10
 _May 2 2014_
 * bug fixes
