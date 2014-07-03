@@ -2,6 +2,7 @@
   - Target Laravel stable version in `composer.json` file. Merges [#67].
   - Use qualified order column name on `newNestedSetQuery` method. Merges [#70].
   - Cleaned up migration stub. Merges [#84].
+  - Enforce sorting for `$orderColumn` when calling `toHierarchy`. Merges [#73], fixing [#71].
 
 * enhancements
   - [#77] Add `makeFirstChildOf` and `makeLastChildOf` helper methods.
