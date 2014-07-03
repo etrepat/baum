@@ -1,3 +1,5 @@
+## 1.0.11
+_Jul 3 2014_
 * bug fixes
   - Target Laravel stable version in `composer.json` file. Merges [#67].
   - Use qualified order column name on `newNestedSetQuery` method. Merges [#70].
