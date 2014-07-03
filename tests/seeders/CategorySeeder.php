@@ -134,3 +134,34 @@ class OrderedCategorySeeder {
   }
 
 }
+
+class OrderedScopedCategorySeeder {
+
+  public function run() {
+    DB::table('categories')->delete();
+
+    OrderedScopedCategory::unguard();
+
+    OrderedScopedCategory::create(array('id' => 1 , 'company_id' => 1, 'name' => 'Root 1'   , 'lft' => 1  , 'rgt' => 10 , 'depth' => 0));
+    OrderedScopedCategory::create(array('id' => 2 , 'company_id' => 1, 'name' => 'Child 3'  , 'lft' => 8  , 'rgt' => 9  , 'depth' => 1, 'parent_id' => 1));
+    OrderedScopedCategory::create(array('id' => 3 , 'company_id' => 1, 'name' => 'Child 2'  , 'lft' => 4  , 'rgt' => 7  , 'depth' => 1, 'parent_id' => 1));
+    OrderedScopedCategory::create(array('id' => 4 , 'company_id' => 1, 'name' => 'Child 2.1', 'lft' => 5  , 'rgt' => 6  , 'depth' => 2, 'parent_id' => 3));
+    OrderedScopedCategory::create(array('id' => 5 , 'company_id' => 1, 'name' => 'Child 1'  , 'lft' => 2  , 'rgt' => 3  , 'depth' => 1, 'parent_id' => 1));
+    OrderedScopedCategory::create(array('id' => 6 , 'company_id' => 2, 'name' => 'Root 2'   , 'lft' => 1  , 'rgt' => 10 , 'depth' => 0));
+    OrderedScopedCategory::create(array('id' => 7 , 'company_id' => 2, 'name' => 'Child 4'  , 'lft' => 2  , 'rgt' => 3  , 'depth' => 1, 'parent_id' => 6));
+    OrderedScopedCategory::create(array('id' => 8 , 'company_id' => 2, 'name' => 'Child 5'  , 'lft' => 4  , 'rgt' => 7  , 'depth' => 1, 'parent_id' => 6));
+    OrderedScopedCategory::create(array('id' => 9 , 'company_id' => 2, 'name' => 'Child 5.1', 'lft' => 5  , 'rgt' => 6  , 'depth' => 2, 'parent_id' => 8));
+    OrderedScopedCategory::create(array('id' => 10, 'company_id' => 2, 'name' => 'Child 6'  , 'lft' => 8  , 'rgt' => 9  , 'depth' => 1, 'parent_id' => 6));
+
+    OrderedScopedCategory::reguard();
+
+    if ( DB::connection()->getDriverName() === 'pgsql' ) {
+      $tablePrefix = DB::connection()->getTablePrefix();
+
+      $sequenceName = $tablePrefix . 'categories_id_seq';
+
+      DB::connection()->statement('ALTER SEQUENCE ' . $sequenceName . ' RESTART WITH 11');
+    }
+  }
+
+}
