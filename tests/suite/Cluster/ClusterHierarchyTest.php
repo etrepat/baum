@@ -592,19 +592,19 @@ class ClusterHierarchyTest extends ClusterTestCase {
 
     // Perform assertions
     $wholeTree = hmap(Cluster::all()->toHierarchy()->toArray());
-    $this->assertEquals($expectedWholeTree, $wholeTree);
+    $this->assertArraysAreEqual($expectedWholeTree, $wholeTree);
 
     $subtreeA = hmap($this->clusters('A')->getDescendantsAndSelf()->toHierarchy()->toArray());
-    $this->assertEquals($expectedSubtreeA, $subtreeA);
+    $this->assertArraysAreEqual($expectedSubtreeA, $subtreeA);
 
     $subtreeB = hmap($this->clusters('B')->getDescendantsAndSelf()->toHierarchy()->toArray());
-    $this->assertEquals($expectedSubtreeB, $subtreeB);
+    $this->assertArraysAreEqual($expectedSubtreeB, $subtreeB);
 
     $subtreeC = hmap($this->clusters('C')->getDescendants()->toHierarchy()->toArray());
-    $this->assertEquals($expectedSubtreeC, $subtreeC);
+    $this->assertArraysAreEqual($expectedSubtreeC, $subtreeC);
 
     $subtreeD = hmap($this->clusters('D')->getDescendantsAndSelf()->toHierarchy()->toArray());
-    $this->assertEquals($expectedSubtreeD, $subtreeD);
+    $this->assertArraysAreEqual($expectedSubtreeD, $subtreeD);
 
     $this->assertTrue($this->clusters('D')->getDescendants()->toHierarchy()->isEmpty());
   }
@@ -626,7 +626,7 @@ class ClusterHierarchyTest extends ClusterTestCase {
     );
 
     $parent->reload();
-    $this->assertEquals($expected, hmap($parent->getDescendantsAndSelf()->toHierarchy()->toArray()));
+    $this->assertArraysAreEqual($expected, hmap($parent->getDescendantsAndSelf()->toHierarchy()->toArray()));
   }
 
   public function testToHierarchyNestsCorrectlyWithOrder() {
@@ -640,7 +640,7 @@ class ClusterHierarchyTest extends ClusterTestCase {
         'Child G' => array( 'Child G.1' => null )
       )
     );
-    $this->assertEquals($expectedWhole, hmap(OrderedCluster::all()->toHierarchy()->toArray()));
+    $this->assertArraysAreEqual($expectedWhole, hmap(OrderedCluster::all()->toHierarchy()->toArray()));
 
     $expectedSubtreeZ = array(
       'Root Z' => array(
@@ -649,8 +649,9 @@ class ClusterHierarchyTest extends ClusterTestCase {
         'Child G' => array( 'Child G.1' => null )
       )
     );
-    $this->assertEquals($expectedSubtreeZ, hmap($this->clusters('Root Z', 'OrderedCluster')->getDescendantsAndSelf()->toHierarchy()->toArray()));
+    $this->assertArraysAreEqual($expectedSubtreeZ, hmap($this->clusters('Root Z', 'OrderedCluster')->getDescendantsAndSelf()->toHierarchy()->toArray()));
   }
+
   public function testGetNestedList() {
     $seperator = ' ';
     $nestedList = Cluster::getNestedList('name', 'id', $seperator);
@@ -664,7 +665,7 @@ class ClusterHierarchyTest extends ClusterTestCase {
       '3bb62314-9e1e-49c6-a5cb-17a9ab9b1b9a' => str_repeat($seperator, 0). 'Root 2',
     );
 
-    $this->assertEquals($expected, $nestedList);
+    $this->assertArraysAreEqual($expected, $nestedList);
   }
 
 }
