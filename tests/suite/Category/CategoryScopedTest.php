@@ -224,7 +224,7 @@ class CategoryScopedTest extends CategoryTestCase {
     );
     $this->assertEquals($expected, $root2->getDescendants()->all());
   }
-  
+
   public function testToHierarchyNestsCorrectlyWithScopedOrder() {
     with(new OrderedScopedCategorySeeder)->run();
 
@@ -237,6 +237,7 @@ class CategoryScopedTest extends CategoryTestCase {
           'Child 3' => null
       )
     );
+
     $expectedWhole2 = array(
       'Root 2' => array(
           'Child 4' => null,
@@ -247,8 +248,8 @@ class CategoryScopedTest extends CategoryTestCase {
       )
     );
 
-    $this->assertEquals(json_encode($expectedWhole1), json_encode(hmap(OrderedScopedCategory::where('company_id', 1)->get()->toHierarchy()->toArray())));
-    $this->assertEquals(json_encode($expectedWhole2), json_encode(hmap(OrderedScopedCategory::where('company_id', 2)->get()->toHierarchy()->toArray())));
+    $this->assertArraysAreEqual($expectedWhole1, hmap(OrderedScopedCategory::where('company_id', 1)->get()->toHierarchy()->toArray()));
+    $this->assertArraysAreEqual($expectedWhole2, hmap(OrderedScopedCategory::where('company_id', 2)->get()->toHierarchy()->toArray()));
   }
 
   /**

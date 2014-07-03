@@ -32,7 +32,9 @@ class OrderedCategory extends Category {
 class OrderedScopedCategory extends Category {
 
   protected $scoped = array('company_id');
+
   protected $orderColumn = 'name';
+
 }
 
 class SoftCategory extends Category {

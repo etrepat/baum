@@ -588,19 +588,19 @@ class CategoryHierarchyTest extends CategoryTestCase {
 
     // Perform assertions
     $wholeTree = hmap(Category::all()->toHierarchy()->toArray());
-    $this->assertEquals($expectedWholeTree, $wholeTree);
+    $this->assertArraysAreEqual($expectedWholeTree, $wholeTree);
 
     $subtreeA = hmap($this->categories('A')->getDescendantsAndSelf()->toHierarchy()->toArray());
-    $this->assertEquals($expectedSubtreeA, $subtreeA);
+    $this->assertArraysAreEqual($expectedSubtreeA, $subtreeA);
 
     $subtreeB = hmap($this->categories('B')->getDescendantsAndSelf()->toHierarchy()->toArray());
-    $this->assertEquals($expectedSubtreeB, $subtreeB);
+    $this->assertArraysAreEqual($expectedSubtreeB, $subtreeB);
 
     $subtreeC = hmap($this->categories('C')->getDescendants()->toHierarchy()->toArray());
-    $this->assertEquals($expectedSubtreeC, $subtreeC);
+    $this->assertArraysAreEqual($expectedSubtreeC, $subtreeC);
 
     $subtreeD = hmap($this->categories('D')->getDescendantsAndSelf()->toHierarchy()->toArray());
-    $this->assertEquals($expectedSubtreeD, $subtreeD);
+    $this->assertArraysAreEqual($expectedSubtreeD, $subtreeD);
 
     $this->assertTrue($this->categories('D')->getDescendants()->toHierarchy()->isEmpty());
   }
@@ -622,7 +622,7 @@ class CategoryHierarchyTest extends CategoryTestCase {
     );
 
     $parent->reload();
-    $this->assertEquals($expected, hmap($parent->getDescendantsAndSelf()->toHierarchy()->toArray()));
+    $this->assertArraysAreEqual($expected, hmap($parent->getDescendantsAndSelf()->toHierarchy()->toArray()));
   }
 
   public function testToHierarchyNestsCorrectlyWithOrder() {
@@ -637,7 +637,7 @@ class CategoryHierarchyTest extends CategoryTestCase {
       )
     );
 
-    $this->assertEquals($expectedWhole, hmap(OrderedCategory::all()->toHierarchy()->toArray()));
+    $this->assertArraysAreEqual($expectedWhole, hmap(OrderedCategory::all()->toHierarchy()->toArray()));
 
     $expectedSubtreeZ = array(
       'Root Z' => array(
@@ -646,7 +646,7 @@ class CategoryHierarchyTest extends CategoryTestCase {
         'Child G' => array( 'Child G.1' => null )
       )
     );
-    $this->assertEquals($expectedSubtreeZ, hmap($this->categories('Root Z', 'OrderedCategory')->getDescendantsAndSelf()->toHierarchy()->toArray()));
+    $this->assertArraysAreEqual($expectedSubtreeZ, hmap($this->categories('Root Z', 'OrderedCategory')->getDescendantsAndSelf()->toHierarchy()->toArray()));
   }
 
   public function testGetNestedList() {
@@ -662,7 +662,7 @@ class CategoryHierarchyTest extends CategoryTestCase {
       6 => str_repeat($seperator, 0). 'Root 2',
     );
 
-    $this->assertEquals($expected, $nestedList);
+    $this->assertArraysAreEqual($expected, $nestedList);
   }
 
 }
