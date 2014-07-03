@@ -787,11 +787,13 @@ Feel free to browse the wiki after finishing this README:
 
 Thinking of contributing? Maybe you've found some nasty bug? That's great news!
 
-1. Fork the project:.
-2. Create your bugfix/feature branch.
-3. Code away your changes and, if you can, provide some tests.
-4. Commit your changes & push to the branch.
-5. Create a new Pull Request
+1. Fork & clone the project: `git clone git@github.com:your-username/baum.git`.
+2. Run the tests and make sure that they pass with your setup: `phpunit`.
+3. Create your bugfix/feature branch and code away your changes. Add tests for your changes.
+4. Make sure all the tests still pass: `phpunit`.
+5. Push to your fork and submit new a pull request.
+
+Please see the [CONTRIBUTING.md](https://github.com/etrepat/baum/blob/master/CONTRIBUTING.md) file for extended guidelines and/or recommendations.
 
 ## License
 
