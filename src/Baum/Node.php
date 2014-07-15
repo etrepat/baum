@@ -990,7 +990,7 @@ abstract class Node extends Model {
    * @return void
    */
   public function storeNewParent() {
-    if ( $this->isDirty($this->getParentColumnName()) )
+    if ( $this->isDirty($this->getParentColumnName()) && ($this->exists || !$this->isRoot()) )
       static::$moveToNewParentId = $this->getParentId();
     else
       static::$moveToNewParentId = FALSE;
