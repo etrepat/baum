@@ -107,10 +107,7 @@ class Move {
 
       $this->target->reload();
 
-      $this->node->setDepth();
-
-      foreach($this->node->getDescendants() as $descendant)
-        $descendant->save();
+      $this->node->setDepthWithSubtree();
 
       $this->node->reload();
     }
@@ -128,6 +125,9 @@ class Move {
    */
   public function updateStructure() {
     list($a, $b, $c, $d) = $this->boundaries();
+
+    // select the rows between the leftmost & the rightmost boundaries and apply a lock
+    $this->applyLockBetween($a, $d);
 
     $connection = $this->node->getConnection();
     $grammar    = $connection->getQueryGrammar();
@@ -348,4 +348,19 @@ class Move {
     return $pdo->quote($value);
   }
 
+  /**
+   * Applies a lock to the rows between the supplied index boundaries.
+   *
+   * @param   int   $lft
+   * @param   int   $rgt
+   * @return  void
+   */
+  protected function applyLockBetween($lft, $rgt) {
+    $this->node->newQuery()
+      ->where($this->node->getLeftColumnName(), '>=', $lft)
+      ->where($this->node->getRightColumnName(), '<=', $rgt)
+      ->select($this->node->getKeyName())
+      ->lockForUpdate()
+      ->get();
+  }
 }
