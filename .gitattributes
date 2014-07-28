@@ -7,3 +7,5 @@
 /phpunit.xml export-ignore
 /CHANGELOG.md export-ignore
 /README.md export-ignore
+/boris export-ignore
+/bootstrap.php export-ignore
