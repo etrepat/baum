@@ -166,6 +166,15 @@ abstract class Node extends Model {
   }
 
   /**
+  * Get the value of the original models "parent_id" field.
+  *
+  * @return int
+  */
+  public function getOriginalParentId() {
+    return $this->getOriginal($this->getparentColumnName());
+  }
+
+  /**
    * Get the "left" field column name.
    *
    * @return string
@@ -489,7 +498,7 @@ abstract class Node extends Model {
    * @return boolean
    */
   public function isRoot() {
-    return is_null($this->getParentId());
+    return ($this->exists) ? is_null($this->getOriginalParentId()) : is_null($this->getParentId());
   }
 
   /**
@@ -925,6 +934,8 @@ abstract class Node extends Model {
    * @return \Baum\Node
    */
   public function makeRoot() {
+    if ($this->isRoot()) return $this;
+
     return $this->moveToRightOf($this->getRoot());
   }
 
