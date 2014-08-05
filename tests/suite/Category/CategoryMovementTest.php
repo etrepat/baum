@@ -125,6 +125,15 @@ class CategoryMovementTest extends CategoryTestCase {
     $this->assertTrue(Category::isValid());
   }
 
+  public function testNewCategoryWithNullParent() {
+    $node = new Category(['name' => 'Root 3']);
+    $this->assertTrue($node->isRoot());
+    $node->save();
+    $this->assertTrue($node->isRoot());
+    $node->makeRoot();
+    $this->assertTrue($node->isRoot());
+  }
+
   public function testMakeChildOf() {
     $this->categories('Child 1')->makeChildOf($this->categories('Child 3'));
 
