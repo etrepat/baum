@@ -28,7 +28,48 @@ class CategoryTreeMapperTest extends BaumTestCase {
     $hierarchy = Category::all()->toHierarchy()->toArray();
     $this->assertArraysAreEqual($tree, array_ints_keys(hmap($hierarchy, array('id', 'name'))));
   }
+  
+  public function testBuildTreeAndUpdate() {
+    $tree = array(
+      array('id' => 1, 'name' => 'A'),
+      array('id' => 2, 'name' => 'B'),
+      array('id' => 3, 'name' => 'C', 'children' => array(
+        array('id' => 4, 'name' => 'C.1', 'children' => array(
+          array('id' => 5, 'name' => 'C.1.1'),
+          array('id' => 6, 'name' => 'C.1.2')
+        )),
+        array('id' => 7, 'name' => 'C.2'),
+        array('id' => 8, 'name' => 'C.3')
+      )),
+      array('id' => 9, 'name' => 'D')
+    );
+    $this->assertTrue(Category::buildTree($tree));
+    $this->assertTrue(Category::isValid());
 
+    $hierarchy = Category::all()->toHierarchy()->toArray();
+    $this->assertArraysAreEqual($tree, array_ints_keys(hmap($hierarchy, array('id', 'name'))));
+    
+    // Now try and update the already existing tree
+    $tree = array(
+      array('id' => 9),
+      array('id' => 8),
+      array('id' => 7, 'children' => array(
+        array('id' => 6, 'children' => array(
+          array('id' => 5),
+          array('id' => 4)
+        )),
+        array('id' => 3),
+        array('id' => 2)
+      )),
+      array('id' => 1)
+    );
+    $this->assertTrue(Category::buildTree($tree));
+    $this->assertTrue(Category::isValid());
+
+    $hierarchy = Category::all()->toHierarchy()->toArray();
+    $this->assertArraysAreEqual($tree, array_ints_keys(hmap($hierarchy, array('id', 'name'))));
+  }
+  
   public function testBuildTreePrunesAndInserts() {
     $tree = array(
       array('id' => 1, 'name' => 'A'),
