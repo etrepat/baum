@@ -552,7 +552,7 @@ class ClusterHierarchyTest extends ClusterTestCase {
     $ch = Cluster::create(array('name' => 'C.2'));
     $ch->makeChildOf($c);
 
-    $this->assertTrue(Cluster::isValid());
+    $this->assertTrue(Cluster::isValidNestedSet());
 
     // Build expectations (expected trees/subtrees)
     $expectedWholeTree = array(
@@ -616,7 +616,7 @@ class ClusterHierarchyTest extends ClusterTestCase {
 
     $parent->children()->create(array('name' => 'Child 1.2'));
 
-    $this->assertTrue(Cluster::isValid());
+    $this->assertTrue(Cluster::isValidNestedSet());
 
     $expected = array(
       'Child 1' => array(

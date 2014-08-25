@@ -15,7 +15,7 @@ class CategoryScopedTest extends CategoryTestCase {
     $child4 = $this->categories('Child 4', 'ScopedCategory');
     $child5 = $this->categories('Child 5', 'ScopedCategory');
 
-    $this->assertTrue(MultiScopedCategory::isValid());
+    $this->assertTrue(MultiScopedCategory::isValidNestedSet());
 
     $this->assertTrue($root1->inSameScope($child1));
     $this->assertTrue($child1->inSameScope($child2));
@@ -36,7 +36,7 @@ class CategoryScopedTest extends CategoryTestCase {
   }
 
   public function testInSameScopeMultiple() {
-    $this->assertTrue(MultiScopedCategory::isValid());
+    $this->assertTrue(MultiScopedCategory::isValidNestedSet());
 
     $child1 = $this->categories('Child 1', 'MultiScopedCategory');
     $child2 = $this->categories('Child 2', 'MultiScopedCategory');
@@ -120,13 +120,13 @@ class CategoryScopedTest extends CategoryTestCase {
   public function testSimpleMovements() {
     with(new ScopedCategorySeeder)->run();
 
-    $this->assertTrue(ScopedCategory::isValid());
+    $this->assertTrue(ScopedCategory::isValidNestedSet());
 
     $root3 = ScopedCategory::create(array('name' => 'Root 3', 'company_id' => 2));
-    $this->assertTrue(ScopedCategory::isValid());
+    $this->assertTrue(ScopedCategory::isValidNestedSet());
 
     $this->categories('Child 6', 'ScopedCategory')->makeChildOf($root3);
-    $this->assertTrue(ScopedCategory::isValid());
+    $this->assertTrue(ScopedCategory::isValidNestedSet());
 
     $root3->reload();
     $expected = array($this->categories('Child 6', 'ScopedCategory'));
@@ -136,13 +136,13 @@ class CategoryScopedTest extends CategoryTestCase {
   public function testSimpleSubtreeMovements() {
     with(new ScopedCategorySeeder)->run();
 
-    $this->assertTrue(ScopedCategory::isValid());
+    $this->assertTrue(ScopedCategory::isValidNestedSet());
 
     $root3 = ScopedCategory::create(array('name' => 'Root 3', 'company_id' => 2));
-    $this->assertTrue(ScopedCategory::isValid());
+    $this->assertTrue(ScopedCategory::isValidNestedSet());
 
     $this->categories('Child 5', 'ScopedCategory')->makeChildOf($root3);
-    $this->assertTrue(ScopedCategory::isValid());
+    $this->assertTrue(ScopedCategory::isValidNestedSet());
 
     $root3->reload();
     $expected = array(
@@ -155,13 +155,13 @@ class CategoryScopedTest extends CategoryTestCase {
   public function testFullSubtreeMovements() {
     with(new ScopedCategorySeeder)->run();
 
-    $this->assertTrue(ScopedCategory::isValid());
+    $this->assertTrue(ScopedCategory::isValidNestedSet());
 
     $root3 = ScopedCategory::create(array('name' => 'Root 3', 'company_id' => 2));
-    $this->assertTrue(ScopedCategory::isValid());
+    $this->assertTrue(ScopedCategory::isValidNestedSet());
 
     $this->categories('Root 2', 'ScopedCategory')->makeChildOf($root3);
-    $this->assertTrue(ScopedCategory::isValid());
+    $this->assertTrue(ScopedCategory::isValidNestedSet());
 
     $root3->reload();
     $expected = array(
@@ -175,13 +175,13 @@ class CategoryScopedTest extends CategoryTestCase {
   }
 
   public function testSimpleMovementsMultiple() {
-    $this->assertTrue(MultiScopedCategory::isValid());
+    $this->assertTrue(MultiScopedCategory::isValidNestedSet());
 
     $root2 = MultiScopedCategory::create(array('name' => 'Raiz 2', 'company_id' => 3, 'language' => 'es'));
-    $this->assertTrue(MultiScopedCategory::isValid());
+    $this->assertTrue(MultiScopedCategory::isValidNestedSet());
 
     $this->categories('Hijo 1', 'MultiScopedCategory')->makeChildOf($root2);
-    $this->assertTrue(MultiScopedCategory::isValid());
+    $this->assertTrue(MultiScopedCategory::isValidNestedSet());
 
     $root2->reload();
     $expected = array($this->categories('Hijo 1', 'MultiScopedCategory'));
@@ -189,13 +189,13 @@ class CategoryScopedTest extends CategoryTestCase {
   }
 
   public function testSimpleSubtreeMovementsMultiple() {
-    $this->assertTrue(MultiScopedCategory::isValid());
+    $this->assertTrue(MultiScopedCategory::isValidNestedSet());
 
     $root2 = MultiScopedCategory::create(array('name' => 'Raiz 2', 'company_id' => 3, 'language' => 'es'));
-    $this->assertTrue(MultiScopedCategory::isValid());
+    $this->assertTrue(MultiScopedCategory::isValidNestedSet());
 
     $this->categories('Hijo 2', 'MultiScopedCategory')->makeChildOf($root2);
-    $this->assertTrue(MultiScopedCategory::isValid());
+    $this->assertTrue(MultiScopedCategory::isValidNestedSet());
 
     $root2->reload();
     $expected = array(
@@ -206,13 +206,13 @@ class CategoryScopedTest extends CategoryTestCase {
   }
 
   public function testFullSubtreeMovementsMultiple() {
-    $this->assertTrue(MultiScopedCategory::isValid());
+    $this->assertTrue(MultiScopedCategory::isValidNestedSet());
 
     $root2 = MultiScopedCategory::create(array('name' => 'Raiz 2', 'company_id' => 3, 'language' => 'es'));
-    $this->assertTrue(MultiScopedCategory::isValid());
+    $this->assertTrue(MultiScopedCategory::isValidNestedSet());
 
     $this->categories('Raiz 1', 'MultiScopedCategory')->makeChildOf($root2);
-    $this->assertTrue(MultiScopedCategory::isValid());
+    $this->assertTrue(MultiScopedCategory::isValidNestedSet());
 
     $root2->reload();
     $expected = array(
@@ -290,12 +290,12 @@ class CategoryScopedTest extends CategoryTestCase {
     // $child11  = Menu::create(array('caption' => 'C11', 'site_id' => 1, 'language' => 'en'));
     // $child12  = Menu::create(array('caption' => 'C12', 'site_id' => 1, 'language' => 'en'));
 
-    // $this->assertTrue(Menu::isValid());
+    // $this->assertTrue(Menu::isValidNestedSet());
 
     // $child11->makeChildOf($root1);
     // $child12->makeChildOf($root1);
 
-    // $this->assertTrue(Menu::isValid());
+    // $this->assertTrue(Menu::isValidNestedSet());
 
     // $root2    = Menu::create(array('caption' => 'TL2', 'site_id' => 2, 'language' => 'en'));
     // $child21  = Menu::create(array('caption' => 'C21', 'site_id' => 2, 'language' => 'en'));
@@ -303,12 +303,12 @@ class CategoryScopedTest extends CategoryTestCase {
     // $child21->makeChildOf($root2);
     // $child22->makeChildOf($root2);
 
-    // $this->assertTrue(Menu::isValid());
+    // $this->assertTrue(Menu::isValidNestedSet());
 
     // $child11->update(array('site_id' => 2));
     // $child11->makeChildOf($root2);
 
-    // $this->assertTrue(Menu::isValid());
+    // $this->assertTrue(Menu::isValidNestedSet());
 
     // $expected = array($this->menus('C12'));
     // $this->assertEquals($expected, $root1->children()->get()->all());

@@ -23,7 +23,7 @@ class CategoryTreeMapperTest extends BaumTestCase {
       array('id' => 9, 'name' => 'D')
     );
     $this->assertTrue(Category::buildTree($tree));
-    $this->assertTrue(Category::isValid());
+    $this->assertTrue(Category::isValidNestedSet());
 
     $hierarchy = Category::all()->toHierarchy()->toArray();
     $this->assertArraysAreEqual($tree, array_ints_keys(hmap($hierarchy, array('id', 'name'))));
@@ -44,7 +44,7 @@ class CategoryTreeMapperTest extends BaumTestCase {
       array('id' => 9, 'name' => 'D')
     );
     $this->assertTrue(Category::buildTree($tree));
-    $this->assertTrue(Category::isValid());
+    $this->assertTrue(Category::isValidNestedSet());
 
     // Postgres fix
     if ( DB::connection()->getDriverName() === 'pgsql' ) {
@@ -71,7 +71,7 @@ class CategoryTreeMapperTest extends BaumTestCase {
       array('id' => 9, 'name' => 'D')
     );
     $this->assertTrue(Category::buildTree($updated));
-    $this->assertTrue(Category::isValid());
+    $this->assertTrue(Category::isValidNestedSet());
 
     $expected = array(
       array('id' => 1, 'name' => 'A'),
@@ -113,7 +113,7 @@ class CategoryTreeMapperTest extends BaumTestCase {
     );
 
     $this->assertTrue($parent->makeTree($subtree));
-    $this->assertTrue(Category::isValid());
+    $this->assertTrue(Category::isValidNestedSet());
 
     $expected = array(
       array('id' => 4, 'name' => 'Child 2.1'),
@@ -153,7 +153,7 @@ class CategoryTreeMapperTest extends BaumTestCase {
     );
 
     $this->assertTrue($parent->makeTree($subtree));
-    $this->assertTrue(Category::isValid());
+    $this->assertTrue(Category::isValidNestedSet());
 
     $expected = array(
       array('id' => 4, 'name' => 'Child 2.1'),
@@ -187,7 +187,7 @@ class CategoryTreeMapperTest extends BaumTestCase {
     );
 
     $this->assertTrue($parent->makeTree($modified));
-    $this->assertTrue(Category::isValid());
+    $this->assertTrue(Category::isValidNestedSet());
 
     $expected = array(
       array('id' => 7 , 'name' => 'Child 2.2'),

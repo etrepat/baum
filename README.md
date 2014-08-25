@@ -552,8 +552,7 @@ attribute (if provided).
 <a name="validation"></a>
 ### Validation
 
-The `::isValid()` static method allows you to check if your underlying tree
-structure is correct. It mainly checks for these 3 things:
+The `::isValidNestedSet()` static method allows you to check if your underlying tree structure is correct. It mainly checks for these 3 things:
 
 * Check that the bound indexes `lft`, `rgt` are not null, `rgt` values greater
 than `lft` and within the bounds of the parent node (if set).
@@ -566,7 +565,7 @@ All of the checks are *scope aware* and will check each scope separately if need
 Example usage, given a `Category` node class:
 
 ```php
-Category::isValid()
+Category::isValidNestedSet()
 => true
 ```
 

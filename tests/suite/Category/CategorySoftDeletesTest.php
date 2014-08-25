@@ -17,21 +17,21 @@ class CategorySoftDeletesTest extends CategoryTestCase {
   }
 
   public function testDeleteMaintainsTreeValid() {
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $child3 = $this->categories('Child 3', 'SoftCategory');
     $child3->delete();
 
     $this->assertTrue($child3->trashed());
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
   }
 
   public function testDeleteMaintainsTreeValidWithSubtrees() {
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $child2 = $this->categories('Child 2', 'SoftCategory');
     $child2->delete();
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $expected = array(
       $this->categories('Child 1', 'SoftCategory'),
@@ -41,11 +41,11 @@ class CategorySoftDeletesTest extends CategoryTestCase {
   }
 
   public function testDeleteShiftsIndexes() {
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $this->categories('Child 1', 'SoftCategory')->delete();
 
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $expected = array(
       $this->categories('Child 2'   , 'SoftCategory'),
@@ -68,11 +68,11 @@ class CategorySoftDeletesTest extends CategoryTestCase {
   }
 
   public function testDeleteShiftsIndexesSubtree() {
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $this->categories('Child 2', 'SoftCategory')->delete();
 
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $expected = array(
       $this->categories('Child 1', 'SoftCategory'),
@@ -91,10 +91,10 @@ class CategorySoftDeletesTest extends CategoryTestCase {
   }
 
   public function testDeleteShiftsIndexesFullSubtree() {
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $this->categories('Root 1', 'SoftCategory')->delete();
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $this->assertEmpty($this->categories('Root 2', 'SoftCategory')->getSiblings()->all());
     $this->assertEquals(1, $this->categories('Root 2', 'SoftCategory')->getLeft());
@@ -102,32 +102,32 @@ class CategorySoftDeletesTest extends CategoryTestCase {
   }
 
   public function testRestoreMaintainsTreeValid() {
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $child3 = $this->categories('Child 3', 'SoftCategory');
     $child3->delete();
 
     $this->assertTrue($child3->trashed());
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $child3->reload();
     $child3->restore();
 
     $this->assertFalse($child3->trashed());
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
   }
 
   public function testRestoreMaintainsTreeValidWithSubtrees() {
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $child2 = $this->categories('Child 2', 'SoftCategory');
     $child2->delete();
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $child2->reload();
     $child2->restore();
 
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $expected = array(
       $this->categories('Child 1'   , 'SoftCategory'),
@@ -139,15 +139,15 @@ class CategorySoftDeletesTest extends CategoryTestCase {
   }
 
   public function testRestoreUnshiftsIndexes() {
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $this->categories('Child 1', 'SoftCategory')->delete();
 
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     SoftCategory::withTrashed()->where('name', 'Child 1')->first()->restore();
 
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $expected = array(
       $this->categories('Child 1'   , 'SoftCategory'),
@@ -173,15 +173,15 @@ class CategorySoftDeletesTest extends CategoryTestCase {
   }
 
   public function testRestoreUnshiftsIndexesSubtree() {
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $this->categories('Child 2', 'SoftCategory')->delete();
 
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     SoftCategory::withTrashed()->where('name', 'Child 2')->first()->restore();
 
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $expected = array(
       $this->categories('Child 1'   , 'SoftCategory'),
@@ -207,15 +207,15 @@ class CategorySoftDeletesTest extends CategoryTestCase {
   }
 
   public function testRestoreUnshiftsIndexesFullSubtree() {
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $this->categories('Root 1', 'SoftCategory')->delete();
 
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     SoftCategory::withTrashed()->where('name', 'Root 1')->first()->restore();
 
-    $this->assertTrue(SoftCategory::isValid());
+    $this->assertTrue(SoftCategory::isValidNestedSet());
 
     $expected = array(
       $this->categories('Child 1'   , 'SoftCategory'),

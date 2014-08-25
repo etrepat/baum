@@ -413,7 +413,7 @@ abstract class Node extends Model {
    *
    * @return boolean
    */
-  public static function isValid() {
+  public static function isValidNestedSet() {
     $validator = new SetValidator(new static);
 
     return $validator->passes();

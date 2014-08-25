@@ -548,7 +548,7 @@ class CategoryHierarchyTest extends CategoryTestCase {
     $ch = Category::create(array('name' => 'C.2'));
     $ch->makeChildOf($c);
 
-    $this->assertTrue(Category::isValid());
+    $this->assertTrue(Category::isValidNestedSet());
 
     // Build expectations (expected trees/subtrees)
     $expectedWholeTree = array(
@@ -612,7 +612,7 @@ class CategoryHierarchyTest extends CategoryTestCase {
 
     $parent->children()->create(array('name' => 'Child 1.2'));
 
-    $this->assertTrue(Category::isValid());
+    $this->assertTrue(Category::isValidNestedSet());
 
     $expected = array(
       'Child 1' => array(

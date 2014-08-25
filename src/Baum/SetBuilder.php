@@ -37,7 +37,7 @@ class SetBuilder {
    * @return void
    */
   public function rebuild() {
-    $alreadyValid = forward_static_call(array(get_class($this->node), 'isValid'));
+    $alreadyValid = forward_static_call(array(get_class($this->node), 'isValidNestedSet'));
 
     // Do not rebuild a valid Nested Set tree structure
     if ( $alreadyValid )

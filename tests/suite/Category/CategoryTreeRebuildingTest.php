@@ -3,14 +3,14 @@
 class CategoryTreeRebuildingTest extends CategoryTestCase {
 
   public function testRebuild() {
-    $this->assertTrue(Category::isValid());
+    $this->assertTrue(Category::isValidNestedSet());
 
     $root = Category::root();
     Category::query()->update(array('lft' => null, 'rgt' => null));
-    $this->assertFalse(Category::isValid());
+    $this->assertFalse(Category::isValidNestedSet());
 
     Category::rebuild();
-    $this->assertTrue(Category::isValid());
+    $this->assertTrue(Category::isValidNestedSet());
 
     $this->assertEquals($root, Category::root());
   }
@@ -32,10 +32,10 @@ class CategoryTreeRebuildingTest extends CategoryTestCase {
   }
 
   public function testRebuildRecomputesDepth() {
-    $this->assertTrue(Category::isValid());
+    $this->assertTrue(Category::isValidNestedSet());
 
     Category::query()->update(array('lft' => null, 'rgt' => null, 'depth' => 0));
-    $this->assertFalse(Category::isValid());
+    $this->assertFalse(Category::isValidNestedSet());
 
     Category::rebuild();
 
@@ -54,10 +54,10 @@ class CategoryTreeRebuildingTest extends CategoryTestCase {
     $child2->makeChildOf($root);
 
     MultiscopedCategory::query()->update(array('lft' => null, 'rgt' => null));
-    $this->assertFalse(MultiscopedCategory::isValid());
+    $this->assertFalse(MultiscopedCategory::isValidNestedSet());
 
     MultiscopedCategory::rebuild();
-    $this->assertTrue(MultiscopedCategory::isValid());
+    $this->assertTrue(MultiscopedCategory::isValidNestedSet());
 
     $this->assertEquals($root, $this->categories('A', 'MultiScopedCategory'));
 
@@ -80,14 +80,14 @@ class CategoryTreeRebuildingTest extends CategoryTestCase {
     $child21->makeChildOf($root2);
     $child22->makeChildOf($root2);
 
-    $this->assertTrue(MultiScopedCategory::isValid());
+    $this->assertTrue(MultiScopedCategory::isValidNestedSet());
 
     $tree = MultiScopedCategory::query()->orderBy($root1->getKeyName())->get()->all();
 
     MultiScopedCategory::query()->update(array('lft' => null, 'rgt' => null));
     MultiScopedCategory::rebuild();
 
-    $this->assertTrue(MultiScopedCategory::isValid());
+    $this->assertTrue(MultiScopedCategory::isValidNestedSet());
     $this->assertEquals($tree, MultiScopedCategory::query()->orderBy($root1->getKeyName())->get()->all());
   }
 
