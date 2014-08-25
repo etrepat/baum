@@ -1,3 +1,17 @@
+## 1.0.12
+_Aug 25 2014_
+* bug fixes
+  - Fix check for `Node->storeNewParent()` to avoid moving a node which was already root. Fixes [#79] and closes [#81].
+  - Several git fixes by @GrahamCampbell [PR #96].
+  - `.travis.yml` improvements by @GrahamCampbell [PR #95].
+  - Rename `isValid` static method to `isValidNestedSet` to avoid name clashes with validator packages. Closes [#89].
+  - Moving to root has been now reimplemented to be more consistent.
+
+* enhancements
+  - Add pessimistic locking into the library. Closes [#89].
+  - Add `trunks` family of methods: `allTrunks`, `trunks`, `getTrunks` and `isTrunk`. Closes [#59].
+  - Add a `force` option to the `rebuild` static method.
+
 ## 1.0.11
 _Jul 3 2014_
 * bug fixes
