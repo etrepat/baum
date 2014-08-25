@@ -23,7 +23,7 @@ class Move {
   protected $target = NULL;
 
   /**
-  * Move target position, one of: child, left, right
+  * Move target position, one of: child, left, right, root
   *
   * @var string
   */
@@ -192,24 +192,26 @@ class Move {
     if ( !$this->node->exists )
       throw new MoveNotPossibleException('A new node cannot be moved.');
 
-    if ( array_search($this->position, array('child', 'left', 'right')) === FALSE )
+    if ( array_search($this->position, array('child', 'left', 'right', 'root')) === FALSE )
       throw new MoveNotPossibleException("Position should be one of ['child', 'left', 'right'] but is {$this->position}.");
 
-    if ( is_null($this->target) ) {
-      if ( $this->position === 'left' || $this->position === 'right' )
-        throw new MoveNotPossibleException("Could not resolve target node. This node cannot move any further to the {$this->position}.");
-      else
-        throw new MoveNotPossibleException('Could not resolve target node.');
+    if ( !$this->promotingToRoot() ) {
+      if ( is_null($this->target) ) {
+        if ( $this->position === 'left' || $this->position === 'right' )
+          throw new MoveNotPossibleException("Could not resolve target node. This node cannot move any further to the {$this->position}.");
+        else
+          throw new MoveNotPossibleException('Could not resolve target node.');
+      }
+
+      if ( $this->node->equals($this->target) )
+        throw new MoveNotPossibleException('A node cannot be moved to itself.');
+
+      if ( $this->target->insideSubtree($this->node) )
+        throw new MoveNotPossibleException('A node cannot be moved to a descendant of itself (inside moved tree).');
+
+      if ( !$this->node->inSameScope($this->target) )
+        throw new MoveNotPossibleException('A node cannot be moved to a different scope.');
     }
-
-    if ( $this->node->equals($this->target) )
-      throw new MoveNotPossibleException('A node cannot be moved to itself.');
-
-    if ( $this->target->insideSubtree($this->node) )
-      throw new MoveNotPossibleException('A node cannot be moved to a descendant of itself (inside moved tree).');
-
-    if ( !$this->node->inSameScope($this->target) )
-      throw new MoveNotPossibleException('A node cannot be moved to a different scope.');
   }
 
   /**
@@ -231,6 +233,10 @@ class Move {
 
       case 'right':
         $this->_bound1 = $this->target->getRight() + 1;
+        break;
+
+      case 'root':
+        $this->_bound1 = $this->node->newNestedSetQuery()->max($this->node->getRightColumnName()) + 1;
         break;
     }
 
@@ -278,10 +284,16 @@ class Move {
    * @return int
    */
   protected function parentId() {
-    if ( $this->position == 'child' )
-      return $this->target->getKey();
+    switch( $this->position ) {
+      case 'root':
+        return NULL;
 
-    return $this->target->getParentId();
+      case 'child':
+        return $this->target->getKey();
+
+      default:
+        return $this->target->getParentId();
+    }
   }
 
   /**
@@ -291,6 +303,15 @@ class Move {
    */
   protected function hasChange() {
     return !( $this->bound1() == $this->node->getRight() || $this->bound1() == $this->node->getLeft() );
+  }
+
+  /**
+   * Check if we are promoting the provided instance to a root node.
+   *
+   * @return boolean
+   */
+  protected function promotingToRoot() {
+    return ($this->position == 'root');
   }
 
   /**

@@ -83,8 +83,8 @@ class CategoryMovementTest extends CategoryTestCase {
 
     $this->assertNull($newRoot->parent()->first());
     $this->assertEquals(0, $newRoot->getLevel());
-    $this->assertEquals(7, $newRoot->getLeft());
-    $this->assertEquals(10, $newRoot->getRight());
+    $this->assertEquals(9, $newRoot->getLeft());
+    $this->assertEquals(12, $newRoot->getRight());
 
     $this->assertEquals(1, $this->categories('Child 2.1')->getLevel());
 
@@ -100,8 +100,8 @@ class CategoryMovementTest extends CategoryTestCase {
 
     $this->assertNull($node->parent()->first());
     $this->assertEquals(0, $node->getLevel());
-    $this->assertEquals(7, $node->getLeft());
-    $this->assertEquals(10, $node->getRight());
+    $this->assertEquals(9, $node->getLeft());
+    $this->assertEquals(12, $node->getRight());
 
     $this->assertEquals(1, $this->categories('Child 2.1')->getLevel());
 
@@ -123,6 +123,17 @@ class CategoryMovementTest extends CategoryTestCase {
     $this->assertEquals(14, $node->getRight());
 
     $this->assertTrue(Category::isValidNestedSet());
+  }
+
+  public function testNewCategoryWithNullParent() {
+    $node = new Category(['name' => 'Root 3']);
+    $this->assertTrue($node->isRoot());
+
+    $node->save();
+    $this->assertTrue($node->isRoot());
+
+    $node->makeRoot();
+    $this->assertTrue($node->isRoot());
   }
 
   public function testMakeChildOf() {

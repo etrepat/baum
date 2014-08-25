@@ -926,7 +926,7 @@ abstract class Node extends Model {
    * @return \Baum\Node
    */
   public function makeRoot() {
-    return $this->moveToRightOf($this->getRoot());
+    return $this->moveTo($this, 'root');
   }
 
   /**
