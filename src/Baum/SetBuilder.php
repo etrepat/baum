@@ -34,14 +34,14 @@ class SetBuilder {
    * Perform the re-calculation of the left and right indexes of the whole
    * nested set tree structure.
    *
+   * @param  bool $force
    * @return void
    */
-  public function rebuild() {
+  public function rebuild($force = false) {
     $alreadyValid = forward_static_call(array(get_class($this->node), 'isValidNestedSet'));
 
     // Do not rebuild a valid Nested Set tree structure
-    if ( $alreadyValid )
-      return true;
+    if ( !$force && $alreadyValid ) return true;
 
     // Rebuild lefts and rights for each root node and its children (recursively).
     // We go by setting left (and keep track of the current left bound), then

@@ -593,6 +593,12 @@ Simple example usage, given a `Category` node class:
 Category::rebuild()
 ```
 
+Valid trees (per the `isValidNestedSet` method) will not get rebuilt. To force the index rebuilding process simply call the rebuild method with `true` as the first parameter:
+
+```php
+Category::rebuild(true);
+```
+
 <a name="soft-deletes"></a>
 ### Soft deletes
 
