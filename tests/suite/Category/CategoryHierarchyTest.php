@@ -55,6 +55,15 @@ class CategoryHierarchyTest extends CategoryTestCase {
     $this->assertContains('Root 2'    , $leaves);
   }
 
+  public function testAllTrunksStatic() {
+    $allTrunks = Category::allTrunks()->get();
+
+    $this->assertCount(1, $allTrunks);
+
+    $trunks = $allTrunks->lists('name');
+    $this->assertContains('Child 2', $trunks);
+  }
+
   public function testGetRoot() {
     $this->assertEquals($this->categories('Root 1'), $this->categories('Root 1')->getRoot());
     $this->assertEquals($this->categories('Root 2'), $this->categories('Root 2')->getRoot());
@@ -105,6 +114,21 @@ class CategoryHierarchyTest extends CategoryTestCase {
       $this->assertEquals($expectedIds[$i], $leaf->getKey());
   }
 
+  public function testGetTrunks() {
+    $trunks = array($this->categories('Child 2'));
+
+    $this->assertEquals($trunks, $this->categories('Root 1')->getTrunks()->all());
+  }
+
+  public function testGetTrunksInIteration() {
+    $node = $this->categories('Root 1');
+
+    $expectedIds = array(3);
+
+    foreach($node->getTrunks() as $i => $trunk)
+      $this->assertEquals($expectedIds[$i], $trunk->getKey());
+  }
+
   public function testIsLeaf() {
     $this->assertTrue($this->categories('Child 1')->isLeaf());
     $this->assertTrue($this->categories('Child 2.1')->isLeaf());
@@ -116,6 +140,19 @@ class CategoryHierarchyTest extends CategoryTestCase {
 
     $new = new Category;
     $this->assertFalse($new->isLeaf());
+  }
+
+  public function testIsTrunk() {
+    $this->assertFalse($this->categories('Child 1')->isTrunk());
+    $this->assertFalse($this->categories('Child 2.1')->isTrunk());
+    $this->assertFalse($this->categories('Child 3')->isTrunk());
+    $this->assertFalse($this->categories('Root 2')->isTrunk());
+
+    $this->assertFalse($this->categories('Root 1')->isTrunk());
+    $this->assertTrue($this->categories('Child 2')->isTrunk());
+
+    $new = new Category;
+    $this->assertFalse($new->isTrunk());
   }
 
   public function testWithoutNodeScope() {

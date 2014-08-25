@@ -409,6 +409,26 @@ abstract class Node extends Model {
   }
 
   /**
+   * Static query scope. Returns a query scope with all nodes which are at
+   * the middle of a branch (not root and not leaves).
+   *
+   * @return \Illuminate\Database\Query\Builder
+   */
+  public static function allTrunks() {
+    $instance = new static;
+
+    $grammar = $instance->getConnection()->getQueryGrammar();
+
+    $rgtCol = $grammar->wrap($instance->getQualifiedRightColumnName());
+    $lftCol = $grammar->wrap($instance->getQualifiedLeftColumnName());
+
+    return $instance->newQuery()
+                    ->whereNotNull($instance->getParentColumnName())
+                    ->whereRaw($rgtCol . ' - ' . $lftCol . ' != 1')
+                    ->orderBy($instance->getQualifiedOrderColumnName());
+  }
+
+  /**
    * Checks wether the underlying Nested Set structure is valid.
    *
    * @return boolean
@@ -500,6 +520,15 @@ abstract class Node extends Model {
    */
   public function isLeaf() {
     return $this->exists && ($this->getRight() - $this->getLeft() == 1);
+  }
+
+  /**
+   * Returns true if this is a trunk node (not root or leaf).
+   *
+   * @return boolean
+   */
+  public function isTrunk() {
+    return !$this->isRoot() && !$this->isLeaf();
   }
 
   /**
@@ -657,6 +686,33 @@ abstract class Node extends Model {
    */
   public function getLeaves($columns = array('*')) {
     return $this->leaves()->get($columns);
+  }
+
+  /**
+   * Instance scope targeting all of its nested children which are between the
+   * root and the leaf nodes (middle branch).
+   *
+   * @return \Illuminate\Database\Query\Builder
+   */
+  public function trunks() {
+    $grammar = $this->getConnection()->getQueryGrammar();
+
+    $rgtCol = $grammar->wrap($this->getQualifiedRightColumnName());
+    $lftCol = $grammar->wrap($this->getQualifiedLeftColumnName());
+
+    return $this->descendants()
+                ->whereNotNull($this->getQualifiedParentColumnName())
+                ->whereRaw($rgtCol . ' - ' . $lftCol . ' != 1');
+  }
+
+  /**
+   * Return all of its nested children which are trunks.
+   *
+   * @param  array  $columns
+   * @return \Illuminate\Database\Eloquent\Collection
+   */
+  public function getTrunks($columns = array('*')) {
+    return $this->trunks()->get($columns);
   }
 
   /**

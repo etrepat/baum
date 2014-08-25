@@ -55,6 +55,15 @@ class ClusterHierarchyTest extends ClusterTestCase {
     $this->assertContains('Root 2'    , $leaves);
   }
 
+  public function testAllTrunksStatic() {
+    $allTrunks = Cluster::allTrunks()->get();
+
+    $this->assertCount(1, $allTrunks);
+
+    $trunks = $allTrunks->lists('name');
+    $this->assertContains('Child 2', $trunks);
+  }
+
   public function testGetRoot() {
     $this->assertEquals($this->clusters('Root 1'), $this->clusters('Root 1')->getRoot());
     $this->assertEquals($this->clusters('Root 2'), $this->clusters('Root 2')->getRoot());
@@ -109,6 +118,21 @@ class ClusterHierarchyTest extends ClusterTestCase {
       $this->assertEquals($expectedIds[$i], $leaf->getKey());
   }
 
+  public function testGetTrunks() {
+    $trunks = array($this->clusters('Child 2'));
+
+    $this->assertEquals($trunks, $this->clusters('Root 1')->getTrunks()->all());
+  }
+
+  public function testGetTrunksInIteration() {
+    $node = $this->clusters('Root 1');
+
+    $expectedIds = array('07c1fc8c-53b5-4fe7-b9c4-e09f266a455c');
+
+    foreach($node->getTrunks() as $i => $trunk)
+      $this->assertEquals($expectedIds[$i], $trunk->getKey());
+  }
+
   public function testIsLeaf() {
     $this->assertTrue($this->clusters('Child 1')->isLeaf());
     $this->assertTrue($this->clusters('Child 2.1')->isLeaf());
@@ -120,6 +144,19 @@ class ClusterHierarchyTest extends ClusterTestCase {
 
     $new = new Cluster;
     $this->assertFalse($new->isLeaf());
+  }
+
+  public function testIsTrunk() {
+    $this->assertFalse($this->clusters('Child 1')->isTrunk());
+    $this->assertFalse($this->clusters('Child 2.1')->isTrunk());
+    $this->assertFalse($this->clusters('Child 3')->isTrunk());
+    $this->assertFalse($this->clusters('Root 2')->isTrunk());
+
+    $this->assertFalse($this->clusters('Root 1')->isTrunk());
+    $this->assertTrue($this->clusters('Child 2')->isTrunk());
+
+    $new = new Cluster;
+    $this->assertFalse($new->isTrunk());
   }
 
   public function testWithoutNodeScope() {
