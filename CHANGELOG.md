@@ -1,5 +1,8 @@
+## 1.0.13
+_Sep 30 2014_
 * bug fixes
   - Fix node depth recomputation when moving nodes. Closes [#109] & [#106].
+  - Laravel 5, composer compatibility.
 
 ## 1.0.12
 _Aug 25 2014_

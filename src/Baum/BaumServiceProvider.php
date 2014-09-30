@@ -14,7 +14,7 @@ class BaumServiceProvider extends ServiceProvider {
    *
    * @var string
    */
-  const VERSION = '1.0.12';
+  const VERSION = '1.0.13';
 
   /**
    * Indicates if loading of the provider is deferred.
