@@ -1100,7 +1100,7 @@ abstract class Node extends Model {
 
       $self->descendantsAndSelf()->select($self->getKeyName())->lockForUpdate()->get();
 
-      $oldDepth = !is_null($self->getDepth()) ?: 0;
+      $oldDepth = !is_null($self->getDepth()) ? $self->getDepth() : 0;
 
       $newDepth = $self->getLevel();
 
