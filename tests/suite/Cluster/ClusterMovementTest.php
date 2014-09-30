@@ -22,6 +22,30 @@ class ClusterMovementTest extends ClusterTestCase {
     $node->moveLeft();
   }
 
+  public function testMoveLeftDoesNotChangeDepth() {
+    $this->clusters('Child 2')->moveLeft();
+
+    $this->assertEquals(1, $this->clusters('Child 2')->getDepth());
+    $this->assertEquals(2, $this->clusters('Child 2.1')->getDepth());
+  }
+
+  public function testMoveLeftWithSubtree() {
+    $this->clusters('Root 2')->moveLeft();
+
+    $this->assertNull($this->clusters('Root 2')->getLeftSibling());
+    $this->assertEquals($this->clusters('Root 1'), $this->clusters('Root 2')->getRightSibling());
+    $this->assertTrue(Cluster::isValidNestedSet());
+
+    $this->assertEquals(0, $this->clusters('Root 1')->getDepth());
+    $this->assertEquals(0, $this->clusters('Root 2')->getDepth());
+
+    $this->assertEquals(1, $this->clusters('Child 1')->getDepth());
+    $this->assertEquals(1, $this->clusters('Child 2')->getDepth());
+    $this->assertEquals(1, $this->clusters('Child 3')->getDepth());
+
+    $this->assertEquals(2, $this->clusters('Child 2.1')->getDepth());
+  }
+
   public function testMoveToLeftOf() {
     $this->clusters('Child 3')->moveToLeftOf($this->clusters('Child 1'));
 
@@ -37,6 +61,30 @@ class ClusterMovementTest extends ClusterTestCase {
    */
   public function testMoveToLeftOfRaisesAnExceptionWhenNotPossible() {
     $this->clusters('Child 1')->moveToLeftOf($this->clusters('Child 1')->getLeftSibling());
+  }
+
+  public function testMoveToLeftOfDoesNotChangeDepth() {
+    $this->clusters('Child 2')->moveToLeftOf($this->clusters('Child 1'));
+
+    $this->assertEquals(1, $this->clusters('Child 2')->getDepth());
+    $this->assertEquals(2, $this->clusters('Child 2.1')->getDepth());
+  }
+
+  public function testMoveToLeftOfWithSubtree() {
+    $this->clusters('Root 2')->moveToLeftOf($this->clusters('Root 1'));
+
+    $this->assertNull($this->clusters('Root 2')->getLeftSibling());
+    $this->assertEquals($this->clusters('Root 1'), $this->clusters('Root 2')->getRightSibling());
+    $this->assertTrue(Cluster::isValidNestedSet());
+
+    $this->assertEquals(0, $this->clusters('Root 1')->getDepth());
+    $this->assertEquals(0, $this->clusters('Root 2')->getDepth());
+
+    $this->assertEquals(1, $this->clusters('Child 1')->getDepth());
+    $this->assertEquals(1, $this->clusters('Child 2')->getDepth());
+    $this->assertEquals(1, $this->clusters('Child 3')->getDepth());
+
+    $this->assertEquals(2, $this->clusters('Child 2.1')->getDepth());
   }
 
   public function testMoveRight() {
@@ -59,6 +107,30 @@ class ClusterMovementTest extends ClusterTestCase {
     $node->moveRight();
   }
 
+  public function testMoveRightDoesNotChangeDepth() {
+    $this->clusters('Child 2')->moveRight();
+
+    $this->assertEquals(1, $this->clusters('Child 2')->getDepth());
+    $this->assertEquals(2, $this->clusters('Child 2.1')->getDepth());
+  }
+
+  public function testMoveRightWithSubtree() {
+    $this->clusters('Root 1')->moveRight();
+
+    $this->assertNull($this->clusters('Root 1')->getRightSibling());
+    $this->assertEquals($this->clusters('Root 2'), $this->clusters('Root 1')->getLeftSibling());
+    $this->assertTrue(Cluster::isValidNestedSet());
+
+    $this->assertEquals(0, $this->clusters('Root 1')->getDepth());
+    $this->assertEquals(0, $this->clusters('Root 2')->getDepth());
+
+    $this->assertEquals(1, $this->clusters('Child 1')->getDepth());
+    $this->assertEquals(1, $this->clusters('Child 2')->getDepth());
+    $this->assertEquals(1, $this->clusters('Child 3')->getDepth());
+
+    $this->assertEquals(2, $this->clusters('Child 2.1')->getDepth());
+  }
+
   public function testMoveToRightOf() {
     $this->clusters('Child 1')->moveToRightOf($this->clusters('Child 3'));
 
@@ -74,6 +146,30 @@ class ClusterMovementTest extends ClusterTestCase {
    */
   public function testMoveToRightOfRaisesAnExceptionWhenNotPossible() {
     $this->clusters('Child 3')->moveToRightOf($this->clusters('Child 3')->getRightSibling());
+  }
+
+  public function testMoveToRightOfDoesNotChangeDepth() {
+    $this->clusters('Child 2')->moveToRightOf($this->clusters('Child 3'));
+
+    $this->assertEquals(1, $this->clusters('Child 2')->getDepth());
+    $this->assertEquals(2, $this->clusters('Child 2.1')->getDepth());
+  }
+
+  public function testMoveToRightOfWithSubtree() {
+    $this->clusters('Root 1')->moveToRightOf($this->clusters('Root 2'));
+
+    $this->assertNull($this->clusters('Root 1')->getRightSibling());
+    $this->assertEquals($this->clusters('Root 2'), $this->clusters('Root 1')->getLeftSibling());
+    $this->assertTrue(Cluster::isValidNestedSet());
+
+    $this->assertEquals(0, $this->clusters('Root 1')->getDepth());
+    $this->assertEquals(0, $this->clusters('Root 2')->getDepth());
+
+    $this->assertEquals(1, $this->clusters('Child 1')->getDepth());
+    $this->assertEquals(1, $this->clusters('Child 2')->getDepth());
+    $this->assertEquals(1, $this->clusters('Child 3')->getDepth());
+
+    $this->assertEquals(2, $this->clusters('Child 2.1')->getDepth());
   }
 
   public function testMakeRoot() {
