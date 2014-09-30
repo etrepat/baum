@@ -1,3 +1,6 @@
+* bug fixes
+  - Fix node depth recomputation when moving nodes. Closes [#109] & [#106].
+
 ## 1.0.12
 _Aug 25 2014_
 * bug fixes
