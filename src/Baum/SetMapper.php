@@ -54,6 +54,60 @@ class SetMapper {
   }
 
   /**
+   * Update a tree structure in the database. Unguards & wraps in transaction.
+   *
+   * @param   array|\Illuminate\Support\Contracts\ArrayableInterface
+   * @return  boolean
+   */
+  public function updateMap($nodeList) {
+    $self = $this;
+
+    return $this->wrapInTransaction(function() use ($self, $nodeList) {
+      forward_static_call(array(get_class($self->node), 'unguard'));
+      $result = true;
+      try {
+        $flattenTree = $this->flattenNestable($nodeList);
+        foreach ($flattenTree as $branch) {
+          $self->node->flushEventListeners();
+          $model = $self->node->find($branch['id']);
+          $model->fill($branch);
+          $model->save();
+        }
+      } catch (\Exception $e) {
+          $result = false;
+      }
+      forward_static_call(array(get_class($self->node), 'reguard'));
+      return $result;
+    });
+  }
+  /**
+   * Flattens an array to contain 'id', 'lft', 'rgt', 'depth', 'parent_id' as a valid tree
+   * @param $nestableArray
+   * @param null $parent_id
+   * @param int $depth
+   * @return array
+   */
+  private $bound = 0;
+  public function flattenNestable($nestableArray, $parent_id = null, $depth = 0)
+  {
+    $return = array();
+    foreach ($nestableArray as $subArray) {
+      $returnSubSubArray = array();
+      $lft = ++$this->bound;
+      if (isset($subArray['children'])) {
+        $returnSubSubArray = $this->flattenNestable($subArray['children'], $subArray['id'], ($depth + 1));
+        $rgt = $this->bound + 1;
+        ++$this->bound;
+      } else {
+        $rgt = ++$this->bound;
+      }
+      $return[] = array('id' => $subArray['id'], 'parent_id' => $parent_id, 'depth' => $depth, 'lft' => $lft, 'rgt' => $rgt);
+      $return = array_merge($return, $returnSubSubArray);
+    }
+    return $return;
+  }
+
+  /**
    * Maps a tree structure into the database without unguarding nor wrapping
    * inside a transaction.
    *
