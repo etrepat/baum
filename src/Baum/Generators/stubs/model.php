@@ -1,4 +1,5 @@
-<?php
+<?php namespace App;
+
 use Baum\Node;
 
 /**
