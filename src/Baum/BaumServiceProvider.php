@@ -24,15 +24,6 @@ class BaumServiceProvider extends ServiceProvider {
   protected $defer = false;
 
   /**
-   * Bootstrap the application events.
-   *
-   * @return void
-   */
-  public function boot() {
-    $this->package('baum/baum');
-  }
-
-  /**
    * Register the service provider.
    *
    * @return void
