@@ -65,7 +65,6 @@ class InstallCommand extends Command {
 
     $this->writeModel($name);
 
-    $this->call('dump-autoload');
   }
 
   /**
@@ -109,7 +108,7 @@ class InstallCommand extends Command {
    * @return string
    */
   protected function getMigrationsPath() {
-    return $this->laravel['path'].'/database/migrations';
+    return $this->laravel['path.base'].'/database/migrations';
   }
 
   /**
@@ -118,7 +117,7 @@ class InstallCommand extends Command {
    * @return string
    */
   protected function getModelsPath() {
-    return $this->laravel['path'].'/models';
+    return $this->laravel['path'];
   }
 
 }
