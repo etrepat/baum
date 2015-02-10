@@ -29,7 +29,6 @@ class BaumServiceProvider extends ServiceProvider {
    * @return void
    */
   public function boot() {
-    $this->package('baum/baum');
   }
 
   /**
@@ -84,8 +83,9 @@ class BaumServiceProvider extends ServiceProvider {
     $this->app['command.baum.install'] = $this->app->share(function($app) {
       $migrator = new MigrationGenerator($app['files']);
       $modeler  = new ModelGenerator($app['files']);
+      $composer = $app['composer'];
 
-      return new InstallCommand($migrator, $modeler);
+      return new InstallCommand($migrator, $modeler, $composer);
     });
   }
 
