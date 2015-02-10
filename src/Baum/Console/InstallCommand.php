@@ -4,6 +4,7 @@ namespace Baum\Console;
 use Baum\Generators\MigrationGenerator;
 use Baum\Generators\ModelGenerator;
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Composer; // @tz
 use Symfony\Component\Console\Input\InputArgument;
 
 class InstallCommand extends Command {
@@ -37,13 +38,19 @@ class InstallCommand extends Command {
   protected $modeler;
 
   /**
+    * @var \Illuminate\Foundation\Composer
+    */
+  protected $composer;
+
+  /**
    * Create a new command instance
    *
    * @return void
    */
-  public function __construct(MigrationGenerator $migrator, ModelGenerator $modeler) {
+  public function __construct(MigrationGenerator $migrator, ModelGenerator $modeler, Composer $composer) {
     parent::__construct();
 
+    $this->composer = $composer;
     $this->migrator = $migrator;
     $this->modeler  = $modeler;
   }
@@ -65,7 +72,7 @@ class InstallCommand extends Command {
 
     $this->writeModel($name);
 
-    $this->call('dump-autoload');
+    $this->composer->dumpAutoloads();
   }
 
   /**
@@ -109,7 +116,7 @@ class InstallCommand extends Command {
    * @return string
    */
   protected function getMigrationsPath() {
-    return $this->laravel['path'].'/database/migrations';
+    return $this->laravel['path.database'].'/migrations';
   }
 
   /**
@@ -118,7 +125,7 @@ class InstallCommand extends Command {
    * @return string
    */
   protected function getModelsPath() {
-    return $this->laravel['path'].'/models';
+    return $this->laravel['path'];
   }
 
 }
