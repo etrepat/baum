@@ -29,7 +29,11 @@ class BaumServiceProvider extends ServiceProvider {
    * @return void
    */
   public function boot() {
-    $this->package('baum/baum');
+    if (method_exists($this->app, 'version') && starts_with($this->app->version(), '5')) {
+      //do nothing for laravel v. 5.x
+    } else {
+      $this->package('baum/baum');
+    }
   }
 
   /**
