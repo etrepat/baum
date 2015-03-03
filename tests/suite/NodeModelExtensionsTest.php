@@ -50,27 +50,29 @@ class NodeModelExtensionsTest extends PHPUnit_Framework_TestCase {
 
   public function testMoving() {
     $dispatcher = Category::getEventDispatcher();
-    Category::setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+
+    Category::setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 
     $closure = function() {};
-    $events->shouldReceive('listen')->once()->with('eloquent.moving: '.get_class(new Category), $closure);
-
+    $events->shouldReceive('listen')->once()->with('eloquent.moving: '.get_class(new Category), $closure, 0);
     Category::moving($closure);
 
     Category::unsetEventDispatcher();
+
     Category::setEventDispatcher($dispatcher);
   }
 
   public function testMoved() {
     $dispatcher = Category::getEventDispatcher();
-    Category::setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+
+    Category::setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 
     $closure = function() {};
-    $events->shouldReceive('listen')->once()->with('eloquent.moved: '.get_class(new Category), $closure);
-
+    $events->shouldReceive('listen')->once()->with('eloquent.moved: '.get_class(new Category), $closure, 0);
     Category::moved($closure);
 
     Category::unsetEventDispatcher();
+
     Category::setEventDispatcher($dispatcher);
   }
 

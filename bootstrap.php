@@ -12,7 +12,7 @@ $capsule = new Illuminate\Database\Capsule\Manager;
 
 $capsule->addConnection(require(__DIR__.'/tests/config/database.php'));
 
-$capsule->setEventDispatcher(new Illuminate\Events\Dispatcher);
+$capsule->setEventDispatcher(new Illuminate\Events\Dispatcher(new Illuminate\Container\Container));
 
 $capsule->bootEloquent();
 

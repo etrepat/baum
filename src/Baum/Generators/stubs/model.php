@@ -95,31 +95,8 @@ class {{class}} extends Node {
   // In the same way as Eloquent's model events, returning false from the
   // `moving` event handler will halt the operation.
   //
-  // Below is a sample `boot` method just for convenience, as an example of how
-  // one should hook into those events. This is the *recommended* way to hook
-  // into model events, as stated in the documentation. Please refer to the
-  // Laravel documentation for details.
-  //
-  // If you don't plan on using model events in your program you can safely
-  // remove all the commented code below.
-  //
-
-  // /**
-  //  * The "booting" method of the model.
-  //  *
-  //  * @return void
-  //  */
-  // protected static function boot() {
-  //   // Do not forget this!
-  //   parent::boot();
-
-  //   static::moving(function($node) {
-  //     // YOUR CODE HERE
-  //   });
-
-  //   static::moved(function($node) {
-  //     // YOUR CODE HERE
-  //   });
-  // }
+  // Please refer the Laravel documentation for further instructions on how
+  // to hook your own callbacks/observers into this events:
+  // http://laravel.com/docs/5.0/eloquent#model-events
 
 }

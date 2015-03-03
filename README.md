@@ -2,8 +2,9 @@
 
 [![Build Status](https://travis-ci.org/etrepat/baum.png?branch=master)](https://travis-ci.org/etrepat/baum)
 
-Baum is an implementation of the [Nested Set](http://en.wikipedia.org/wiki/Nested_set_model)
-pattern for [Laravel 4's](http://laravel.com/) Eloquent ORM.
+Baum is an implementation of the [Nested Set](http://en.wikipedia.org/wiki/Nested_set_model) pattern for [Laravel 5's](http://laravel.com/) Eloquent ORM.
+
+> For **Laravel 4.2.x compatibility**, check the [1.0.x branch](https://github.com/etrepat/baum/tree/1.0.x-stable) branch or use the latest [1.0.x tagged release](https://github.com/etrepat/baum/releases).
 
 ## Documentation
 
@@ -93,18 +94,18 @@ ordinary trees are suddenly quite fast. Nifty, isn't it?
 <a name="installation"></a>
 ## Installation
 
-Baum works with Laravel 4 onwards. You can add it to your `composer.json` file
+Baum works with Laravel 5 onwards. You can add it to your `composer.json` file
 with:
 
-    "baum/baum": "~1.0"
+    "baum/baum": "~1.1"
 
 Run `composer install` to install it.
 
-As with most Laravel 4 packages you'll then need to register the Baum
-*service provider*. To do that, head over your `app/config/app.php` file and add
+As with most Laravel 5 packages you'll then need to register the Baum
+*service provider*. To do that, head over your `config/app.php` file and add
 the following line into the `providers` array:
 
-    'Baum\BaumServiceProvider',
+    'Baum\Providers\BaumServiceProvider',
 
 <a name="getting-started"></a>
 ## Getting started
