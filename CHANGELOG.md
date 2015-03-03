@@ -1,3 +1,8 @@
+## 1.0.14
+_Mar 3 2014_
+* bug fixes
+  - Backwards compatible version for Laravel 4.2.x.
+
 ## 1.0.13
 _Sep 30 2014_
 * bug fixes

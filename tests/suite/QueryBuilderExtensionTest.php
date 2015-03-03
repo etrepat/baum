@@ -32,7 +32,7 @@ class QueryBuilderExtensionTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals(1, $results);
 
     $builder = $this->getBuilder();
-    $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', array())->andReturn(array(array('aggregate' => 1)));
+    $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users" limit 1', array())->andReturn(array(array('aggregate' => 1)));
     $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function($builder, $results) { return $results; });
     $results = $builder->from('users')->orderBy('age', 'desc')->exists();
     $this->assertTrue($results);

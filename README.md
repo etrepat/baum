@@ -2,8 +2,9 @@
 
 [![Build Status](https://travis-ci.org/etrepat/baum.png?branch=master)](https://travis-ci.org/etrepat/baum)
 
-Baum is an implementation of the [Nested Set](http://en.wikipedia.org/wiki/Nested_set_model)
-pattern for [Laravel 4's](http://laravel.com/) Eloquent ORM.
+Baum is an implementation of the [Nested Set](http://en.wikipedia.org/wiki/Nested_set_model) pattern for [Laravel 4's](http://laravel.com/) Eloquent ORM.
+
+> For **Laravel 5.x compatibility**, check the [master](https://github.com/etrepat/baum/tree/master) branch or use the latest [1.1.x tagged release](https://github.com/etrepat/baum/releases).
 
 ## Documentation
 
@@ -93,7 +94,7 @@ ordinary trees are suddenly quite fast. Nifty, isn't it?
 <a name="installation"></a>
 ## Installation
 
-Baum works with Laravel 4 onwards. You can add it to your `composer.json` file
+Baum works with Laravel 4.2 onwards. You can add it to your `composer.json` file
 with:
 
     "baum/baum": "~1.0"
