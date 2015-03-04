@@ -1,5 +1,5 @@
 <?php
-namespace Baum;
+namespace Baum\Providers;
 
 use Baum\Generators\MigrationGenerator;
 use Baum\Generators\ModelGenerator;
@@ -14,23 +14,7 @@ class BaumServiceProvider extends ServiceProvider {
    *
    * @var string
    */
-  const VERSION = '1.0.13';
-
-  /**
-   * Indicates if loading of the provider is deferred.
-   *
-   * @var bool
-   */
-  protected $defer = false;
-
-  /**
-   * Bootstrap the application events.
-   *
-   * @return void
-   */
-  public function boot() {
-    $this->package('baum/baum');
-  }
+  const VERSION = '1.1.0';
 
   /**
    * Register the service provider.
@@ -39,15 +23,6 @@ class BaumServiceProvider extends ServiceProvider {
    */
   public function register() {
     $this->registerCommands();
-  }
-
-  /**
-   * Get the services provided by the provider.
-   *
-   * @return array
-   */
-  public function provides() {
-    return array('node');
   }
 
   /**
@@ -70,8 +45,8 @@ class BaumServiceProvider extends ServiceProvider {
    * @return void
    */
   protected function registerBaumCommand() {
-    $this->app['command.baum'] = $this->app->share(function($app) {
-      return new BaumCommand();
+    $this->app->singleton('command.baum', function($app) {
+      return new BaumCommand;
     });
   }
 
@@ -81,12 +56,21 @@ class BaumServiceProvider extends ServiceProvider {
    * @return void
    */
   protected function registerInstallCommand() {
-    $this->app['command.baum.install'] = $this->app->share(function($app) {
+    $this->app->singleton('command.baum.install', function($app) {
       $migrator = new MigrationGenerator($app['files']);
       $modeler  = new ModelGenerator($app['files']);
 
       return new InstallCommand($migrator, $modeler);
     });
+  }
+
+  /**
+   * Get the services provided by the provider.
+   *
+   * @return array
+   */
+  public function provides() {
+    return array('command.baum', 'command.baum.install');
   }
 
 }

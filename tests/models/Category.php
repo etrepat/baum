@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Database\Eloquent\SoftDeletingTrait;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Baum\Node;
 
 class Category extends Node {
@@ -39,7 +39,7 @@ class OrderedScopedCategory extends Category {
 
 class SoftCategory extends Category {
 
-  use SoftDeletingTrait;
+  use SoftDeletes;
 
   public $timestamps = true;
 

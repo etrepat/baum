@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Database\Eloquent\SoftDeletingTrait;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Baum\Node;
 
 class Cluster extends Node {
@@ -58,7 +58,7 @@ class OrderedCluster extends Cluster {
 
 class SoftCluster extends Cluster {
 
-  use SoftDeletingTrait;
+  use SoftDeletes;
 
   public $timestamps = true;
 

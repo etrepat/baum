@@ -1,9 +1,9 @@
 <?php
-
 namespace Baum\Extensions\Eloquent;
 
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Baum\Extensions\Query\Builder as QueryBuilder;
 
 abstract class Model extends BaseModel {
@@ -50,8 +50,8 @@ abstract class Model extends BaseModel {
    * @param  Closure|string  $callback
    * @return void
    */
-  public static function moving($callback) {
-    static::registerModelEvent('moving', $callback);
+  public static function moving($callback, $priority = 0) {
+    static::registerModelEvent('moving', $callback, $priority);
   }
 
   /**
@@ -60,8 +60,8 @@ abstract class Model extends BaseModel {
    * @param  Closure|string  $callback
    * @return void
    */
-  public static function moved($callback) {
-    static::registerModelEvent('moved', $callback);
+  public static function moved($callback, $priority = 0) {
+    static::registerModelEvent('moved', $callback, $priority);
   }
 
   /**
@@ -95,18 +95,15 @@ abstract class Model extends BaseModel {
    * @return boolean
    */
   public function areSoftDeletesEnabled() {
-    // Soft-delete functionality in 4.2 has been moved into a trait.
-    // The proper way to check if a model includes a global scope in >= 4.2
-    // should look similar to the following:
-    //
-    //    static::hasGlobalScope(new SoftDeletingScope);
-    //
-    // We are doing it this way (not the best probably) to keep backwards
-    // compatibility...
-    return (
-      (property_exists($this, 'softDelete') && $this->softDelete == true) ||
-      (!property_exists($this, 'softDelete') && method_exists($this, 'getDeletedAtColumn'))
-    );
+    // To determine if there's a global soft delete scope defined we must
+    // first determine if there are any, to workaround a non-existent key error.
+    $globalScopes = $this->getGlobalScopes();
+
+    if ( count($globalScopes) === 0 ) return false;
+
+    // Now that we're sure that the calling class has some kind of global scope
+    // we check for the SoftDeletingScope existance
+    return static::hasGlobalScope(new SoftDeletingScope);
   }
 
   /**
