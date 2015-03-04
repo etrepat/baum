@@ -1,5 +1,10 @@
+## 1.0.15
+_Mar 4 2015_
+* bug fixes
+  - Backport minor bugfixes from master.
+
 ## 1.0.14
-_Mar 3 2014_
+_Mar 3 2015_
 * bug fixes
   - Backwards compatible version for Laravel 4.2.x.
 

@@ -332,7 +332,7 @@ You can ask some questions to your Baum nodes:
 * `isAncestorOf($other)`: Returns true if node is an ancestor of the other.
 * `isSelfOrAncestorOf($other)`: Returns true if node is self or an ancestor.
 * `equals($node)`: current node instance equals the other.
-* `insideSubtree($node)`: Checks wether the given node is inside the subtree
+* `insideSubtree($node)`: Checks whether the given node is inside the subtree
 defined by the left and right indices.
 * `inSameScope($node)`: Returns true if the given node is in the same scope
 as the current one. That is, if *every* column in the `scoped` property has
@@ -475,7 +475,7 @@ Retrieving a complete tree hierarchy into a regular `Collection` object with
 its children *properly nested* is as simple as:
 
 ```php
-$tree = Category::where('name', '=', Books)->first()->getDescendantsAndSelf()->toHierarchy();
+$tree = Category::where('name', '=', 'Books')->first()->getDescendantsAndSelf()->toHierarchy();
 ```
 
 <a name="node-model-events"></a>

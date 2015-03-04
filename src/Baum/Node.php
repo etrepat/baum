@@ -500,8 +500,9 @@ abstract class Node extends Model {
   public function scopeLimitDepth($query, $limit) {
     $depth  = $this->exists ? $this->getDepth() : $this->getLevel();
     $max    = $depth + $limit;
+    $scopes = array($depth, $max);
 
-    return $query->whereBetween($this->getDepthColumnName(), array($depth, $max));
+    return $query->whereBetween($this->getDepthColumnName(), array(min($scopes), max($scopes)));
   }
 
   /**
