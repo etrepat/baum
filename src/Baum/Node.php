@@ -109,7 +109,11 @@ abstract class Node extends Model {
    */
   protected static function boot() {
     parent::boot();
+    static::flushModelEvents();
+  }
 
+  public static function flushModelEvents()
+  {
     static::creating(function($node) {
       $node->setDefaultLeftAndRight();
     });
