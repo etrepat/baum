@@ -475,7 +475,7 @@ Retrieving a complete tree hierarchy into a regular `Collection` object with
 its children *properly nested* is as simple as:
 
 ```php
-$tree = Category::where('name', '=', Books)->first()->getDescendantsAndSelf()->toHierarchy();
+$tree = Category::where('name', '=', 'Books')->first()->getDescendantsAndSelf()->toHierarchy();
 ```
 
 <a name="node-model-events"></a>
