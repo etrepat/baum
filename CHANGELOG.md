@@ -1,3 +1,10 @@
+## 1.1.1
+_Mar 4 2015_
+* bug fixes
+  - Fix README.md typos [PR #134 and #131]
+  - Use table prefixes in `rebuild` command [PR #133]
+  - Fix `limitDepth` query scope [PR #125]
+
 ## 1.1.0
 _Mar 3 2015_
 * enhancements
