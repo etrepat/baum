@@ -154,7 +154,9 @@ class SetMapper {
   }
 
   protected function deleteUnaffected($keys = array()) {
-    return $this->pruneScope()->whereNotIn($this->node->getKeyName(), $keys)->delete();
+    $nodes = $this->pruneScope()->whereNotIn($this->node->getKeyName(), $keys)->get();
+    foreach ($nodes as $node)
+      $node->delete();
   }
 
   protected function wrapInTransaction(Closure $callback) {
