@@ -5,9 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -21,7 +21,7 @@
       <div class="inner">
         <h1>Baum</h1>
         <h2>Baum is an implementation of the Nested Set pattern for Laravel 4&#39;s Eloquent ORM.</h2>
-        <a href="https://github.com/etrepat/baum" class="button"><small>View project on</small>GitHub</a>
+        <a href="https://github.com/etrepat/baum" class="button"><small>View project on</small> GitHub</a>
       </div>
     </header>
 
@@ -29,15 +29,18 @@
       <div class="inner clearfix">
         <section id="main-content">
           <h1>
-<a name="baum" class="anchor" href="#baum"><span class="octicon octicon-link"></span></a>Baum</h1>
+<a id="baum" class="anchor" href="#baum" aria-hidden="true"><span class="octicon octicon-link"></span></a>Baum</h1>
 
 <p><a href="https://travis-ci.org/etrepat/baum"><img src="https://travis-ci.org/etrepat/baum.png?branch=master" alt="Build Status"></a></p>
 
-<p>Baum is an implementation of the <a href="http://en.wikipedia.org/wiki/Nested_set_model">Nested Set</a>
-pattern for <a href="http://laravel.com/">Laravel 4's</a> Eloquent ORM.</p>
+<p>Baum is an implementation of the <a href="http://en.wikipedia.org/wiki/Nested_set_model">Nested Set</a> pattern for <a href="http://laravel.com/">Laravel 5's</a> Eloquent ORM.</p>
+
+<blockquote>
+<p>For <strong>Laravel 4.2.x compatibility</strong>, check the <a href="https://github.com/etrepat/baum/tree/1.0.x-stable">1.0.x branch</a> branch or use the latest <a href="https://github.com/etrepat/baum/releases">1.0.x tagged release</a>.</p>
+</blockquote>
 
 <h2>
-<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
+<a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documentation</h2>
 
 <ul>
 <li><a href="#about">About Nested Sets</a></li>
@@ -45,10 +48,14 @@ pattern for <a href="http://laravel.com/">Laravel 4's</a> Eloquent ORM.</p>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#getting-started">Getting started</a></li>
 <li><a href="#usage">Usage</a></li>
-</ul><p><a name="about"></a></p>
+<li><a href="#further-information">Further information</a></li>
+<li><a href="#contributing">Contributing</a></li>
+</ul>
+
+<p><a name="about"></a></p>
 
 <h2>
-<a name="about-nested-sets" class="anchor" href="#about-nested-sets"><span class="octicon octicon-link"></span></a>About Nested Sets</h2>
+<a id="about-nested-sets" class="anchor" href="#about-nested-sets" aria-hidden="true"><span class="octicon octicon-link"></span></a>About Nested Sets</h2>
 
 <p>A nested set is a smart way to implement an <em>ordered</em> tree that allows for fast,
 non-recursive queries. For example, you can fetch all descendants of a node in a
@@ -65,7 +72,7 @@ for more info. Also, this is a good introductory tutorial:
 <p><a name="theory"></a></p>
 
 <h2>
-<a name="the-theory-behind-a-tldr-version" class="anchor" href="#the-theory-behind-a-tldr-version"><span class="octicon octicon-link"></span></a>The theory behind, a TL;DR version</h2>
+<a id="the-theory-behind-a-tldr-version" class="anchor" href="#the-theory-behind-a-tldr-version" aria-hidden="true"><span class="octicon octicon-link"></span></a>The theory behind, a TL;DR version</h2>
 
 <p>An easy way to visualize how a nested set works is to think of a parent entity surrounding all
 of its children, and its parent surrounding it, etc. So this tree:</p>
@@ -107,18 +114,15 @@ look like this:</p>
 
 <p>To get all children of a <em>parent</em> node, you</p>
 
-<div class="highlight highlight-sql"><pre><span class="k">SELECT</span> <span class="o">*</span> <span class="k">WHERE</span> <span class="n">lft</span> <span class="k">IS</span> <span class="k">BETWEEN</span> <span class="n">parent</span><span class="p">.</span><span class="n">lft</span> <span class="k">AND</span> <span class="n">parent</span><span class="p">.</span><span class="n">rgt</span>
-</pre></div>
+<div class="highlight highlight-sql"><pre><span class="pl-k">SELECT</span> <span class="pl-k">*</span> <span class="pl-k">WHERE</span> lft IS BETWEEN <span class="pl-c1">parent</span>.<span class="pl-c1">lft</span> <span class="pl-k">AND</span> <span class="pl-c1">parent</span>.<span class="pl-c1">rgt</span></pre></div>
 
 <p>To get the number of children, it's</p>
 
-<div class="highlight highlight-sql"><pre><span class="p">(</span><span class="k">right</span> <span class="o">-</span> <span class="k">left</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
-</pre></div>
+<div class="highlight highlight-sql"><pre>(right <span class="pl-k">-</span> left <span class="pl-k">-</span> <span class="pl-c1">1</span>)<span class="pl-k">/</span><span class="pl-c1">2</span></pre></div>
 
 <p>To get a node and all its ancestors going back to the root, you</p>
 
-<div class="highlight highlight-sql"><pre><span class="k">SELECT</span> <span class="o">*</span> <span class="k">WHERE</span> <span class="n">node</span><span class="p">.</span><span class="n">lft</span> <span class="k">IS</span> <span class="k">BETWEEN</span> <span class="n">lft</span> <span class="k">AND</span> <span class="n">rgt</span>
-</pre></div>
+<div class="highlight highlight-sql"><pre><span class="pl-k">SELECT</span> <span class="pl-k">*</span> <span class="pl-k">WHERE</span> <span class="pl-c1">node</span>.<span class="pl-c1">lft</span> IS BETWEEN lft <span class="pl-k">AND</span> rgt</pre></div>
 
 <p>As you can see, queries that would be recursive and prohibitively slow on
 ordinary trees are suddenly quite fast. Nifty, isn't it?</p>
@@ -126,27 +130,27 @@ ordinary trees are suddenly quite fast. Nifty, isn't it?</p>
 <p><a name="installation"></a></p>
 
 <h2>
-<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<p>Baum works with Laravel 4 onwards. You can add it to your <code>composer.json</code> file
+<p>Baum works with Laravel 5 onwards. You can add it to your <code>composer.json</code> file
 with:</p>
 
-<pre><code>"baum/baum": "~1.0"
+<pre><code>"baum/baum": "~1.1"
 </code></pre>
 
 <p>Run <code>composer install</code> to install it.</p>
 
-<p>As with most Laravel 4 packages you'll then need to register the Baum
-<em>service provider</em>. To do that, head over your <code>app/config/app.php</code> file and add
+<p>As with most Laravel 5 packages you'll then need to register the Baum
+<em>service provider</em>. To do that, head over your <code>config/app.php</code> file and add
 the following line into the <code>providers</code> array:</p>
 
-<pre><code>'Baum\BaumServiceProvider',
+<pre><code>'Baum\Providers\BaumServiceProvider',
 </code></pre>
 
 <p><a name="getting-started"></a></p>
 
 <h2>
-<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started</h2>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting started</h2>
 
 <p>After the package is correctly installed the easiest way to get started is to
 run the provided generator:</p>
@@ -163,46 +167,44 @@ take a look at those files, as each of them describes how they can be customized
 <p>Next, you would probably run <code>artisan migrate</code> to apply the migration.</p>
 
 <h3>
-<a name="model-configuration" class="anchor" href="#model-configuration"><span class="octicon octicon-link"></span></a>Model configuration</h3>
+<a id="model-configuration" class="anchor" href="#model-configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Model configuration</h3>
 
 <p>In order to work with Baum, you must ensure that your model class extends
 <code>Baum\Node</code>.</p>
 
 <p>This is the easiest it can get:</p>
 
-<div class="highlight highlight-php"><pre><span class="k">class</span> <span class="nc">Category</span> <span class="k">extends</span> <span class="nx">Baum\Node</span> <span class="p">{</span>
-
-<span class="p">}</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-st">class</span> <span class="pl-en">Category</span> <span class="pl-s">extends</span> <span class="pl-s3">Baum\</span><span class="pl-e">Node</span> {</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">}</span></pre></div>
 
 <p>This is a <em>slightly</em> more complex example where we have the column names customized:</p>
 
-<div class="highlight highlight-php"><pre><span class="k">class</span> <span class="nc">Dictionary</span> <span class="k">extends</span> <span class="nx">Baum\Node</span> <span class="p">{</span>
-
-  <span class="k">protected</span> <span class="nv">$table</span> <span class="o">=</span> <span class="s1">'dictionary'</span><span class="p">;</span>
-
-  <span class="c1">// 'parent_id' column name</span>
-  <span class="k">protected</span> <span class="nv">$parentColumn</span> <span class="o">=</span> <span class="s1">'parent_id'</span><span class="p">;</span>
-
-  <span class="c1">// 'lft' column name</span>
-  <span class="k">protected</span> <span class="nv">$leftColumn</span> <span class="o">=</span> <span class="s1">'lidx'</span><span class="p">;</span>
-
-  <span class="c1">// 'rgt' column name</span>
-  <span class="k">protected</span> <span class="nv">$rightColumn</span> <span class="o">=</span> <span class="s1">'ridx'</span><span class="p">;</span>
-
-  <span class="c1">// 'depth' column name</span>
-  <span class="k">protected</span> <span class="nv">$depthColumn</span> <span class="o">=</span> <span class="s1">'nesting'</span><span class="p">;</span>
-
-  <span class="c1">// guard attributes from mass-assignment</span>
-  <span class="k">protected</span> <span class="nv">$guarded</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'parent_id'</span><span class="p">,</span> <span class="s1">'lidx'</span><span class="p">,</span> <span class="s1">'ridx'</span><span class="p">,</span> <span class="s1">'nesting'</span><span class="p">);</span>
-
-<span class="p">}</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-st">class</span> <span class="pl-en">Dictionary</span> <span class="pl-s">extends</span> <span class="pl-s3">Baum\</span><span class="pl-e">Node</span> {</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">  <span class="pl-s">protected</span> <span class="pl-vo">$table</span> <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>dictionary<span class="pl-pds">'</span></span>;</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">  <span class="pl-c">// 'parent_id' column name</span></span>
+<span class="pl-s2">  <span class="pl-s">protected</span> <span class="pl-vo">$parentColumn</span> <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>parent_id<span class="pl-pds">'</span></span>;</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">  <span class="pl-c">// 'lft' column name</span></span>
+<span class="pl-s2">  <span class="pl-s">protected</span> <span class="pl-vo">$leftColumn</span> <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>lidx<span class="pl-pds">'</span></span>;</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">  <span class="pl-c">// 'rgt' column name</span></span>
+<span class="pl-s2">  <span class="pl-s">protected</span> <span class="pl-vo">$rightColumn</span> <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>ridx<span class="pl-pds">'</span></span>;</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">  <span class="pl-c">// 'depth' column name</span></span>
+<span class="pl-s2">  <span class="pl-s">protected</span> <span class="pl-vo">$depthColumn</span> <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>nesting<span class="pl-pds">'</span></span>;</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">  <span class="pl-c">// guard attributes from mass-assignment</span></span>
+<span class="pl-s2">  <span class="pl-s">protected</span> <span class="pl-vo">$guarded</span> <span class="pl-k">=</span> <span class="pl-s3">array</span>(<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>parent_id<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>lidx<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>ridx<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>nesting<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">}</span></pre></div>
 
 <p>Remember that, obviously, the column names must match those in the database table.</p>
 
 <h3>
-<a name="migration-configuration" class="anchor" href="#migration-configuration"><span class="octicon octicon-link"></span></a>Migration configuration</h3>
+<a id="migration-configuration" class="anchor" href="#migration-configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Migration configuration</h3>
 
 <p>You must ensure that the database table that supports your Baum models has the
 following columns:</p>
@@ -216,31 +218,32 @@ following columns:</p>
 <code>rgt</code>: right index bound (int)</li>
 <li>
 <code>depth</code>: depth or nesting level (int)</li>
-</ul><p>Here is a sample migration file:</p>
+</ul>
 
-<div class="highlight highlight-php"><pre><span class="k">class</span> <span class="nc">Category</span> <span class="k">extends</span> <span class="nx">Migration</span> <span class="p">{</span>
+<p>Here is a sample migration file:</p>
 
-  <span class="k">public</span> <span class="k">function</span> <span class="nf">up</span><span class="p">()</span> <span class="p">{</span>
-    <span class="nx">Schema</span><span class="o">::</span><span class="na">create</span><span class="p">(</span><span class="s1">'categories'</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nx">Blueprint</span> <span class="nv">$table</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
-
-      <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">(</span><span class="s1">'parent_id'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullable</span><span class="p">();</span>
-      <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">(</span><span class="s1">'lft'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullable</span><span class="p">();</span>
-      <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">(</span><span class="s1">'rgt'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullable</span><span class="p">();</span>
-      <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">(</span><span class="s1">'depth'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullable</span><span class="p">();</span>
-
-      <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="mi">255</span><span class="p">);</span>
-
-      <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">timestamps</span><span class="p">();</span>
-    <span class="p">});</span>
-  <span class="p">}</span>
-
-  <span class="k">public</span> <span class="k">function</span> <span class="nf">down</span><span class="p">()</span> <span class="p">{</span>
-    <span class="nx">Schema</span><span class="o">::</span><span class="na">drop</span><span class="p">(</span><span class="s1">'categories'</span><span class="p">);</span>
-  <span class="p">}</span>
-
-<span class="p">}</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-st">class</span> <span class="pl-en">Category</span> <span class="pl-s">extends</span> <span class="pl-e">Migration</span> {</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">  <span class="pl-s">public</span> <span class="pl-st">function</span> <span class="pl-en">up</span>() {</span>
+<span class="pl-s2">    <span class="pl-s3">Schema</span><span class="pl-k">::</span>create(<span class="pl-s1"><span class="pl-pds">'</span>categories<span class="pl-pds">'</span></span>, <span class="pl-st">function</span>(<span class="pl-s3">Blueprint</span> <span class="pl-vo">$table</span>) {</span>
+<span class="pl-s2">      <span class="pl-vo">$table</span><span class="pl-k">-&gt;</span>increments(<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">      <span class="pl-vo">$table</span><span class="pl-k">-&gt;</span>integer(<span class="pl-s1"><span class="pl-pds">'</span>parent_id<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>nullable();</span>
+<span class="pl-s2">      <span class="pl-vo">$table</span><span class="pl-k">-&gt;</span>integer(<span class="pl-s1"><span class="pl-pds">'</span>lft<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>nullable();</span>
+<span class="pl-s2">      <span class="pl-vo">$table</span><span class="pl-k">-&gt;</span>integer(<span class="pl-s1"><span class="pl-pds">'</span>rgt<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>nullable();</span>
+<span class="pl-s2">      <span class="pl-vo">$table</span><span class="pl-k">-&gt;</span>integer(<span class="pl-s1"><span class="pl-pds">'</span>depth<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>nullable();</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">      <span class="pl-vo">$table</span><span class="pl-k">-&gt;</span>string(<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>, <span class="pl-c1">255</span>);</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">      <span class="pl-vo">$table</span><span class="pl-k">-&gt;</span>timestamps();</span>
+<span class="pl-s2">    });</span>
+<span class="pl-s2">  }</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">  <span class="pl-s">public</span> <span class="pl-st">function</span> <span class="pl-en">down</span>() {</span>
+<span class="pl-s2">    <span class="pl-s3">Schema</span><span class="pl-k">::</span>drop(<span class="pl-s1"><span class="pl-pds">'</span>categories<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s2">  }</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">}</span></pre></div>
 
 <p>You may freely modify the column names, provided you change them both in the
 migration and the model.</p>
@@ -248,7 +251,7 @@ migration and the model.</p>
 <p><a name="usage"></a></p>
 
 <h2>
-<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <p>After you've configured your model and run the migration, you are now ready
 to use Baum with your model. Below are some examples.</p>
@@ -263,46 +266,56 @@ to use Baum with your model. Below are some examples.</p>
 <li><a href="#node-relations">Relations</a></li>
 <li><a href="#node-basic-scopes">Root and Leaf scopes</a></li>
 <li><a href="#node-chains">Accessing the ancestry/descendancy chain</a></li>
+<li><a href="#limiting-depth">Limiting levels of children returned</a></li>
+<li><a href="#custom-sorting-column">Custom sorting column</a></li>
 <li><a href="#hierarchy-tree">Dumping the hierarchy tree</a></li>
 <li><a href="#node-model-events">Model events: <code>moving</code> and <code>moved</code></a></li>
 <li><a href="#scope-support">Scope support</a></li>
+<li><a href="#validation">Validation</a></li>
+<li><a href="#rebuilding">Tree rebuilding</a></li>
+<li><a href="#soft-deletes">Soft deletes</a></li>
+<li><a href="#seeding">Seeding/Mass assignment</a></li>
 <li><a href="#misc-utilities">Misc/Utility functions</a></li>
-</ul><p><a name="creating-root-node"></a></p>
+</ul>
+
+<p><a name="creating-root-node"></a></p>
 
 <h3>
-<a name="creating-a-root-node" class="anchor" href="#creating-a-root-node"><span class="octicon octicon-link"></span></a>Creating a root node</h3>
+<a id="creating-a-root-node" class="anchor" href="#creating-a-root-node" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating a root node</h3>
 
 <p>By default, all nodes are created as roots:</p>
 
-<div class="highlight highlight-php"><pre><span class="nv">$root</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Root category'</span><span class="p">]);</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$root</span> <span class="pl-k">=</span> <span class="pl-s3">Category</span><span class="pl-k">::</span>create([<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Root category<span class="pl-pds">'</span></span>]);</span></pre></div>
 
 <p>Alternatively, you may find yourself in the need of <em>converting</em> an existing node
 into a <em>root node</em>:</p>
 
-<div class="highlight highlight-php"><pre><span class="nv">$node</span><span class="o">-&gt;</span><span class="na">makeRoot</span><span class="p">();</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$node</span><span class="pl-k">-&gt;</span>makeRoot();</span></pre></div>
+
+<p>You may also nullify it's <code>parent_id</code> column to accomplish the same behaviour:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-c">// This works the same as makeRoot()</span></span>
+<span class="pl-s2"><span class="pl-vo">$node</span><span class="pl-k">-&gt;</span><span class="pl-vo">parent_id</span> <span class="pl-k">=</span> <span class="pl-c1">null</span>;</span>
+<span class="pl-s2"><span class="pl-vo">$node</span><span class="pl-k">-&gt;</span>save();</span></pre></div>
 
 <p><a name="inserting-nodes"></a></p>
 
 <h3>
-<a name="inserting-nodes" class="anchor" href="#inserting-nodes"><span class="octicon octicon-link"></span></a>Inserting nodes</h3>
+<a id="inserting-nodes" class="anchor" href="#inserting-nodes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Inserting nodes</h3>
 
-<div class="highlight highlight-php"><pre><span class="c1">// Directly with a relation</span>
-<span class="nv">$child1</span> <span class="o">=</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Child 1'</span><span class="p">]);</span>
-
-<span class="c1">// with the `makeChildOf` method</span>
-<span class="nv">$child2</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Child 2'</span><span class="p">]);</span>
-<span class="nv">$child2</span><span class="o">-&gt;</span><span class="na">makeChildOf</span><span class="p">(</span><span class="nv">$root</span><span class="p">);</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-c">// Directly with a relation</span></span>
+<span class="pl-s2"><span class="pl-vo">$child1</span> <span class="pl-k">=</span> <span class="pl-vo">$root</span><span class="pl-k">-&gt;</span>children()<span class="pl-k">-&gt;</span>create([<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Child 1<span class="pl-pds">'</span></span>]);</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-c">// with the `makeChildOf` method</span></span>
+<span class="pl-s2"><span class="pl-vo">$child2</span> <span class="pl-k">=</span> <span class="pl-s3">Category</span><span class="pl-k">::</span>create([<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Child 2<span class="pl-pds">'</span></span>]);</span>
+<span class="pl-s2"><span class="pl-vo">$child2</span><span class="pl-k">-&gt;</span>makeChildOf(<span class="pl-vo">$root</span>);</span></pre></div>
 
 <p><a name="deleting-nodes"></a></p>
 
 <h3>
-<a name="deleting-nodes" class="anchor" href="#deleting-nodes"><span class="octicon octicon-link"></span></a>Deleting nodes</h3>
+<a id="deleting-nodes" class="anchor" href="#deleting-nodes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deleting nodes</h3>
 
-<div class="highlight highlight-php"><pre><span class="nv">$child1</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$child1</span><span class="pl-k">-&gt;</span>delete();</span></pre></div>
 
 <p>Descendants of deleted nodes will also be deleted and all the <code>lft</code> and <code>rgt</code>
 bound will be recalculated. Pleases note that, for now, <code>deleting</code> and <code>deleted</code>
@@ -311,17 +324,16 @@ model events for the descendants will not be fired.</p>
 <p><a name="node-level"></a></p>
 
 <h3>
-<a name="getting-the-nesting-level-of-a-node" class="anchor" href="#getting-the-nesting-level-of-a-node"><span class="octicon octicon-link"></span></a>Getting the nesting level of a node</h3>
+<a id="getting-the-nesting-level-of-a-node" class="anchor" href="#getting-the-nesting-level-of-a-node" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting the nesting level of a node</h3>
 
 <p>The <code>getLevel()</code> method will return current nesting level, or depth, of a node.</p>
 
-<div class="highlight highlight-php"><pre><span class="nv">$node</span><span class="o">-&gt;</span><span class="na">getLevel</span><span class="p">()</span> <span class="c1">// 0 when root</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$node</span><span class="pl-k">-&gt;</span>getLevel() <span class="pl-c">// 0 when root</span></span></pre></div>
 
 <p><a name="moving-nodes"></a></p>
 
 <h3>
-<a name="moving-nodes-around" class="anchor" href="#moving-nodes-around"><span class="octicon octicon-link"></span></a>Moving nodes around</h3>
+<a id="moving-nodes-around" class="anchor" href="#moving-nodes-around" aria-hidden="true"><span class="octicon octicon-link"></span></a>Moving nodes around</h3>
 
 <p>Baum provides several methods for moving nodes around:</p>
 
@@ -343,27 +355,32 @@ model events for the descendants will not be fired.</p>
 <li>
 <code>makeChildOf($otherNode)</code>: Make the node a child of ...</li>
 <li>
+<code>makeFirstChildOf($otherNode)</code>: Make the node the first child of ...</li>
+<li>
+<code>makeLastChildOf($otherNode)</code>: Alias for <code>makeChildOf</code>.</li>
+<li>
 <code>makeRoot()</code>: Make current node a root node.</li>
-</ul><p>For example:</p>
+</ul>
 
-<div class="highlight highlight-php"><pre><span class="nv">$root</span> <span class="o">=</span> <span class="nx">Creatures</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'The Root of All Evil'</span><span class="p">]);</span>
+<p>For example:</p>
 
-<span class="nv">$dragons</span> <span class="o">=</span> <span class="nx">Creatures</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Here Be Dragons'</span><span class="p">]);</span>
-<span class="nv">$dragons</span><span class="o">-&gt;</span><span class="na">makeChildOf</span><span class="p">(</span><span class="nv">$root</span><span class="p">);</span>
-
-<span class="nv">$monsters</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Creatures</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Horrible Monsters'</span><span class="p">]);</span>
-<span class="nv">$monsters</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
-
-<span class="nv">$monsters</span><span class="o">-&gt;</span><span class="na">makeSiblingOf</span><span class="p">(</span><span class="nv">$dragons</span><span class="p">);</span>
-
-<span class="nv">$demons</span> <span class="o">=</span> <span class="nx">Creatures</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="s1">'demons'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">first</span><span class="p">();</span>
-<span class="nv">$demons</span><span class="o">-&gt;</span><span class="na">moveToLeftOf</span><span class="p">(</span><span class="nv">$dragons</span><span class="p">);</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$root</span> <span class="pl-k">=</span> <span class="pl-s3">Creatures</span><span class="pl-k">::</span>create([<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>The Root of All Evil<span class="pl-pds">'</span></span>]);</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-vo">$dragons</span> <span class="pl-k">=</span> <span class="pl-s3">Creatures</span><span class="pl-k">::</span>create([<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Here Be Dragons<span class="pl-pds">'</span></span>]);</span>
+<span class="pl-s2"><span class="pl-vo">$dragons</span><span class="pl-k">-&gt;</span>makeChildOf(<span class="pl-vo">$root</span>);</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-vo">$monsters</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-s3">Creatures</span>([<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Horrible Monsters<span class="pl-pds">'</span></span>]);</span>
+<span class="pl-s2"><span class="pl-vo">$monsters</span><span class="pl-k">-&gt;</span>save();</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-vo">$monsters</span><span class="pl-k">-&gt;</span>makeSiblingOf(<span class="pl-vo">$dragons</span>);</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-vo">$demons</span> <span class="pl-k">=</span> <span class="pl-s3">Creatures</span><span class="pl-k">::</span>where(<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>=<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>demons<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>first();</span>
+<span class="pl-s2"><span class="pl-vo">$demons</span><span class="pl-k">-&gt;</span>moveToLeftOf(<span class="pl-vo">$dragons</span>);</span></pre></div>
 
 <p><a name="node-questions"></a></p>
 
 <h3>
-<a name="asking-questions-to-your-nodes" class="anchor" href="#asking-questions-to-your-nodes"><span class="octicon octicon-link"></span></a>Asking questions to your nodes</h3>
+<a id="asking-questions-to-your-nodes" class="anchor" href="#asking-questions-to-your-nodes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Asking questions to your nodes</h3>
 
 <p>You can ask some questions to your Baum nodes:</p>
 
@@ -391,49 +408,47 @@ defined by the left and right indices.</li>
 <code>inSameScope($node)</code>: Returns true if the given node is in the same scope
 as the current one. That is, if <em>every</em> column in the <code>scoped</code> property has
 the same value in both nodes.</li>
-</ul><p>Using the nodes from the previous example:</p>
+</ul>
 
-<div class="highlight highlight-php"><pre><span class="nv">$demons</span><span class="o">-&gt;</span><span class="na">isRoot</span><span class="p">();</span> <span class="c1">// =&gt; false</span>
+<p>Using the nodes from the previous example:</p>
 
-<span class="nv">$demons</span><span class="o">-&gt;</span><span class="na">isDescendantOf</span><span class="p">(</span><span class="nv">$root</span><span class="p">)</span> <span class="c1">// =&gt; true</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$demons</span><span class="pl-k">-&gt;</span>isRoot(); <span class="pl-c">// =&gt; false</span></span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-vo">$demons</span><span class="pl-k">-&gt;</span>isDescendantOf(<span class="pl-vo">$root</span>) <span class="pl-c">// =&gt; true</span></span></pre></div>
 
 <p><a name="node-relations"></a></p>
 
 <h3>
-<a name="relations" class="anchor" href="#relations"><span class="octicon octicon-link"></span></a>Relations</h3>
+<a id="relations" class="anchor" href="#relations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Relations</h3>
 
 <p>Baum provides two self-referential Eloquent relations for your nodes: <code>parent</code>
 and <code>children</code>.</p>
 
-<div class="highlight highlight-php"><pre><span class="nv">$parent</span> <span class="o">=</span> <span class="nv">$node</span><span class="o">-&gt;</span><span class="na">parent</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span>
-
-<span class="nv">$children</span> <span class="o">=</span> <span class="nv">$node</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$parent</span> <span class="pl-k">=</span> <span class="pl-vo">$node</span><span class="pl-k">-&gt;</span>parent()<span class="pl-k">-&gt;</span>get();</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-vo">$children</span> <span class="pl-k">=</span> <span class="pl-vo">$node</span><span class="pl-k">-&gt;</span>children()<span class="pl-k">-&gt;</span>get();</span></pre></div>
 
 <p><a name="node-basic-scopes"></a></p>
 
 <h3>
-<a name="root-and-leaf-scopes" class="anchor" href="#root-and-leaf-scopes"><span class="octicon octicon-link"></span></a>Root and Leaf scopes</h3>
+<a id="root-and-leaf-scopes" class="anchor" href="#root-and-leaf-scopes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Root and Leaf scopes</h3>
 
 <p>Baum provides some very basic query scopes for accessing the root and leaf nodes:</p>
 
-<div class="highlight highlight-php"><pre><span class="c1">// Query scope which targets all root nodes</span>
-<span class="nx">Category</span><span class="o">::</span><span class="na">roots</span><span class="p">()</span>
-
-<span class="c1">// All leaf nodes (nodes at the end of a branch)</span>
-<span class="nx">Category</span><span class="o">:</span><span class="nx">allLeaves</span><span class="p">()</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-c">// Query scope which targets all root nodes</span></span>
+<span class="pl-s2"><span class="pl-s3">Category</span><span class="pl-k">::</span>roots()</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-c">// All leaf nodes (nodes at the end of a branch)</span></span>
+<span class="pl-s2"><span class="pl-en">Category</span>:allLeaves()</span></pre></div>
 
 <p>You may also be interested in only the first root:</p>
 
-<div class="highlight highlight-php"><pre><span class="nv">$firstRootNode</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">root</span><span class="p">();</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$firstRootNode</span> <span class="pl-k">=</span> <span class="pl-s3">Category</span><span class="pl-k">::</span>root();</span></pre></div>
 
 <p><a name="node-chains"></a></p>
 
 <h3>
-<a name="accessing-the-ancestrydescendancy-chain" class="anchor" href="#accessing-the-ancestrydescendancy-chain"><span class="octicon octicon-link"></span></a>Accessing the ancestry/descendancy chain</h3>
+<a id="accessing-the-ancestrydescendancy-chain" class="anchor" href="#accessing-the-ancestrydescendancy-chain" aria-hidden="true"><span class="octicon octicon-link"></span></a>Accessing the ancestry/descendancy chain</h3>
 
 <p>There are several methods which Baum offers to access the ancestry/descendancy
 chain of a node in the Nested Set tree. The main thing to keep in mind is that
@@ -460,7 +475,9 @@ remember to call <code>get()</code> or <code>first()</code>.</p>
 <code>descendants()</code>: Set of all children &amp; nested children.</li>
 <li>
 <code>immediateDescendants()</code>: Set of all children nodes (non-recursive).</li>
-</ul><p>Second, as <strong>methods</strong> which return actual <code>Baum\Node</code> instances (inside a <code>Collection</code>
+</ul>
+
+<p>Second, as <strong>methods</strong> which return actual <code>Baum\Node</code> instances (inside a <code>Collection</code>
 object where appropiate):</p>
 
 <ul>
@@ -486,20 +503,60 @@ object where appropiate):</p>
 <code>getDescendants()</code>: Retrieve all of its children &amp; nested children.</li>
 <li>
 <code>getImmediateDescendants()</code>: Retrieve all of its children nodes (non-recursive).</li>
-</ul><p>Here's a simple example for iterating a node's descendants (provided a name
+</ul>
+
+<p>Here's a simple example for iterating a node's descendants (provided a name
 attribute is available):</p>
 
-<div class="highlight highlight-php"><pre><span class="nv">$node</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="s1">'Books'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">first</span><span class="p">();</span>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$node</span> <span class="pl-k">=</span> <span class="pl-s3">Category</span><span class="pl-k">::</span>where(<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>=<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>Books<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>first();</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-k">foreach</span>(<span class="pl-vo">$node</span><span class="pl-k">-&gt;</span>getDescendantsAndSelf() <span class="pl-k">as</span> <span class="pl-vo">$descendant</span>) {</span>
+<span class="pl-s2">  <span class="pl-s3">echo</span> <span class="pl-s1"><span class="pl-pds">"</span>{<span class="pl-vo">$descendant</span><span class="pl-k">-&gt;</span><span class="pl-vo">name</span>}<span class="pl-pds">"</span></span>;</span>
+<span class="pl-s2">}</span></pre></div>
 
-<span class="k">foreach</span><span class="p">(</span><span class="nv">$node</span><span class="o">-&gt;</span><span class="na">getDescendantsAndSelf</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$descendant</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">echo</span> <span class="s2">"</span><span class="si">{</span><span class="nv">$descendant</span><span class="o">-&gt;</span><span class="na">name</span><span class="si">}</span><span class="s2">"</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
+<p><a name="limiting-depth"></a></p>
+
+<h3>
+<a id="limiting-the-levels-of-children-returned" class="anchor" href="#limiting-the-levels-of-children-returned" aria-hidden="true"><span class="octicon octicon-link"></span></a>Limiting the levels of children returned</h3>
+
+<p>In some situations where the hierarchy depth is huge it might be desirable to limit the number of levels of children returned (depth). You can do this in Baum by using the <code>limitDepth</code> query scope.</p>
+
+<p>The following snippet will get the current node's descendants up to a maximum
+of 5 depth levels below it:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$node</span><span class="pl-k">-&gt;</span>descendants()<span class="pl-k">-&gt;</span>limitDepth(<span class="pl-c1">5</span>)<span class="pl-k">-&gt;</span>get();</span></pre></div>
+
+<p>Similarly, you can limit the descendancy levels with both the <code>getDescendants</code> and <code>getDescendantsAndSelf</code> methods by supplying the desired depth limit as the first argument:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-c">// This will work without depth limiting</span></span>
+<span class="pl-s2"><span class="pl-c">// 1. As usual</span></span>
+<span class="pl-s2"><span class="pl-vo">$node</span><span class="pl-k">-&gt;</span>getDescendants();</span>
+<span class="pl-s2"><span class="pl-c">// 2. Selecting only some attributes</span></span>
+<span class="pl-s2"><span class="pl-vo">$other</span><span class="pl-k">-&gt;</span>getDescendants(<span class="pl-s3">array</span>(<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>parent_id<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>));</span>
+<span class="pl-s2"><span class="pl-k">...</span></span>
+<span class="pl-s2"><span class="pl-c">// With depth limiting</span></span>
+<span class="pl-s2"><span class="pl-c">// 1. A maximum of 5 levels of children will be returned</span></span>
+<span class="pl-s2"><span class="pl-vo">$node</span><span class="pl-k">-&gt;</span>getDescendants(<span class="pl-c1">5</span>);</span>
+<span class="pl-s2"><span class="pl-c">// 2. A max. of 5 levels of children will be returned selecting only some attrs</span></span>
+<span class="pl-s2"><span class="pl-vo">$other</span><span class="pl-k">-&gt;</span>getDescendants(<span class="pl-c1">5</span>, <span class="pl-s3">array</span>(<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>parent_id<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>));</span></pre></div>
+
+<p><a name="custom-sorting-column"></a></p>
+
+<h3>
+<a id="custom-sorting-column" class="anchor" href="#custom-sorting-column" aria-hidden="true"><span class="octicon octicon-link"></span></a>Custom sorting column</h3>
+
+<p>By default in Baum all results are returned sorted by the <code>lft</code> index column
+value for consistency.</p>
+
+<p>If you wish to change this default behaviour you need to specify in your model
+the name of the column you wish to use to sort your results like this:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-s">protected</span> <span class="pl-vo">$orderColumn</span> <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>;</span></pre></div>
 
 <p><a name="hierarchy-tree"></a></p>
 
 <h3>
-<a name="dumping-the-hierarchy-tree" class="anchor" href="#dumping-the-hierarchy-tree"><span class="octicon octicon-link"></span></a>Dumping the hierarchy tree</h3>
+<a id="dumping-the-hierarchy-tree" class="anchor" href="#dumping-the-hierarchy-tree" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dumping the hierarchy tree</h3>
 
 <p>Baum extends the default <code>Eloquent\Collection</code> class and provides the
 <code>toHierarchy</code> method to it which returns a nested collection representing the
@@ -508,13 +565,12 @@ queried tree.</p>
 <p>Retrieving a complete tree hierarchy into a regular <code>Collection</code> object with
 its children <em>properly nested</em> is as simple as:</p>
 
-<div class="highlight highlight-php"><pre><span class="nv">$tree</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="nx">Books</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">getDescendantsAndSelf</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toHierarchy</span><span class="p">();</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$tree</span> <span class="pl-k">=</span> <span class="pl-s3">Category</span><span class="pl-k">::</span>where(<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>=<span class="pl-pds">'</span></span>, <span class="pl-c1">Books</span>)<span class="pl-k">-&gt;</span>first()<span class="pl-k">-&gt;</span>getDescendantsAndSelf()<span class="pl-k">-&gt;</span>toHierarchy();</span></pre></div>
 
 <p><a name="node-model-events"></a></p>
 
 <h3>
-<a name="model-events-moving-and-moved" class="anchor" href="#model-events-moving-and-moved"><span class="octicon octicon-link"></span></a>Model events: <code>moving</code> and <code>moved</code>
+<a id="model-events-moving-and-moved" class="anchor" href="#model-events-moving-and-moved" aria-hidden="true"><span class="octicon octicon-link"></span></a>Model events: <code>moving</code> and <code>moved</code>
 </h3>
 
 <p>Baum models fire the following events: <code>moving</code> and <code>moved</code> every time a node
@@ -525,28 +581,27 @@ is returned from the <code>moving</code> event, the movement operation will be c
 <p>The recommended way to hook into those events is by using the model's boot
 method:</p>
 
-<div class="highlight highlight-php"><pre><span class="k">class</span> <span class="nc">Category</span> <span class="k">extends</span> <span class="nx">Baum\Node</span> <span class="p">{</span>
-
-  <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">boot</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">parent</span><span class="o">::</span><span class="na">boot</span><span class="p">();</span>
-
-    <span class="k">static</span><span class="o">::</span><span class="na">moving</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$node</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// Before moving the node this function will be called.</span>
-    <span class="p">});</span>
-
-    <span class="k">static</span><span class="o">::</span><span class="na">moved</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$node</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// After the move operation is processed this function will be</span>
-      <span class="c1">// called.</span>
-    <span class="p">});</span>
-  <span class="p">}</span>
-
-<span class="p">}</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-st">class</span> <span class="pl-en">Category</span> <span class="pl-s">extends</span> <span class="pl-s3">Baum\</span><span class="pl-e">Node</span> {</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">  <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-st">function</span> <span class="pl-en">boot</span>() {</span>
+<span class="pl-s2">    <span class="pl-st">parent</span><span class="pl-k">::</span>boot();</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">    <span class="pl-st">static</span><span class="pl-k">::</span>moving(<span class="pl-st">function</span>(<span class="pl-vo">$node</span>) {</span>
+<span class="pl-s2">      <span class="pl-c">// Before moving the node this function will be called.</span></span>
+<span class="pl-s2">    });</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">    <span class="pl-st">static</span><span class="pl-k">::</span>moved(<span class="pl-st">function</span>(<span class="pl-vo">$node</span>) {</span>
+<span class="pl-s2">      <span class="pl-c">// After the move operation is processed this function will be</span></span>
+<span class="pl-s2">      <span class="pl-c">// called.</span></span>
+<span class="pl-s2">    });</span>
+<span class="pl-s2">  }</span>
+<span class="pl-s2"></span>
+<span class="pl-s2">}</span></pre></div>
 
 <p><a name="scope-support"></a></p>
 
 <h3>
-<a name="scope-support" class="anchor" href="#scope-support"><span class="octicon octicon-link"></span></a>Scope support</h3>
+<a id="scope-support" class="anchor" href="#scope-support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Scope support</h3>
 
 <p>Baum provides a simple method to provide Nested Set "scoping" which restricts
 what we consider part of a nested set tree. This should allow for multiple nested
@@ -556,40 +611,251 @@ set trees in the same database table.</p>
 attribute in your subclass. This attribute should contain an array of the column
 names (database fields) which shall be used to restrict Nested Set queries:</p>
 
-<div class="highlight highlight-php"><pre><span class="k">class</span> <span class="nc">Category</span> <span class="k">extends</span> <span class="nx">Baum\Node</span> <span class="p">{</span>
-  <span class="o">...</span>
-  <span class="k">protected</span> <span class="nv">$scoped</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">'company_id'</span><span class="p">);</span>
-  <span class="o">...</span>
-<span class="p">}</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-st">class</span> <span class="pl-en">Category</span> <span class="pl-s">extends</span> <span class="pl-s3">Baum\</span><span class="pl-e">Node</span> {</span>
+<span class="pl-s2">  <span class="pl-k">...</span></span>
+<span class="pl-s2">  <span class="pl-s">protected</span> <span class="pl-vo">$scoped</span> <span class="pl-k">=</span> <span class="pl-s3">array</span>(<span class="pl-s1"><span class="pl-pds">'</span>company_id<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s2">  <span class="pl-k">...</span></span>
+<span class="pl-s2">}</span></pre></div>
 
 <p>In the previous example, <code>company_id</code> effectively restricts (or "scopes") a
 Nested Set tree. So, for each value of that field we may be able to construct
 a full different tree.</p>
 
-<div class="highlight highlight-php"><pre><span class="nv">$root1</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'R1'</span><span class="p">,</span> <span class="s1">'company_id'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">]);</span>
-<span class="nv">$root2</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'R2'</span><span class="p">,</span> <span class="s1">'company_id'</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">]);</span>
-
-<span class="nv">$child1</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'C1'</span><span class="p">,</span> <span class="s1">'company_id'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">]);</span>
-<span class="nv">$child2</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">create</span><span class="p">([</span><span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'C2'</span><span class="p">,</span> <span class="s1">'company_id'</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">]);</span>
-
-<span class="nv">$child1</span><span class="o">-&gt;</span><span class="na">makeChildOf</span><span class="p">(</span><span class="nv">$root1</span><span class="p">);</span>
-<span class="nv">$child2</span><span class="o">-&gt;</span><span class="na">makeChildOf</span><span class="p">(</span><span class="nv">$root2</span><span class="p">);</span>
-
-<span class="nv">$root1</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span> <span class="c1">// &lt;- returns $child1</span>
-<span class="nv">$root2</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span> <span class="c1">// &lt;- returns $child2</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$root1</span> <span class="pl-k">=</span> <span class="pl-s3">Category</span><span class="pl-k">::</span>create([<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>R1<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>company_id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">1</span>]);</span>
+<span class="pl-s2"><span class="pl-vo">$root2</span> <span class="pl-k">=</span> <span class="pl-s3">Category</span><span class="pl-k">::</span>create([<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>R2<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>company_id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">2</span>]);</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-vo">$child1</span> <span class="pl-k">=</span> <span class="pl-s3">Category</span><span class="pl-k">::</span>create([<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>C1<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>company_id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">1</span>]);</span>
+<span class="pl-s2"><span class="pl-vo">$child2</span> <span class="pl-k">=</span> <span class="pl-s3">Category</span><span class="pl-k">::</span>create([<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>C2<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>company_id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">2</span>]);</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-vo">$child1</span><span class="pl-k">-&gt;</span>makeChildOf(<span class="pl-vo">$root1</span>);</span>
+<span class="pl-s2"><span class="pl-vo">$child2</span><span class="pl-k">-&gt;</span>makeChildOf(<span class="pl-vo">$root2</span>);</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-vo">$root1</span><span class="pl-k">-&gt;</span>children()<span class="pl-k">-&gt;</span>get(); <span class="pl-c">// &lt;- returns $child1</span></span>
+<span class="pl-s2"><span class="pl-vo">$root2</span><span class="pl-k">-&gt;</span>children()<span class="pl-k">-&gt;</span>get(); <span class="pl-c">// &lt;- returns $child2</span></span></pre></div>
 
 <p>All methods which ask or traverse the Nested Set tree will use the <code>scoped</code>
 attribute (if provided).</p>
 
+<p><strong>Please note</strong> that, for now, moving nodes between scopes is not supported.</p>
+
+<p><a name="validation"></a></p>
+
+<h3>
+<a id="validation" class="anchor" href="#validation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Validation</h3>
+
+<p>The <code>::isValidNestedSet()</code> static method allows you to check if your underlying tree structure is correct. It mainly checks for these 3 things:</p>
+
+<ul>
+<li>Check that the bound indexes <code>lft</code>, <code>rgt</code> are not null, <code>rgt</code> values greater
+than <code>lft</code> and within the bounds of the parent node (if set).</li>
+<li>That there are no duplicates for the <code>lft</code> and <code>rgt</code> column values.</li>
+<li>As the first check does not actually check root nodes, see if each root has
+the <code>lft</code> and <code>rgt</code> indexes within the bounds of its children.</li>
+</ul>
+
+<p>All of the checks are <em>scope aware</em> and will check each scope separately if needed.</p>
+
+<p>Example usage, given a <code>Category</code> node class:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-s3">Category</span><span class="pl-k">::</span>isValidNestedSet()</span>
+<span class="pl-s2"><span class="pl-k">=&gt;</span> <span class="pl-c1">true</span></span></pre></div>
+
+<p><a name="rebuilding"></a></p>
+
+<h3>
+<a id="tree-rebuilding" class="anchor" href="#tree-rebuilding" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tree rebuilding</h3>
+
+<p>Baum supports for complete tree-structure rebuilding (or reindexing) via the
+<code>::rebuild()</code> static method.</p>
+
+<p>This method will re-index all your <code>lft</code>, <code>rgt</code> and <code>depth</code> column values,
+inspecting your tree only from the parent &lt;-&gt; children relation
+standpoint. Which means that you only need a correctly filled <code>parent_id</code> column
+and Baum will try its best to recompute the rest.</p>
+
+<p>This can prove quite useful when something has gone horribly wrong with the index
+values or it may come quite handy when <em>converting</em> from another implementation
+(which would probably have a <code>parent_id</code> column).</p>
+
+<p>This operation is also <em>scope aware</em> and will rebuild all of the scopes
+separately if they are defined.</p>
+
+<p>Simple example usage, given a <code>Category</code> node class:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-s3">Category</span><span class="pl-k">::</span>rebuild()</span></pre></div>
+
+<p>Valid trees (per the <code>isValidNestedSet</code> method) will not get rebuilt. To force the index rebuilding process simply call the rebuild method with <code>true</code> as the first parameter:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-s3">Category</span><span class="pl-k">::</span>rebuild(<span class="pl-c1">true</span>);</span></pre></div>
+
+<p><a name="soft-deletes"></a></p>
+
+<h3>
+<a id="soft-deletes" class="anchor" href="#soft-deletes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Soft deletes</h3>
+
+<p>Baum comes with <strong>limited support</strong> for soft-delete operations. What I mean
+by <em>limited</em> is that the testing is still limited and the <em>soft delete</em>
+functionality is changing in the upcoming 4.2 version of the framework, so use
+this feature wisely.</p>
+
+<p>For now, you may consider a <strong>safe</strong> <code>restore()</code> operation to be one of:</p>
+
+<ul>
+<li>Restoring a leaf node</li>
+<li>Restoring a whole sub-tree in which the parent is not soft-deleted</li>
+</ul>
+
+<p><a name="seeding"></a></p>
+
+<h3>
+<a id="seedingmass-assignment" class="anchor" href="#seedingmass-assignment" aria-hidden="true"><span class="octicon octicon-link"></span></a>Seeding/Mass-assignment</h3>
+
+<p>Because Nested Set structures usually involve a number of method calls to build a hierarchy structure (which result in several database queries), Baum provides two convenient methods which will map the supplied array of node attributes and create a hierarchy tree from them:</p>
+
+<ul>
+<li>
+<code>buildTree($nodeList)</code>: (static method) Maps the supplied array of node attributes into the database.</li>
+<li>
+<code>makeTree($nodeList)</code>: (instance method) Maps the supplied array of node attributes into the database using the current node instance as the parent for the provided subtree.</li>
+</ul>
+
+<p>Both methods will <em>create</em> new nodes when the primary key is not supplied, <em>update</em> or <em>create</em> if it is, and <em>delete</em> all nodes which are not present in the <em>affecting scope</em>. Understand that the <em>affecting scope</em> for the <code>buildTree</code> static method is the whole nested set tree and for the <code>makeTree</code> instance method are all of the current node's descendants.</p>
+
+<p>For example, imagine we wanted to map the following category hierarchy into our database:</p>
+
+<ul>
+<li>TV &amp; Home Theater</li>
+<li>Tablets &amp; E-Readers</li>
+<li>Computers
+
+<ul>
+<li>Laptops
+
+<ul>
+<li>PC Laptops</li>
+<li>Macbooks (Air/Pro)</li>
+</ul>
+</li>
+<li>Desktops</li>
+<li>Monitors</li>
+</ul>
+</li>
+<li>Cell Phones</li>
+</ul>
+
+<p>This could be easily accomplished with the following code:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$categories</span> <span class="pl-k">=</span> [</span>
+<span class="pl-s2">  [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">1</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>TV &amp; Home Theather<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s2">  [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">2</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Tablets &amp; E-Readers<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s2">  [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">3</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Computers<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>children<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [</span>
+<span class="pl-s2">    [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">4</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Laptops<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>children<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [</span>
+<span class="pl-s2">      [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">5</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>PC Laptops<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s2">      [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">6</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Macbooks (Air/Pro)<span class="pl-pds">'</span></span>]</span>
+<span class="pl-s2">    ]],</span>
+<span class="pl-s2">    [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">7</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Desktops<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s2">    [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">8</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Monitors<span class="pl-pds">'</span></span>]</span>
+<span class="pl-s2">  ]],</span>
+<span class="pl-s2">  [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">9</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Cell Phones<span class="pl-pds">'</span></span>]</span>
+<span class="pl-s2">];</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-s3">Category</span><span class="pl-k">::</span>buildTree(<span class="pl-vo">$categories</span>) <span class="pl-c">// =&gt; true</span></span></pre></div>
+
+<p>After that, we may just update the hierarchy as needed:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$categories</span> <span class="pl-k">=</span> [</span>
+<span class="pl-s2">  [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">1</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>TV &amp; Home Theather<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s2">  [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">2</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Tablets &amp; E-Readers<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s2">  [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">3</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Computers<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>children<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [</span>
+<span class="pl-s2">    [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">4</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Laptops<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>children<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [</span>
+<span class="pl-s2">      [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">5</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>PC Laptops<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s2">      [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">6</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Macbooks (Air/Pro)<span class="pl-pds">'</span></span>]</span>
+<span class="pl-s2">    ]],</span>
+<span class="pl-s2">    [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">7</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Desktops<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>children<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [</span>
+<span class="pl-s2">      <span class="pl-c">// These will be created</span></span>
+<span class="pl-s2">      [<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Towers Only<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s2">      [<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Desktop Packages<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s2">      [<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>All-in-One Computers<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s2">      [<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Gaming Desktops<span class="pl-pds">'</span></span>]</span>
+<span class="pl-s2">    ]]</span>
+<span class="pl-s2">    <span class="pl-c">// This one, as it's not present, will be deleted</span></span>
+<span class="pl-s2">    <span class="pl-c">// ['id' =&gt; 8, 'name' =&gt; 'Monitors'],</span></span>
+<span class="pl-s2">  ]],</span>
+<span class="pl-s2">  [<span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">9</span>, <span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Cell Phones<span class="pl-pds">'</span></span>]</span>
+<span class="pl-s2">];</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-s3">Category</span><span class="pl-k">::</span>buildTree(<span class="pl-vo">$categories</span>); <span class="pl-c">// =&gt; true</span></span></pre></div>
+
+<p>The <code>makeTree</code> instance method works in a similar fashion. The only difference
+is that it will only perform operations on the <em>descendants</em> of the calling node instance.</p>
+
+<p>So now imagine we already have the following hierarchy in the database:</p>
+
+<ul>
+<li>Electronics</li>
+<li>Health Fitness &amp; Beaty</li>
+<li>Small Appliances</li>
+<li>Major Appliances</li>
+</ul>
+
+<p>If we execute the following code:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$children</span> <span class="pl-k">=</span> [</span>
+<span class="pl-s2">  [<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>TV &amp; Home Theather<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s2">  [<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Tablets &amp; E-Readers<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s2">  [<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Computers<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>children<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [</span>
+<span class="pl-s2">    [<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Laptops<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>children<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [</span>
+<span class="pl-s2">      [<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>PC Laptops<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s2">      [<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Macbooks (Air/Pro)<span class="pl-pds">'</span></span>]</span>
+<span class="pl-s2">    ]],</span>
+<span class="pl-s2">    [<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Desktops<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s2">    [<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Monitors<span class="pl-pds">'</span></span>]</span>
+<span class="pl-s2">  ]],</span>
+<span class="pl-s2">  [<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s1"><span class="pl-pds">'</span>Cell Phones<span class="pl-pds">'</span></span>]</span>
+<span class="pl-s2">];</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-vo">$electronics</span> <span class="pl-k">=</span> <span class="pl-s3">Category</span><span class="pl-k">::</span>where(<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>=<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>Electronics<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>first();</span>
+<span class="pl-s2"><span class="pl-vo">$electronics</span><span class="pl-k">-&gt;</span>makeTree(<span class="pl-vo">$children</span>); <span class="pl-c">// =&gt; true</span></span></pre></div>
+
+<p>Would result in:</p>
+
+<ul>
+<li>Electronics
+
+<ul>
+<li>TV &amp; Home Theater</li>
+<li>Tablets &amp; E-Readers</li>
+<li>Computers
+
+<ul>
+<li>Laptops
+
+<ul>
+<li>PC Laptops</li>
+<li>Macbooks (Air/Pro)</li>
+</ul>
+</li>
+<li>Desktops</li>
+<li>Monitors</li>
+</ul>
+</li>
+<li>Cell Phones</li>
+</ul>
+</li>
+<li>Health Fitness &amp; Beaty</li>
+<li>Small Appliances</li>
+<li>Major Appliances</li>
+</ul>
+
+<p>Updating and deleting nodes from the subtree works the same way.</p>
+
 <p><a name="misc-utilities"></a></p>
 
 <h3>
-<a name="miscutility-functions" class="anchor" href="#miscutility-functions"><span class="octicon octicon-link"></span></a>Misc/Utility functions</h3>
+<a id="miscutility-functions" class="anchor" href="#miscutility-functions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Misc/Utility functions</h3>
 
 <h4>
-<a name="node-extraction-query-scopes" class="anchor" href="#node-extraction-query-scopes"><span class="octicon octicon-link"></span></a>Node extraction query scopes</h4>
+<a id="node-extraction-query-scopes" class="anchor" href="#node-extraction-query-scopes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Node extraction query scopes</h4>
 
 <p>Baum provides some query scopes which may be used to extract (remove) selected nodes
 from the current results set.</p>
@@ -601,31 +867,76 @@ from the current results set.</p>
 <code>withoutSelf()</code>: Extracts itself from the current results set.</li>
 <li>
 <code>withoutRoot()</code>: Extracts the current root node from the results set.</li>
-</ul><div class="highlight highlight-php"><pre><span class="nv">$node</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="s1">'Some category I do not want to see.'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">first</span><span class="p">();</span>
+</ul>
 
-<span class="nv">$root</span> <span class="o">=</span> <span class="nx">Category</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="s1">'Old boooks'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">first</span><span class="p">();</span>
-<span class="nb">var_dump</span><span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="na">descendantsAndSelf</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">withoutNode</span><span class="p">(</span><span class="nv">$node</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">());</span>
-<span class="o">...</span> <span class="c1">// &lt;- This result set will not contain $node</span>
-</pre></div>
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$node</span> <span class="pl-k">=</span> <span class="pl-s3">Category</span><span class="pl-k">::</span>where(<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>=<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>Some category I do not want to see.<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>first();</span>
+<span class="pl-s2"></span>
+<span class="pl-s2"><span class="pl-vo">$root</span> <span class="pl-k">=</span> <span class="pl-s3">Category</span><span class="pl-k">::</span>where(<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>=<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>Old boooks<span class="pl-pds">'</span></span>)<span class="pl-k">-&gt;</span>first();</span>
+<span class="pl-s2"><span class="pl-s3">var_dump</span>(<span class="pl-vo">$root</span><span class="pl-k">-&gt;</span>descendantsAndSelf()<span class="pl-k">-&gt;</span>withoutNode(<span class="pl-vo">$node</span>)<span class="pl-k">-&gt;</span>get());</span>
+<span class="pl-s2"><span class="pl-k">...</span> <span class="pl-c">// &lt;- This result set will not contain $node</span></span></pre></div>
+
+<h4>
+<a id="get-a-nested-list-of-column-values" class="anchor" href="#get-a-nested-list-of-column-values" aria-hidden="true"><span class="octicon octicon-link"></span></a>Get a nested list of column values</h4>
+
+<p>The <code>::getNestedList()</code> static method returns a key-value pair array indicating
+a node's depth. Useful for silling <code>select</code> elements, etc.</p>
+
+<p>It expects the column name to return, and optionally: the column
+to use for array keys (will use <code>id</code> if none supplied) and/or a separator:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-st">function</span> <span class="pl-en">getNestedList</span>(<span class="pl-vo">$column</span>, <span class="pl-vo">$key</span> <span class="pl-k">=</span> <span class="pl-c1">null</span>, <span class="pl-vo">$seperator</span> <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span> <span class="pl-pds">'</span></span>);</span></pre></div>
+
+<p>An example use case:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-vo">$nestedList</span> <span class="pl-k">=</span> <span class="pl-s3">Category</span><span class="pl-k">::</span>getNestedList(<span class="pl-s1"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s2"><span class="pl-c">// $nestedList will contain an array like the following:</span></span>
+<span class="pl-s2"><span class="pl-c">// array(</span></span>
+<span class="pl-s2"><span class="pl-c">//   1 =&gt; 'Root 1',</span></span>
+<span class="pl-s2"><span class="pl-c">//   2 =&gt; ' Child 1',</span></span>
+<span class="pl-s2"><span class="pl-c">//   3 =&gt; ' Child 2',</span></span>
+<span class="pl-s2"><span class="pl-c">//   4 =&gt; '  Child 2.1',</span></span>
+<span class="pl-s2"><span class="pl-c">//   5 =&gt; ' Child 3',</span></span>
+<span class="pl-s2"><span class="pl-c">//   6 =&gt; 'Root 2'</span></span>
+<span class="pl-s2"><span class="pl-c">// );</span></span></pre></div>
+
+<p><a name="further-information"></a></p>
 
 <h2>
-<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
+<a id="further-information" class="anchor" href="#further-information" aria-hidden="true"><span class="octicon octicon-link"></span></a>Further information</h2>
+
+<p>You may find additional information, usage examples and/or frequently
+asked questions about Baum in the <a href="https://github.com/etrepat/baum/wiki">wiki</a>.</p>
+
+<p>Feel free to browse the wiki after finishing this README:</p>
+
+<p><a href="https://github.com/etrepat/baum/wiki">https://github.com/etrepat/baum/wiki</a></p>
+
+<p><a name="contributing"></a></p>
+
+<h2>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
 <p>Thinking of contributing? Maybe you've found some nasty bug? That's great news!</p>
 
 <ol>
-<li>Fork the project:.</li>
-<li>Create your bugfix/feature branch.</li>
-<li>Code away your changes and, if you can, provide some tests.</li>
-<li>Commit your changes &amp; push to the branch.</li>
-<li>Create a new Pull Request</li>
-</ol><h2>
-<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+<li>Fork &amp; clone the project: <code>git clone git@github.com:your-username/baum.git</code>.</li>
+<li>Run the tests and make sure that they pass with your setup: <code>phpunit</code>.</li>
+<li>Create your bugfix/feature branch and code away your changes. Add tests for your changes.</li>
+<li>Make sure all the tests still pass: <code>phpunit</code>.</li>
+<li>Push to your fork and submit new a pull request.</li>
+</ol>
+
+<p>Please see the <a href="https://github.com/etrepat/baum/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> file for extended guidelines and/or recommendations.</p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
 
 <p>Baum is licensed under the terms of the <a href="http://opensource.org/licenses/MIT">MIT License</a>
 (See LICENSE file for details).</p>
 
-<hr><p>Coded by <a href="http://etrepat.com">Estanislau Trepat (etrepat)</a>. I'm also
+<hr>
+
+<p>Coded by <a href="http://etrepat.com">Estanislau Trepat (etrepat)</a>. I'm also
 <a href="http://twitter.com/etrepat">@etrepat</a> on twitter.</p>
         </section>
 
