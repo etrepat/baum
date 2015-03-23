@@ -18,10 +18,10 @@ class {{class}} extends Migration {
       // Take a look at the model scaffold comments for details.
       // We add indexes on parent_id, lft, rgt columns by default.
       $table->increments('id');
-      $table->integer('parent_id')->nullable()->index();
-      $table->integer('lft')->nullable()->index();
-      $table->integer('rgt')->nullable()->index();
-      $table->integer('depth')->nullable();
+      $table->integer('parent_id')->unsigned()->nullable()->index();
+      $table->integer('lft')->unsigned()->nullable()->index();
+      $table->integer('rgt')->unsigned()->nullable()->index();
+      $table->integer('depth')->unsigned()->nullable();
 
       // Add needed columns here (f.ex: name, slug, path, etc.)
       // $table->string('name', 255);
