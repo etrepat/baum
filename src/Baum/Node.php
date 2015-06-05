@@ -336,8 +336,8 @@ abstract class Node extends Model {
     $builder = $this->newQuery($excludeDeleted)->orderBy($this->getQualifiedOrderColumnName());
 
     if ( $this->isScoped() ) {
-      foreach($this->getQualifiedScopedColumns() as $scopeFld)
-        $builder->where($scopeFld, '=', $this->$scopeFld);
+      foreach($this->getQualifiedScopedColumns() as $k=>$scopeFld)
+        $builder->where($scopeFld, '=', $this->{$this->scoped[$k]});
     }
 
     return $builder;
