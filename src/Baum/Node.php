@@ -336,7 +336,7 @@ abstract class Node extends Model {
     $builder = $this->newQuery($excludeDeleted)->orderBy($this->getQualifiedOrderColumnName());
 
     if ( $this->isScoped() ) {
-      foreach($this->scoped as $scopeFld)
+      foreach($this->getQualifiedScopedColumns() as $scopeFld)
         $builder->where($scopeFld, '=', $this->$scopeFld);
     }
 
@@ -723,8 +723,8 @@ abstract class Node extends Model {
    */
   public function descendantsAndSelf() {
     return $this->newNestedSetQuery()
-                ->where($this->getLeftColumnName(), '>=', $this->getLeft())
-                ->where($this->getLeftColumnName(), '<', $this->getRight());
+                ->where($this->getQualifiedLeftColumnName(), '>=', $this->getLeft())
+                ->where($this->getQualifiedLeftColumnName(), '<', $this->getRight());
   }
 
   /**
