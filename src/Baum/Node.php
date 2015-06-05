@@ -468,7 +468,7 @@ abstract class Node extends Model {
    * @return \Illuminate\Database\Query\Builder
    */
   public function scopeWithoutNode($query, $node) {
-    return $query->where($node->getKeyName(), '!=', $node->getKey());
+    return $query->where($this->getTable() . '.' . $node->getKeyName(), '!=', $node->getKey());
   }
 
   /**
