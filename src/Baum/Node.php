@@ -105,7 +105,7 @@ abstract class Node extends Model {
    *    6. (optional) "restore": After having restored a soft-deleted node,
    *    restore all of its descendants.
    *
-   * @return void
+   * @return voidal
    */
   protected static function boot() {
     parent::boot();
@@ -364,7 +364,7 @@ abstract class Node extends Model {
 
     return $instance->newQuery()
                     ->orderBy($instance->getQualifiedOrderColumnName())
-                    ->get();
+                    ->get($columns);
   }
 
   /**
