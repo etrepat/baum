@@ -1195,22 +1195,39 @@ abstract class Node extends Model {
   }
 
   /**
-   * Return an key-value array indicating the node's depth with $seperator
+   * Return an key-value array indicating the node's depth with $separator
    *
-   * @return Array
+   *
+   * By specifying a $parent Node, the list is limited to $parent and its children.
+   * $relative
+   *
+   * @param string $column The attribute which is used to populate values of the array.
+   * @param null $key The attribute which is used to populate keys of the array.
+   * @param string $separator A separator which is prepended to values, according to their depth.
+   * @param Node|null $parent The parent node to use.
+   * @param bool|true $sep_relative Whether the separator length should be relative to the $parent depth or absolute.
+   * @return array
    */
-  public static function getNestedList($column, $key = null, $seperator = ' ') {
+  public static function getNestedList($column, $key = null, $separator = ' ', Node $parent = null, $sep_relative = true) {
     $instance = new static;
 
     $key = $key ?: $instance->getKeyName();
     $depthColumn = $instance->getDepthColumnName();
 
-    $nodes = $instance->newNestedSetQuery()->get()->toArray();
+    $initialDepth = 0;
+    if ($parent) {
+      $nodes = $parent->getDescendantsAndSelf()->toArray();
+      if ($sep_relative) {
+        $initialDepth = $parent[$depthColumn];
+      }
+    } else {
+      $nodes = $instance->newNestedSetQuery()->get()->toArray();
+    }
 
     return array_combine(array_map(function($node) use($key) {
       return $node[$key];
-    }, $nodes), array_map(function($node) use($seperator, $depthColumn, $column) {
-      return str_repeat($seperator, $node[$depthColumn]) . $node[$column];
+    }, $nodes), array_map(function($node) use($separator, $depthColumn, $column, $initialDepth) {
+      return str_repeat($separator, $node[$depthColumn] - $initialDepth) . $node[$column];
     }, $nodes));
   }
 
