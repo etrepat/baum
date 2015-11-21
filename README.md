@@ -121,6 +121,11 @@ The generator will install a migration and a model file into your application
 configured to work with the Nested Set behaviour provided by Baum. You SHOULD
 take a look at those files, as each of them describes how they can be customized.
 
+Also, if you like to separately create the migration and model files, you can do it like this:
+
+    php artisan baum:migration MODEL
+    php artisan baum:model MODEL
+
 Next, you would probably run `artisan migrate` to apply the migration.
 
 ### Model configuration
