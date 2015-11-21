@@ -1,6 +1,8 @@
 <?php
 namespace Baum\Providers;
 
+use Baum\Console\MigrationCommand;
+use Baum\Console\ModelCommand;
 use Baum\Generators\MigrationGenerator;
 use Baum\Generators\ModelGenerator;
 use Baum\Console\BaumCommand;
@@ -14,7 +16,7 @@ class BaumServiceProvider extends ServiceProvider {
    *
    * @var string
    */
-  const VERSION = '1.1.1';
+  const VERSION = '1.1.2';
 
   /**
    * Register the service provider.
@@ -33,10 +35,12 @@ class BaumServiceProvider extends ServiceProvider {
   public function registerCommands() {
     $this->registerBaumCommand();
     $this->registerInstallCommand();
+    $this->registerMigrationCommand();
+    $this->registerModelCommand();
 
     // Resolve the commands with Artisan by attaching the event listener to Artisan's
     // startup. This allows us to use the commands from our terminal.
-    $this->commands('command.baum', 'command.baum.install');
+    $this->commands('command.baum', 'command.baum.install', 'command.baum.migration', 'command.baum.model');
   }
 
   /**
@@ -57,10 +61,33 @@ class BaumServiceProvider extends ServiceProvider {
    */
   protected function registerInstallCommand() {
     $this->app->singleton('command.baum.install', function($app) {
+      return new InstallCommand();
+    });
+  }
+
+  /**
+   * Register the 'baum:install' command.
+   *
+   * @return void
+   */
+  protected function registerMigrationCommand() {
+    $this->app->singleton('command.baum.migration', function($app) {
       $migrator = new MigrationGenerator($app['files']);
+
+      return new MigrationCommand($migrator);
+    });
+  }
+
+  /**
+   * Register the 'baum:install' command.
+   *
+   * @return void
+   */
+  protected function registerModelCommand() {
+    $this->app->singleton('command.baum.model', function($app) {
       $modeler  = new ModelGenerator($app['files']);
 
-      return new InstallCommand($migrator, $modeler);
+      return new ModelCommand($modeler);
     });
   }
 
@@ -70,7 +97,7 @@ class BaumServiceProvider extends ServiceProvider {
    * @return array
    */
   public function provides() {
-    return array('command.baum', 'command.baum.install');
+    return array('command.baum', 'command.baum.install', 'command.baum.migration', 'command.baum.model');
   }
 
 }

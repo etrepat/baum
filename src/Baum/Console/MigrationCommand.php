@@ -6,14 +6,14 @@ use Baum\Generators\ModelGenerator;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputArgument;
 
-class InstallCommand extends Command {
+class MigrationCommand extends Command {
 
   /**
    * The console command name.
    *
    * @var string
    */
-  protected $name = 'baum:install';
+  protected $name = 'baum:migration';
 
   /**
    * The console command description.
@@ -23,12 +23,21 @@ class InstallCommand extends Command {
   protected $description = 'Scaffolds a new migration and model suitable for Baum.';
 
   /**
+   * Migration generator instance
+   *
+   * @var \Baum\Generators\MigrationGenerator
+   */
+  protected $migrator;
+
+  /**
    * Create a new command instance
    *
    * @return void
    */
-  public function __construct() {
+  public function __construct(MigrationGenerator $migrator) {
     parent::__construct();
+
+    $this->migrator = $migrator;
   }
 
   /**
@@ -44,8 +53,9 @@ class InstallCommand extends Command {
   public function fire() {
     $name = $this->input->getArgument('name');
 
-    $this->call('baum:migration', ['name' => $name]);
-    $this->call('baum:model', ['name' => $name]);
+    $output = pathinfo($this->migrator->create($name, $this->getMigrationsPath()), PATHINFO_FILENAME);
+
+    $this->line("      <fg=green;options=bold>create</fg=green;options=bold>  $output");
   }
 
   /**
@@ -57,6 +67,15 @@ class InstallCommand extends Command {
     return array(
       array('name', InputArgument::REQUIRED, 'Name to use for the scaffolding of the migration and model.')
     );
+  }
+
+  /**
+   * Get the path to the migrations directory.
+   *
+   * @return string
+   */
+  protected function getMigrationsPath() {
+    return $this->laravel['path.database'].'/migrations';
   }
 
 }
