@@ -117,7 +117,7 @@ class InstallCommand extends Command {
    * @return string
    */
   protected function getModelsPath() {
-    return $this->laravel['path.base'];
+    return $this->laravel['path.base'].'/app';
   }
 
 }
