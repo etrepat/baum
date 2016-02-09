@@ -132,8 +132,8 @@ class Move {
     $connection = $this->node->getConnection();
     $grammar    = $connection->getQueryGrammar();
 
-    $currentId      = $this->quoteIdentifier($this->node->getKey());
-    $parentId       = $this->quoteIdentifier($this->parentId());
+    $currentId      = (int) $this->node->getKey();
+    $parentId       = (int) $this->parentId();
     $leftColumn     = $this->node->getLeftColumnName();
     $rightColumn    = $this->node->getRightColumnName();
     $parentColumn   = $this->node->getParentColumnName();
