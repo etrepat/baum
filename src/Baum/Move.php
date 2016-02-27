@@ -1,54 +1,55 @@
 <?php
+
 namespace Baum;
 
-use \Illuminate\Events\Dispatcher;
+use Illuminate\Events\Dispatcher;
 
 /**
-* Move
-*/
-class Move {
+ * Move.
+ */
+class Move
+{
+    /**
+   * Node on which the move operation will be performed.
+   *
+   * @var \Baum\Node
+   */
+  protected $node = null;
 
   /**
-  * Node on which the move operation will be performed
-  *
-  * @var \Baum\Node
-  */
-  protected $node = NULL;
+   * Destination node.
+   *
+   * @var \Baum\Node | int
+   */
+  protected $target = null;
 
   /**
-  * Destination node
-  *
-  * @var \Baum\Node | int
-  */
-  protected $target = NULL;
+   * Move target position, one of: child, left, right, root.
+   *
+   * @var string
+   */
+  protected $position = null;
 
   /**
-  * Move target position, one of: child, left, right, root
-  *
-  * @var string
-  */
-  protected $position = NULL;
+   * Memoized 1st boundary.
+   *
+   * @var int
+   */
+  protected $_bound1 = null;
 
   /**
-  * Memoized 1st boundary.
-  *
-  * @var int
-  */
-  protected $_bound1 = NULL;
+   * Memoized 2nd boundary.
+   *
+   * @var int
+   */
+  protected $_bound2 = null;
 
   /**
-  * Memoized 2nd boundary.
-  *
-  * @var int
-  */
-  protected $_bound2 = NULL;
-
-  /**
-  * Memoized boundaries array.
-  *
-  * @var array
-  */
-  protected $_boundaries = NULL;
+   * Memoized boundaries array.
+   *
+   * @var array
+   */
+  protected $_boundaries = null;
 
   /**
    * The event dispatcher instance.
@@ -65,12 +66,13 @@ class Move {
    * @param   string          $position
    * @return  void
    */
-  public function __construct($node, $target, $position) {
-    $this->node     = $node;
-    $this->target   = $this->resolveNode($target);
-    $this->position = $position;
+  public function __construct($node, $target, $position)
+  {
+      $this->node = $node;
+      $this->target = $this->resolveNode($target);
+      $this->position = $position;
 
-    $this->setEventDispatcher($node->getEventDispatcher());
+      $this->setEventDispatcher($node->getEventDispatcher());
   }
 
   /**
@@ -81,10 +83,11 @@ class Move {
    * @param   string          $position
    * @return \Baum\Node
    */
-  public static function to($node, $target, $position) {
-    $instance = new static($node, $target, $position);
+  public static function to($node, $target, $position)
+  {
+      $instance = new static($node, $target, $position);
 
-    return $instance->perform();
+      return $instance->perform();
   }
 
   /**
@@ -92,29 +95,31 @@ class Move {
    *
    * @return \Baum\Node
    */
-  public function perform() {
-    $this->guardAgainstImpossibleMove();
+  public function perform()
+  {
+      $this->guardAgainstImpossibleMove();
 
-    if ( $this->fireMoveEvent('moving') === false )
-      return $this->node;
+      if ($this->fireMoveEvent('moving') === false) {
+          return $this->node;
+      }
 
-    if ( $this->hasChange() ) {
-      $self = $this;
+      if ($this->hasChange()) {
+          $self = $this;
 
-      $this->node->getConnection()->transaction(function() use ($self) {
+          $this->node->getConnection()->transaction(function () use ($self) {
         $self->updateStructure();
       });
 
-      $this->target->reload();
+          $this->target->reload();
 
-      $this->node->setDepthWithSubtree();
+          $this->node->setDepthWithSubtree();
 
-      $this->node->reload();
-    }
+          $this->node->reload();
+      }
 
-    $this->fireMoveEvent('moved', false);
+      $this->fireMoveEvent('moved', false);
 
-    return $this->node;
+      return $this->node;
   }
 
   /**
@@ -123,53 +128,55 @@ class Move {
    *
    * @return int
    */
-  public function updateStructure() {
-    list($a, $b, $c, $d) = $this->boundaries();
+  public function updateStructure()
+  {
+      list($a, $b, $c, $d) = $this->boundaries();
 
     // select the rows between the leftmost & the rightmost boundaries and apply a lock
     $this->applyLockBetween($a, $d);
 
-    $connection = $this->node->getConnection();
-    $grammar    = $connection->getQueryGrammar();
+      $connection = $this->node->getConnection();
+      $grammar = $connection->getQueryGrammar();
 
-    $currentId      = $this->quoteIdentifier($this->node->getKey());
-    $parentId       = $this->quoteIdentifier($this->parentId());
-    $leftColumn     = $this->node->getLeftColumnName();
-    $rightColumn    = $this->node->getRightColumnName();
-    $parentColumn   = $this->node->getParentColumnName();
-    $wrappedLeft    = $grammar->wrap($leftColumn);
-    $wrappedRight   = $grammar->wrap($rightColumn);
-    $wrappedParent  = $grammar->wrap($parentColumn);
-    $wrappedId      = $grammar->wrap($this->node->getKeyName());
+      $currentId = $this->quoteIdentifier($this->node->getKey());
+      $parentId = $this->quoteIdentifier($this->parentId());
+      $leftColumn = $this->node->getLeftColumnName();
+      $rightColumn = $this->node->getRightColumnName();
+      $parentColumn = $this->node->getParentColumnName();
+      $wrappedLeft = $grammar->wrap($leftColumn);
+      $wrappedRight = $grammar->wrap($rightColumn);
+      $wrappedParent = $grammar->wrap($parentColumn);
+      $wrappedId = $grammar->wrap($this->node->getKeyName());
 
-    $lftSql = "CASE
+      $lftSql = "CASE
       WHEN $wrappedLeft BETWEEN $a AND $b THEN $wrappedLeft + $d - $b
       WHEN $wrappedLeft BETWEEN $c AND $d THEN $wrappedLeft + $a - $c
       ELSE $wrappedLeft END";
 
-    $rgtSql = "CASE
+      $rgtSql = "CASE
       WHEN $wrappedRight BETWEEN $a AND $b THEN $wrappedRight + $d - $b
       WHEN $wrappedRight BETWEEN $c AND $d THEN $wrappedRight + $a - $c
       ELSE $wrappedRight END";
 
-    $parentSql = "CASE
+      $parentSql = "CASE
       WHEN $wrappedId = $currentId THEN $parentId
       ELSE $wrappedParent END";
 
-    $updateConditions = array(
+      $updateConditions = [
       $leftColumn   => $connection->raw($lftSql),
       $rightColumn  => $connection->raw($rgtSql),
-      $parentColumn => $connection->raw($parentSql)
-    );
+      $parentColumn => $connection->raw($parentSql),
+    ];
 
-    if ( $this->node->timestamps )
-      $updateConditions[$this->node->getUpdatedAtColumn()] = $this->node->freshTimestamp();
+      if ($this->node->timestamps) {
+          $updateConditions[$this->node->getUpdatedAtColumn()] = $this->node->freshTimestamp();
+      }
 
-    return $this->node
+      return $this->node
                 ->newNestedSetQuery()
-                ->where(function($query) use ($leftColumn, $rightColumn, $a, $d) {
-                  $query->whereBetween($leftColumn, array($a, $d))
-                        ->orWhereBetween($rightColumn, array($a, $d));
+                ->where(function ($query) use ($leftColumn, $rightColumn, $a, $d) {
+                  $query->whereBetween($leftColumn, [$a, $d])
+                        ->orWhereBetween($rightColumn, [$a, $d]);
                 })
                 ->update($updateConditions);
   }
@@ -182,10 +189,13 @@ class Move {
    * @param   \Baum\node|int
    * @return  \Baum\Node
    */
-  protected function resolveNode($node) {
-    if ( $node instanceof \Baum\Node ) return $node->reload();
+  protected function resolveNode($node)
+  {
+      if ($node instanceof \Baum\Node) {
+          return $node->reload();
+      }
 
-    return $this->node->newNestedSetQuery()->find($node);
+      return $this->node->newNestedSetQuery()->find($node);
   }
 
   /**
@@ -193,30 +203,37 @@ class Move {
    *
    * @return void
    */
-  protected function guardAgainstImpossibleMove() {
-    if ( !$this->node->exists )
-      throw new MoveNotPossibleException('A new node cannot be moved.');
-
-    if ( array_search($this->position, array('child', 'left', 'right', 'root')) === FALSE )
-      throw new MoveNotPossibleException("Position should be one of ['child', 'left', 'right'] but is {$this->position}.");
-
-    if ( !$this->promotingToRoot() ) {
-      if ( is_null($this->target) ) {
-        if ( $this->position === 'left' || $this->position === 'right' )
-          throw new MoveNotPossibleException("Could not resolve target node. This node cannot move any further to the {$this->position}.");
-        else
-          throw new MoveNotPossibleException('Could not resolve target node.');
+  protected function guardAgainstImpossibleMove()
+  {
+      if (! $this->node->exists) {
+          throw new MoveNotPossibleException('A new node cannot be moved.');
       }
 
-      if ( $this->node->equals($this->target) )
-        throw new MoveNotPossibleException('A node cannot be moved to itself.');
+      if (array_search($this->position, ['child', 'left', 'right', 'root']) === false) {
+          throw new MoveNotPossibleException("Position should be one of ['child', 'left', 'right'] but is {$this->position}.");
+      }
 
-      if ( $this->target->insideSubtree($this->node) )
-        throw new MoveNotPossibleException('A node cannot be moved to a descendant of itself (inside moved tree).');
+      if (! $this->promotingToRoot()) {
+          if (is_null($this->target)) {
+              if ($this->position === 'left' || $this->position === 'right') {
+                  throw new MoveNotPossibleException("Could not resolve target node. This node cannot move any further to the {$this->position}.");
+              } else {
+                  throw new MoveNotPossibleException('Could not resolve target node.');
+              }
+          }
 
-      if ( !$this->node->inSameScope($this->target) )
-        throw new MoveNotPossibleException('A node cannot be moved to a different scope.');
-    }
+          if ($this->node->equals($this->target)) {
+              throw new MoveNotPossibleException('A node cannot be moved to itself.');
+          }
+
+          if ($this->target->insideSubtree($this->node)) {
+              throw new MoveNotPossibleException('A node cannot be moved to a descendant of itself (inside moved tree).');
+          }
+
+          if (! $this->node->inSameScope($this->target)) {
+              throw new MoveNotPossibleException('A node cannot be moved to a different scope.');
+          }
+      }
   }
 
   /**
@@ -224,10 +241,13 @@ class Move {
    *
    * @return int
    */
-  protected function bound1() {
-    if ( !is_null($this->_bound1) ) return $this->_bound1;
+  protected function bound1()
+  {
+      if (! is_null($this->_bound1)) {
+          return $this->_bound1;
+      }
 
-    switch ( $this->position ) {
+      switch ($this->position) {
       case 'child':
         $this->_bound1 = $this->target->getRight();
         break;
@@ -245,8 +265,9 @@ class Move {
         break;
     }
 
-    $this->_bound1 = (($this->_bound1 > $this->node->getRight()) ? $this->_bound1 - 1 : $this->_bound1);
-    return $this->_bound1;
+      $this->_bound1 = (($this->_bound1 > $this->node->getRight()) ? $this->_bound1 - 1 : $this->_bound1);
+
+      return $this->_bound1;
   }
 
   /**
@@ -255,11 +276,15 @@ class Move {
    *
    * @return int
    */
-  protected function bound2() {
-    if ( !is_null($this->_bound2) ) return $this->_bound2;
+  protected function bound2()
+  {
+      if (! is_null($this->_bound2)) {
+          return $this->_bound2;
+      }
 
-    $this->_bound2 = (($this->bound1() > $this->node->getRight()) ? $this->node->getRight() + 1 : $this->node->getLeft() - 1);
-    return $this->_bound2;
+      $this->_bound2 = (($this->bound1() > $this->node->getRight()) ? $this->node->getRight() + 1 : $this->node->getLeft() - 1);
+
+      return $this->_bound2;
   }
 
   /**
@@ -267,20 +292,23 @@ class Move {
    *
    * @return array
    */
-  protected function boundaries() {
-    if ( !is_null($this->_boundaries) ) return $this->_boundaries;
+  protected function boundaries()
+  {
+      if (! is_null($this->_boundaries)) {
+          return $this->_boundaries;
+      }
 
     // we have defined the boundaries of two non-overlapping intervals,
     // so sorting puts both the intervals and their boundaries in order
-    $this->_boundaries = array(
-      $this->node->getLeft()  ,
-      $this->node->getRight() ,
-      $this->bound1()         ,
-      $this->bound2()
-    );
-    sort($this->_boundaries);
+    $this->_boundaries = [
+      $this->node->getLeft(),
+      $this->node->getRight(),
+      $this->bound1(),
+      $this->bound2(),
+    ];
+      sort($this->_boundaries);
 
-    return $this->_boundaries;
+      return $this->_boundaries;
   }
 
   /**
@@ -288,10 +316,11 @@ class Move {
    *
    * @return int
    */
-  protected function parentId() {
-    switch( $this->position ) {
+  protected function parentId()
+  {
+      switch ($this->position) {
       case 'root':
-        return NULL;
+        return;
 
       case 'child':
         return $this->target->getKey();
@@ -304,19 +333,21 @@ class Move {
   /**
    * Check wether there should be changes in the downward tree structure.
    *
-   * @return boolean
+   * @return bool
    */
-  protected function hasChange() {
-    return !( $this->bound1() == $this->node->getRight() || $this->bound1() == $this->node->getLeft() );
+  protected function hasChange()
+  {
+      return ! ($this->bound1() == $this->node->getRight() || $this->bound1() == $this->node->getLeft());
   }
 
   /**
    * Check if we are promoting the provided instance to a root node.
    *
-   * @return boolean
+   * @return bool
    */
-  protected function promotingToRoot() {
-    return ($this->position == 'root');
+  protected function promotingToRoot()
+  {
+      return $this->position == 'root';
   }
 
   /**
@@ -324,8 +355,9 @@ class Move {
    *
    * @return \Illuminate\Events\Dispatcher
    */
-  public static function getEventDispatcher() {
-    return static::$dispatcher;
+  public static function getEventDispatcher()
+  {
+      return static::$dispatcher;
   }
 
   /**
@@ -334,8 +366,9 @@ class Move {
    * @param  \Illuminate\Events\Dispatcher
    * @return void
    */
-  public static function setEventDispatcher(Dispatcher $dispatcher) {
-    static::$dispatcher = $dispatcher;
+  public static function setEventDispatcher(Dispatcher $dispatcher)
+  {
+      static::$dispatcher = $dispatcher;
   }
 
   /**
@@ -345,16 +378,19 @@ class Move {
    * @param  bool   $halt
    * @return mixed
    */
-  protected function fireMoveEvent($event, $halt = true) {
-    if ( !isset(static::$dispatcher) ) return true;
+  protected function fireMoveEvent($event, $halt = true)
+  {
+      if (! isset(static::$dispatcher)) {
+          return true;
+      }
 
     // Basically the same as \Illuminate\Database\Eloquent\Model->fireModelEvent
     // but we relay the event into the node instance.
     $event = "eloquent.{$event}: ".get_class($this->node);
 
-    $method = $halt ? 'until' : 'fire';
+      $method = $halt ? 'until' : 'fire';
 
-    return static::$dispatcher->$method($event, $this->node);
+      return static::$dispatcher->$method($event, $this->node);
   }
 
   /**
@@ -363,15 +399,17 @@ class Move {
    * @param mixed $value
    * @return string
    */
-  protected function quoteIdentifier($value) {
-    if ( is_null($value) )
-      return 'NULL';
+  protected function quoteIdentifier($value)
+  {
+      if (is_null($value)) {
+          return 'NULL';
+      }
 
-    $connection = $this->node->getConnection();
+      $connection = $this->node->getConnection();
 
-    $pdo = $connection->getPdo();
+      $pdo = $connection->getPdo();
 
-    return $pdo->quote($value);
+      return $pdo->quote($value);
   }
 
   /**
@@ -381,8 +419,9 @@ class Move {
    * @param   int   $rgt
    * @return  void
    */
-  protected function applyLockBetween($lft, $rgt) {
-    $this->node->newQuery()
+  protected function applyLockBetween($lft, $rgt)
+  {
+      $this->node->newQuery()
       ->where($this->node->getLeftColumnName(), '>=', $lft)
       ->where($this->node->getRightColumnName(), '<=', $rgt)
       ->select($this->node->getKeyName())
