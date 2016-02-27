@@ -1,16 +1,15 @@
 <?php
+
 namespace Baum;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
-
-class SetValidator {
-
-  /**
-  * Node instance for reference
-  *
-  * @var \Baum\Node
-  */
-  protected $node = NULL;
+class SetValidator
+{
+    /**
+   * Node instance for reference.
+   *
+   * @var \Baum\Node
+   */
+  protected $node = null;
 
   /**
    * Create a new \Baum\SetValidator class instance.
@@ -18,27 +17,30 @@ class SetValidator {
    * @param   \Baum\Node      $node
    * @return  void
    */
-  public function __construct($node) {
-    $this->node = $node;
+  public function __construct($node)
+  {
+      $this->node = $node;
   }
 
   /**
    * Determine if the validation passes.
    *
-   * @return boolean
+   * @return bool
    */
-  public function passes() {
-    return $this->validateBounds() && $this->validateDuplicates() &&
+  public function passes()
+  {
+      return $this->validateBounds() && $this->validateDuplicates() &&
       $this->validateRoots();
   }
 
   /**
    * Determine if validation fails.
    *
-   * @return boolean
+   * @return bool
    */
-  public function fails() {
-    return !$this->passes();
+  public function fails()
+  {
+      return ! $this->passes();
   }
 
   /**
@@ -46,66 +48,69 @@ class SetValidator {
    * the `lft`, `rgt` and `parent_id` columns. Mainly that they're not null,
    * rights greater than lefts, and that they're within the bounds of the parent.
    *
-   * @return boolean
+   * @return bool
    */
-  protected function validateBounds() {
-    $connection = $this->node->getConnection();
-    $grammar    = $connection->getQueryGrammar();
+  protected function validateBounds()
+  {
+      $connection = $this->node->getConnection();
+      $grammar = $connection->getQueryGrammar();
 
-    $tableName      = $this->node->getTable();
-    $primaryKeyName = $this->node->getKeyName();
-    $parentColumn   = $this->node->getQualifiedParentColumnName();
+      $tableName = $this->node->getTable();
+      $primaryKeyName = $this->node->getKeyName();
+      $parentColumn = $this->node->getQualifiedParentColumnName();
 
-    $lftCol = $grammar->wrap($this->node->getLeftColumnName());
-    $rgtCol = $grammar->wrap($this->node->getRightColumnName());
+      $lftCol = $grammar->wrap($this->node->getLeftColumnName());
+      $rgtCol = $grammar->wrap($this->node->getRightColumnName());
 
-    $qualifiedLftCol    = $grammar->wrap($this->node->getQualifiedLeftColumnName());
-    $qualifiedRgtCol    = $grammar->wrap($this->node->getQualifiedRightColumnName());
-    $qualifiedParentCol = $grammar->wrap($this->node->getQualifiedParentColumnName());
+      $qualifiedLftCol = $grammar->wrap($this->node->getQualifiedLeftColumnName());
+      $qualifiedRgtCol = $grammar->wrap($this->node->getQualifiedRightColumnName());
+      $qualifiedParentCol = $grammar->wrap($this->node->getQualifiedParentColumnName());
 
-    $whereStm = "($qualifiedLftCol IS NULL OR
+      $whereStm = "($qualifiedLftCol IS NULL OR
       $qualifiedRgtCol IS NULL OR
       $qualifiedLftCol >= $qualifiedRgtCol OR
       ($qualifiedParentCol IS NOT NULL AND
         ($qualifiedLftCol <= parent.$lftCol OR
           $qualifiedRgtCol >= parent.$rgtCol)))";
 
-    $query = $this->node->newQuery()
+      $query = $this->node->newQuery()
       ->join($connection->raw($grammar->wrapTable($tableName).' AS parent'),
              $parentColumn, '=', $connection->raw('parent.'.$grammar->wrap($primaryKeyName)),
              'left outer')
       ->whereRaw($whereStm);
 
-    return ($query->count() == 0);
+      return $query->count() == 0;
   }
 
   /**
    * Checks that there are no duplicates for the `lft` and `rgt` columns.
    *
-   * @return boolean
+   * @return bool
    */
-  protected function validateDuplicates() {
-    return (
-      !$this->duplicatesExistForColumn($this->node->getQualifiedLeftColumnName()) &&
-      !$this->duplicatesExistForColumn($this->node->getQualifiedRightColumnName())
-    );
+  protected function validateDuplicates()
+  {
+      return
+      ! $this->duplicatesExistForColumn($this->node->getQualifiedLeftColumnName()) &&
+      ! $this->duplicatesExistForColumn($this->node->getQualifiedRightColumnName());
   }
 
   /**
    * For each root of the whole nested set tree structure, checks that their
    * `lft` and `rgt` bounds are properly set.
    *
-   * @return boolean
+   * @return bool
    */
-  protected function validateRoots() {
-    $roots = forward_static_call(array(get_class($this->node), 'roots'))->get();
+  protected function validateRoots()
+  {
+      $roots = forward_static_call([get_class($this->node), 'roots'])->get();
 
     // If a scope is defined in the model we should check that the roots are
     // valid *for each* value in the scope columns.
-    if ( $this->node->isScoped() )
-      return $this->validateRootsByScope($roots);
+    if ($this->node->isScoped()) {
+        return $this->validateRootsByScope($roots);
+    }
 
-    return $this->isEachRootValid($roots);
+      return $this->isEachRootValid($roots);
   }
 
   /**
@@ -113,29 +118,31 @@ class SetValidator {
    * the Nested Set scope columns into account (if appropiate).
    *
    * @param   string  $column
-   * @return  boolean
+   * @return  bool
    */
-  protected function duplicatesExistForColumn($column) {
-    $connection = $this->node->getConnection();
-    $grammar    = $connection->getQueryGrammar();
+  protected function duplicatesExistForColumn($column)
+  {
+      $connection = $this->node->getConnection();
+      $grammar = $connection->getQueryGrammar();
 
-    $columns = array_merge($this->node->getQualifiedScopedColumns(), array($column));
+      $columns = array_merge($this->node->getQualifiedScopedColumns(), [$column]);
 
-    $columnsForSelect = implode(', ', array_map(function($col) use ($grammar) {
+      $columnsForSelect = implode(', ', array_map(function ($col) use ($grammar) {
       return $grammar->wrap($col); }, $columns));
 
-    $wrappedColumn = $grammar->wrap($column);
+      $wrappedColumn = $grammar->wrap($column);
 
-    $query = $this->node->newQuery()
+      $query = $this->node->newQuery()
       ->select($connection->raw("$columnsForSelect, COUNT($wrappedColumn)"))
       ->havingRaw("COUNT($wrappedColumn) > 1");
 
-    foreach($columns as $col)
-      $query->groupBy($col);
+      foreach ($columns as $col) {
+          $query->groupBy($col);
+      }
 
-    $result = $query->first();
+      $result = $query->first();
 
-    return !is_null($result);
+      return ! is_null($result);
   }
 
   /**
@@ -143,23 +150,25 @@ class SetValidator {
    * values (lft, rgt indexes) are less than the next.
    *
    * @param   mixed   $roots
-   * @return  boolean
+   * @return  bool
    */
-  protected function isEachRootValid($roots) {
-    $left = $right = 0;
+  protected function isEachRootValid($roots)
+  {
+      $left = $right = 0;
 
-    foreach($roots as $root) {
-      $rootLeft   = $root->getLeft();
-      $rootRight  = $root->getRight();
+      foreach ($roots as $root) {
+          $rootLeft = $root->getLeft();
+          $rootRight = $root->getRight();
 
-      if ( !($rootLeft > $left && $rootRight > $right) )
-        return false;
+          if (! ($rootLeft > $left && $rootRight > $right)) {
+              return false;
+          }
 
-      $left   = $rootLeft;
-      $right  = $rootRight;
-    }
+          $left = $rootLeft;
+          $right = $rootRight;
+      }
 
-    return true;
+      return true;
   }
 
   /**
@@ -167,40 +176,44 @@ class SetValidator {
    * values (lft, rgt indexes) are less than the next *within each scope*.
    *
    * @param   mixed   $roots
-   * @return  boolean
+   * @return  bool
    */
-  protected function validateRootsByScope($roots) {
-    foreach($this->groupRootsByScope($roots) as $scope => $groupedRoots) {
-      $valid = $this->isEachRootValid($groupedRoots);
+  protected function validateRootsByScope($roots)
+  {
+      foreach ($this->groupRootsByScope($roots) as $scope => $groupedRoots) {
+          $valid = $this->isEachRootValid($groupedRoots);
 
-      if ( !$valid )
-        return false;
-    }
+          if (! $valid) {
+              return false;
+          }
+      }
 
-    return true;
+      return true;
   }
 
   /**
    * Given a list of root nodes, it returns an array in which the keys are the
    * array of the actual scope column values and the values are the root nodes
-   * inside that scope themselves
+   * inside that scope themselves.
    *
    * @param   mixed   $roots
    * @return  array
    */
-  protected function groupRootsByScope($roots) {
-    $rootsGroupedByScope = array();
+  protected function groupRootsByScope($roots)
+  {
+      $rootsGroupedByScope = [];
 
-    foreach($roots as $root) {
-      $key = $this->keyForScope($root);
+      foreach ($roots as $root) {
+          $key = $this->keyForScope($root);
 
-      if ( !isset($rootsGroupedByScope[$key]) )
-        $rootsGroupedByScope[$key] = array();
+          if (! isset($rootsGroupedByScope[$key])) {
+              $rootsGroupedByScope[$key] = [];
+          }
 
-      $rootsGroupedByScope[$key][] = $root;
-    }
+          $rootsGroupedByScope[$key][] = $root;
+      }
 
-    return $rootsGroupedByScope;
+      return $rootsGroupedByScope;
   }
 
   /**
@@ -210,15 +223,16 @@ class SetValidator {
    * @param Baum\Node   $node
    * @return string
    */
-  protected function keyForScope($node) {
-    return implode('-', array_map(function($column) use ($node) {
+  protected function keyForScope($node)
+  {
+      return implode('-', array_map(function ($column) use ($node) {
       $value = $node->getAttribute($column);
 
-      if ( is_null($value) )
-        return 'NULL';
+      if (is_null($value)) {
+          return 'NULL';
+      }
 
       return $value;
     }, $node->getScopedColumns()));
   }
-
 }
