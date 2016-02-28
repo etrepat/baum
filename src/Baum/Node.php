@@ -157,7 +157,7 @@ abstract class Node extends Model
      */
     public function getQualifiedParentColumnName()
     {
-        return $this->getTable() . '.' . $this->getParentColumnName();
+        return $this->getTable().'.'.$this->getParentColumnName();
     }
 
     /**
@@ -187,7 +187,7 @@ abstract class Node extends Model
      */
     public function getQualifiedLeftColumnName()
     {
-        return $this->getTable() . '.' . $this->getLeftColumnName();
+        return $this->getTable().'.'.$this->getLeftColumnName();
     }
 
     /**
@@ -217,7 +217,7 @@ abstract class Node extends Model
      */
     public function getQualifiedRightColumnName()
     {
-        return $this->getTable() . '.' . $this->getRightColumnName();
+        return $this->getTable().'.'.$this->getRightColumnName();
     }
 
     /**
@@ -247,7 +247,7 @@ abstract class Node extends Model
      */
     public function getQualifiedDepthColumnName()
     {
-        return $this->getTable() . '.' . $this->getDepthColumnName();
+        return $this->getTable().'.'.$this->getDepthColumnName();
     }
 
     /**
@@ -277,7 +277,7 @@ abstract class Node extends Model
      */
     public function getQualifiedOrderColumnName()
     {
-        return $this->getTable() . '.' . $this->getOrderColumnName();
+        return $this->getTable().'.'.$this->getOrderColumnName();
     }
 
     /**
@@ -297,7 +297,7 @@ abstract class Node extends Model
      */
     public function getScopedColumns()
     {
-        return (array)$this->scoped;
+        return (array) $this->scoped;
     }
 
     /**
@@ -307,14 +307,14 @@ abstract class Node extends Model
      */
     public function getQualifiedScopedColumns()
     {
-        if (!$this->isScoped()) {
+        if (! $this->isScoped()) {
             return $this->getScopedColumns();
         }
 
-        $prefix = $this->getTable() . '.';
+        $prefix = $this->getTable().'.';
 
         return array_map(function ($c) use ($prefix) {
-            return $prefix . $c;
+            return $prefix.$c;
         }, $this->getScopedColumns());
     }
 
@@ -326,7 +326,7 @@ abstract class Node extends Model
      */
     public function isScoped()
     {
-        return (bool)(count($this->getScopedColumns()) > 0);
+        return (bool) (count($this->getScopedColumns()) > 0);
     }
 
     /**
@@ -435,7 +435,7 @@ abstract class Node extends Model
         $lftCol = $grammar->wrap($instance->getQualifiedLeftColumnName());
 
         return $instance->newQuery()
-            ->whereRaw($rgtCol . ' - ' . $lftCol . ' = 1')
+            ->whereRaw($rgtCol.' - '.$lftCol.' = 1')
             ->orderBy($instance->getQualifiedOrderColumnName());
     }
 
@@ -456,7 +456,7 @@ abstract class Node extends Model
 
         return $instance->newQuery()
             ->whereNotNull($instance->getParentColumnName())
-            ->whereRaw($rgtCol . ' - ' . $lftCol . ' != 1')
+            ->whereRaw($rgtCol.' - '.$lftCol.' != 1')
             ->orderBy($instance->getQualifiedOrderColumnName());
     }
 
@@ -573,7 +573,7 @@ abstract class Node extends Model
      */
     public function isTrunk()
     {
-        return !$this->isRoot() && !$this->isLeaf();
+        return ! $this->isRoot() && ! $this->isLeaf();
     }
 
     /**
@@ -583,7 +583,7 @@ abstract class Node extends Model
      */
     public function isChild()
     {
-        return !$this->isRoot();
+        return ! $this->isRoot();
     }
 
     /**
@@ -598,7 +598,7 @@ abstract class Node extends Model
         } else {
             $parentId = $this->getParentId();
 
-            if (!is_null($parentId) && $currentParent = static::find($parentId)) {
+            if (! is_null($parentId) && $currentParent = static::find($parentId)) {
                 return $currentParent->getRoot();
             } else {
                 return $this;
@@ -733,7 +733,7 @@ abstract class Node extends Model
         $lftCol = $grammar->wrap($this->getQualifiedLeftColumnName());
 
         return $this->descendants()
-            ->whereRaw($rgtCol . ' - ' . $lftCol . ' = 1');
+            ->whereRaw($rgtCol.' - '.$lftCol.' = 1');
     }
 
     /**
@@ -762,7 +762,7 @@ abstract class Node extends Model
 
         return $this->descendants()
             ->whereNotNull($this->getQualifiedParentColumnName())
-            ->whereRaw($rgtCol . ' - ' . $lftCol . ' != 1');
+            ->whereRaw($rgtCol.' - '.$lftCol.' != 1');
     }
 
     /**
@@ -1125,7 +1125,7 @@ abstract class Node extends Model
             'desc')->take(1)->sharedLock()->first();
 
         $maxRgt = 0;
-        if (!is_null($withHighestRight)) {
+        if (! is_null($withHighestRight)) {
             $maxRgt = $withHighestRight->getRight();
         }
 
@@ -1141,7 +1141,7 @@ abstract class Node extends Model
      */
     public function storeNewParent()
     {
-        if ($this->isDirty($this->getParentColumnName()) && ($this->exists || !$this->isRoot())) {
+        if ($this->isDirty($this->getParentColumnName()) && ($this->exists || ! $this->isRoot())) {
             static::$moveToNewParentId = $this->getParentId();
         } else {
             static::$moveToNewParentId = false;
@@ -1195,21 +1195,22 @@ abstract class Node extends Model
     {
         $self = $this;
 
-        $this->getConnection()->transaction(function() use ($self) {
+        $this->getConnection()->transaction(function () use ($self) {
             $self->reload();
 
             $self->descendantsAndSelf()->select($self->getQualifiedKeyName())->lockForUpdate()->get();
 
-            $oldDepth = !is_null($self->getDepth()) ? $self->getDepth() : 0;
+            $oldDepth = ! is_null($self->getDepth()) ? $self->getDepth() : 0;
 
             $newDepth = $self->getLevel();
 
-            $self->newNestedSetQuery()->where($self->getQualifiedKeyName(), '=', $self->getKey())->update(array($self->getDepthColumnName() => $newDepth));
+            $self->newNestedSetQuery()->where($self->getQualifiedKeyName(), '=', $self->getKey())->update([$self->getDepthColumnName() => $newDepth]);
             $self->setAttribute($self->getDepthColumnName(), $newDepth);
 
             $diff = $newDepth - $oldDepth;
-            if ( !$self->isLeaf() && $diff != 0 )
+            if (! $self->isLeaf() && $diff != 0) {
                 $self->descendants()->increment($self->getDepthColumnName(), $diff);
+            }
         });
 
         return $this;
@@ -1319,7 +1320,7 @@ abstract class Node extends Model
         return array_combine(array_map(function ($node) use ($key) {
             return $node[$key];
         }, $nodes), array_map(function ($node) use ($seperator, $depthColumn, $column) {
-            return str_repeat($seperator, $node[$depthColumn]) . $node[$column];
+            return str_repeat($seperator, $node[$depthColumn]).$node[$column];
         }, $nodes));
     }
 
