@@ -108,7 +108,6 @@ abstract class Node extends Model
      *
      * @return void
      */
-
     protected static function boot()
     {
         parent::boot();
