@@ -1,6 +1,7 @@
 # Baum
 
 [![Build Status](https://travis-ci.org/etrepat/baum.png?branch=master)](https://travis-ci.org/etrepat/baum)
+[![StyleCI](https://styleci.io/repos/51155875/shield)](https://styleci.io/repos/51155875)
 
 Baum is an implementation of the [Nested Set](http://en.wikipedia.org/wiki/Nested_set_model) pattern for [Laravel 5's](http://laravel.com/) Eloquent ORM.
 
