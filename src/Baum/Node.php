@@ -111,7 +111,11 @@ abstract class Node extends Model
     protected static function boot()
     {
         parent::boot();
+        static::flushModelEvents();
+    }
 
+    public static function flushModelEvents()
+    {
         static::creating(function ($node) {
             $node->setDefaultLeftAndRight();
         });
@@ -504,9 +508,7 @@ abstract class Node extends Model
      */
     public function scopeWithoutNode($query, $node)
     {
-        return $query->where(
-            $node->getQualifiedKeyName(), '!=', $node->getKey()
-        );
+        return $query->where($node->getKeyName(), '!=', $node->getKey());
     }
 
     /**
@@ -589,7 +591,7 @@ abstract class Node extends Model
     /**
      * Returns the root node starting at the current node.
      *
-     * @return $this
+     * @return NestedSet
      */
     public function getRoot()
     {
@@ -1198,13 +1200,14 @@ abstract class Node extends Model
         $this->getConnection()->transaction(function () use ($self) {
             $self->reload();
 
-            $self->descendantsAndSelf()->select($self->getQualifiedKeyName())->lockForUpdate()->get();
+            $self->descendantsAndSelf()->select($self->getKeyName())->lockForUpdate()->get();
 
             $oldDepth = ! is_null($self->getDepth()) ? $self->getDepth() : 0;
 
             $newDepth = $self->getLevel();
 
-            $self->newNestedSetQuery()->where($self->getQualifiedKeyName(), '=', $self->getKey())->update([$self->getDepthColumnName() => $newDepth]);
+            $self->newNestedSetQuery()->where($self->getQualifiedKeyName(), '=',
+                $self->getKey())->update([$self->getDepthColumnName() => $newDepth]);
             $self->setAttribute($self->getDepthColumnName(), $newDepth);
 
             $diff = $newDepth - $oldDepth;
@@ -1343,7 +1346,7 @@ abstract class Node extends Model
      * Main move method. Here we handle all node movements with the corresponding
      * lft/rgt index updates.
      *
-     * @param Baum\Node|int $target
+     * @param \Baum\Node|int $target
      * @param string $position
      * @return \Baum\Node
      */
@@ -1373,7 +1376,7 @@ abstract class Node extends Model
     /**
      * Return an array with the last node we could reach and its nesting level.
      *
-     * @param   Baum\Node $node
+     * @param   \Baum\Node $node
      * @param   int $nesting
      * @return  array
      */
