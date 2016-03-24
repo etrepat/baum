@@ -108,7 +108,7 @@ class InstallCommand extends Command {
    * @return string
    */
   protected function getMigrationsPath() {
-    return $this->laravel['path.database'].'/migrations';
+    return $this->laravel->databasePath().'/migrations';
   }
 
   /**
