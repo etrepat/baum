@@ -368,7 +368,7 @@ Baum provides some very basic query scopes for accessing the root and leaf nodes
 Category::roots()
 
 // All leaf nodes (nodes at the end of a branch)
-Category:allLeaves()
+Category::allLeaves()
 ```
 
 You may also be interested in only the first root:
