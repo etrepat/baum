@@ -2,6 +2,9 @@
 
 [![Build Status](https://travis-ci.org/etrepat/baum.png?branch=master)](https://travis-ci.org/etrepat/baum)
 
+## Notice
+This project is just a fork of [Baum](https://travis-ci.org/etrepat/baum) and is maintained to work with Oracle using [Laravel-OCI8](https://github.com/yajra/laravel-oci8) package.
+
 Baum is an implementation of the [Nested Set](http://en.wikipedia.org/wiki/Nested_set_model) pattern for [Laravel 5's](http://laravel.com/) Eloquent ORM.
 
 > For **Laravel 4.2.x compatibility**, check the [1.0.x branch](https://github.com/etrepat/baum/tree/1.0.x-stable) branch or use the latest [1.0.x tagged release](https://github.com/etrepat/baum/releases).
