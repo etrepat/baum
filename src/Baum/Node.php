@@ -568,8 +568,8 @@ abstract class Node extends Model {
    */
   public function ancestorsAndSelf() {
     return $this->newNestedSetQuery()
-                ->where($this->getLeftColumnName(), '<=', $this->getLeft())
-                ->where($this->getRightColumnName(), '>=', $this->getRight());
+                ->where($this->getQualifiedLeftColumnName(), '<=', $this->getLeft())
+                ->where($this->getQualifiedRightColumnName(), '>=', $this->getRight());
   }
 
   /**
@@ -723,8 +723,8 @@ abstract class Node extends Model {
    */
   public function descendantsAndSelf() {
     return $this->newNestedSetQuery()
-                ->where($this->getLeftColumnName(), '>=', $this->getLeft())
-                ->where($this->getLeftColumnName(), '<', $this->getRight());
+                ->where($this->getQualifiedLeftColumnName(), '>=', $this->getLeft())
+                ->where($this->getQualifiedLeftColumnName(), '<', $this->getRight());
   }
 
   /**
