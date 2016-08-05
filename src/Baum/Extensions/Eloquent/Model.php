@@ -24,8 +24,6 @@ abstract class Model extends BaseModel {
 
       $this->setRawAttributes($fresh->getAttributes(), true);
 
-      $this->setRelations($fresh->getRelations());
-
       $this->exists = $fresh->exists;
     } else {
       // Revert changes if model is not persisted
@@ -86,7 +84,9 @@ abstract class Model extends BaseModel {
     if ( $this->areSoftDeletesEnabled() )
       return static::withTrashed()->find($this->getKey());
 
-    return static::find($this->getKey());
+    $instance = static::find($this->getKey());
+    $instance->setRelations($this->getRelations());
+    return $instance;
   }
 
   /**
