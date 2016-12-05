@@ -631,7 +631,7 @@ abstract class Node extends Model {
    */
   public function siblingsAndSelf() {
     return $this->newNestedSetQuery()
-                ->where($this->getParentColumnName(), $this->getParentId());
+                ->where($this->getParentColumnName(), $this->id);
   }
 
   /**
