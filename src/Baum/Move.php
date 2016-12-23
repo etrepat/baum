@@ -153,7 +153,7 @@ class Move {
       ELSE $wrappedRight END";
 
     $parentSql = "CASE
-      WHEN $wrappedId = $currentId THEN $parentId
+      WHEN $wrappedId = '$currentId' THEN '$parentId''
       ELSE $wrappedParent END";
 
     $updateConditions = array(
