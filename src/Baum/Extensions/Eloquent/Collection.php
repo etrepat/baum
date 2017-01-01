@@ -7,6 +7,11 @@ class Collection extends BaseCollection {
 
   public function toHierarchy() {
     $dict = $this->getDictionary();
+    
+    //sort array by orderColumn
+    uasort($dict, function($a, $b){
+        return ($a->getOrder() >= $b->getOrder()) ? 1 : -1;
+    });
 
     // Enforce sorting by $orderColumn setting in Baum\Node instance
     uasort($dict, function($a, $b){
