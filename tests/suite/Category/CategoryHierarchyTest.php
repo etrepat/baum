@@ -702,4 +702,21 @@ class CategoryHierarchyTest extends CategoryTestCase {
     $this->assertArraysAreEqual($expected, $nestedList);
   }
 
+  public function testGetDescendantsNestedList() {
+    $parent = $this->categories('Root 1');
+
+    $seperator = ' ';
+
+    $nestedList = $parent->getDescendantsNestedList('name', 'id', $seperator);
+
+    $expected = array(
+      2 => str_repeat($seperator, 0). 'Child 1',
+      3 => str_repeat($seperator, 0). 'Child 2',
+      4 => str_repeat($seperator, 1). 'Child 2.1',
+      5 => str_repeat($seperator, 0). 'Child 3',
+    );
+
+    $this->assertArraysAreEqual($expected, $nestedList);
+  }
+
 }

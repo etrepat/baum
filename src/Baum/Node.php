@@ -1215,6 +1215,25 @@ abstract class Node extends Model {
   }
 
   /**
+   * Return an key-value array indicating the node's depth with $seperator
+   *
+   * @return Array
+   */
+  public function getDescendantsNestedList($column, $key = null, $seperator = ' ') {
+    $nodes = $this->getDescendants()->toArray();
+
+    $depthColumn = $this->getDepthColumnName();
+
+    $rootDepth = $this->{$depthColumn} + 1;
+
+    return array_combine(array_map(function($node) use($key) {
+      return $node[$key];
+    }, $nodes), array_map(function($node) use($seperator, $depthColumn, $column, $rootDepth) {
+      return str_repeat($seperator, $node[$depthColumn] - $rootDepth) . $node[$column];
+    }, $nodes));
+  }
+
+  /**
    * Maps the provided tree structure into the database using the current node
    * as the parent. The provided tree structure will be inserted/updated as the
    * descendancy subtree of the current node instance.
