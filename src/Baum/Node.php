@@ -1207,10 +1207,61 @@ abstract class Node extends Model {
 
     $nodes = $instance->newNestedSetQuery()->get()->toArray();
 
-    return array_combine(array_map(function($node) use($key) {
+    return $instance->buildNestedList($nodes, $depthColumn, $column, $key, $seperator);
+  }
+
+  /**
+   * Return an key-value array with all nested children indicating the node's depth with $seperator
+   *
+   * @param $column
+   * @param null $key
+   * @param string $seperator
+   * @return Array
+   */
+  public function getDescendantsNestedList($column, $key = null, $seperator = ' ') {
+    $nodes = $this->getDescendants()->toArray();
+
+    $depthColumn = $this->getDepthColumnName();
+
+    $rootDepth = $this->{$depthColumn} + 1;
+
+    return $this->buildNestedList($nodes, $depthColumn, $column, $key, $seperator, $rootDepth);
+  }
+
+  /**
+   * Return an key-value array with all nested children and self indicating the node's depth with $seperator
+   *
+   * @param $column
+   * @param null $key
+   * @param string $seperator
+   * @return Array
+   */
+  public function getDescendantsAndSelfNestedList($column, $key = null, $seperator = ' ') {
+    $nodes = $this->getDescendantsAndSelf()->toArray();
+
+    $depthColumn = $this->getDepthColumnName();
+
+    $rootDepth = $this->{$depthColumn};
+
+    return $this->buildNestedList($nodes, $depthColumn, $column, $key, $seperator, $rootDepth);
+  }
+
+  /**
+   * Build key-value array
+   *
+   * @param array $nodes
+   * @param $depthColumn
+   * @param $column
+   * @param null $key
+   * @param string $seperator
+   * @param int $rootDepth
+   * @return Array
+   */
+  private function buildNestedList(array $nodes, $depthColumn, $column, $key = null, $seperator = ' ', $rootDepth = 0) {
+    return array_combine(array_map(function ($node) use ($key) {
       return $node[$key];
-    }, $nodes), array_map(function($node) use($seperator, $depthColumn, $column) {
-      return str_repeat($seperator, $node[$depthColumn]) . $node[$column];
+    }, $nodes), array_map(function ($node) use ($seperator, $depthColumn, $column, $rootDepth) {
+      return str_repeat($seperator, $node[$depthColumn] - $rootDepth) . $node[$column];
     }, $nodes));
   }
 
