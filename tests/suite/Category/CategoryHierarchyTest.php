@@ -703,20 +703,59 @@ class CategoryHierarchyTest extends CategoryTestCase {
   }
 
   public function testGetDescendantsNestedList() {
-    $parent = $this->categories('Root 1');
-
     $seperator = ' ';
 
-    $nestedList = $parent->getDescendantsNestedList('name', 'id', $seperator);
+    $root = $this->categories('Root 1');
+
+    $nestedList = $root->getDescendantsNestedList('name', 'id', $seperator);
 
     $expected = array(
-      2 => str_repeat($seperator, 0). 'Child 1',
-      3 => str_repeat($seperator, 0). 'Child 2',
-      4 => str_repeat($seperator, 1). 'Child 2.1',
-      5 => str_repeat($seperator, 0). 'Child 3',
+      2 => str_repeat($seperator, 0) . 'Child 1',
+      3 => str_repeat($seperator, 0) . 'Child 2',
+      4 => str_repeat($seperator, 1) . 'Child 2.1',
+      5 => str_repeat($seperator, 0) . 'Child 3',
+    );
+
+    $this->assertArraysAreEqual($expected, $nestedList);
+
+
+    $child = $this->categories('Child 2');
+
+    $nestedList = $child->getDescendantsNestedList('name', 'id', $seperator);
+
+    $expected = array(
+      4 => str_repeat($seperator, 0) . 'Child 2.1',
     );
 
     $this->assertArraysAreEqual($expected, $nestedList);
   }
 
+  public function testGetDescendantsAndSelfNestedList() {
+    $seperator = ' ';
+
+    $root = $this->categories('Root 1');
+
+    $nestedList = $root->getDescendantsAndSelfNestedList('name', 'id', $seperator);
+
+    $expected = array(
+      1 => str_repeat($seperator, 0) . 'Root 1',
+      2 => str_repeat($seperator, 1) . 'Child 1',
+      3 => str_repeat($seperator, 1) . 'Child 2',
+      4 => str_repeat($seperator, 2) . 'Child 2.1',
+      5 => str_repeat($seperator, 1) . 'Child 3',
+    );
+
+    $this->assertArraysAreEqual($expected, $nestedList);
+
+    $child = $this->categories('Child 2');
+
+    $nestedList = $child->getDescendantsAndSelfNestedList('name', 'id', $seperator);
+
+    $expected = array(
+      3 => str_repeat($seperator, 0) . 'Child 2',
+      4 => str_repeat($seperator, 1) . 'Child 2.1',
+    );
+
+    $this->assertArraysAreEqual($expected, $nestedList);
+  }
 }
