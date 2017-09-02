@@ -66,6 +66,15 @@ class InstallCommand extends Command {
     $this->writeModel($name);
 
   }
+  
+  /**
+   * Execute the console command in Laravel 5.5
+   * 
+   * @return void
+   */
+  public function handle(){
+    $this->fire();
+  }
 
   /**
    * Get the command arguments
