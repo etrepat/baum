@@ -1,5 +1,7 @@
 # Baum
 
+Fork of https://github.com/etrepat/baum for Laravel 5.8 Implementation.
+
 [![Build Status](https://travis-ci.org/etrepat/baum.png?branch=master)](https://travis-ci.org/etrepat/baum)
 
 Baum is an implementation of the [Nested Set](http://en.wikipedia.org/wiki/Nested_set_model) pattern for [Laravel 5's](http://laravel.com/) Eloquent ORM.
