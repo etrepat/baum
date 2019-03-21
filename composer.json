@@ -23,8 +23,8 @@
     "d11wtq/boris": "~1.0.10"
   },
   "autoload": {
-    "psr-0": {
-      "Baum": "src/"
+    "psr-4": {
+      "Baum\\": "src/"
     }
   }
 }
