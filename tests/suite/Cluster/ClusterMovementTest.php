@@ -246,7 +246,7 @@ class ClusterMovementTest extends ClusterTestCase {
     $newChild->makeChildOf($this->clusters('Root 1'));
 
     $lastChild = $this->clusters('Root 1')->children()->get()->last();
-    $this->assertEquals($newChild, $lastChild);
+    $this->assertEquals($newChild->getAttributes(), $lastChild->getAttributes());
 
     $this->assertTrue(Cluster::isValidNestedSet());
   }
@@ -314,7 +314,7 @@ class ClusterMovementTest extends ClusterTestCase {
     $newChild->makeFirstChildOf($this->clusters('Root 1'));
 
     $lastChild = $this->clusters('Root 1')->children()->get()->first();
-    $this->assertEquals($newChild, $lastChild);
+    $this->assertEquals($newChild->getAttributes(), $lastChild->getAttributes());
 
     $this->assertTrue(Cluster::isValidNestedSet());
   }
@@ -382,7 +382,7 @@ class ClusterMovementTest extends ClusterTestCase {
     $newChild->makeLastChildOf($this->clusters('Root 1'));
 
     $lastChild = $this->clusters('Root 1')->children()->get()->last();
-    $this->assertEquals($newChild, $lastChild);
+    $this->assertEquals($newChild->getAttributes(), $lastChild->getAttributes());
 
     $this->assertTrue(Cluster::isValidNestedSet());
   }

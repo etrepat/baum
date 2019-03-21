@@ -17,9 +17,9 @@ class CategoryRelationsTest extends CategoryTestCase {
   public function testParentRelationRefersToCorrectField() {
     $category = new Category;
 
-    $this->assertEquals($category->getParentColumnName(), $category->parent()->getForeignKey());
+    $this->assertEquals($category->getParentColumnName(), $category->parent()->getForeignKeyName());
 
-    $this->assertEquals($category->getQualifiedParentColumnName(), $category->parent()->getQualifiedForeignKey());
+    $this->assertEquals($category->getQualifiedParentColumnName(), $category->parent()->getQualifiedForeignKeyName());
   }
 
   public function testParentRelation() {
@@ -43,9 +43,9 @@ class CategoryRelationsTest extends CategoryTestCase {
   public function testChildrenRelationReferesToCorrectField() {
     $category = new Category;
 
-    $this->assertEquals($category->getParentColumnName(), $category->children()->getPlainForeignKey());
+    $this->assertEquals($category->getParentColumnName(), $category->children()->getForeignKeyName());
 
-    $this->assertEquals($category->getQualifiedParentColumnName(), $category->children()->getForeignKey());
+    $this->assertEquals($category->getQualifiedParentColumnName(), $category->children()->getQualifiedForeignKeyName());
   }
 
   public function testChildrenRelation() {

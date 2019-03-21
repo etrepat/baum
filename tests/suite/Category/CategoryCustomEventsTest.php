@@ -9,15 +9,18 @@ class CategoryCustomEventsTest extends CategoryTestCase {
   }
 
   public function testMovementEventsFire() {
+    $child1 = $this->categories('Child 1');
+    $child3 = $this->categories('Child 3');
+
     $dispatcher = Category::getEventDispatcher();
-    Category::setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
 
-    $child = $this->categories('Child 1');
+    Category::setEventDispatcher($events = m::mock('\Illuminate\Events\Dispatcher')->makePartial());
 
-    $events->shouldReceive('until')->once()->with('eloquent.moving: '.get_class($child), $child)->andReturn(true);
-    $events->shouldReceive('fire')->once()->with('eloquent.moved: '.get_class($child), $child)->andReturn(true);
+    $events->shouldReceive('until')->once()->with('eloquent.moving: '.get_class($child1), $child1)->andReturn(true);
 
-    $child->moveToRightOf($this->categories('Child 3'));
+    $events->shouldReceive('dispatch')->once()->with('eloquent.moved: '.get_class($child1), $child1)->andReturn(true);
+
+    $child1->moveToRightOf($child3);
 
     Category::unsetEventDispatcher();
     Category::setEventDispatcher($dispatcher);
@@ -28,7 +31,7 @@ class CategoryCustomEventsTest extends CategoryTestCase {
 
     $dispatcher = Category::getEventDispatcher();
 
-    Category::setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher[until]'));
+    Category::setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher')->makePartial());
     $events->shouldReceive('until')->once()->with('eloquent.moving: '.get_class($unchanged), $unchanged)->andReturn(false);
 
     // Force "moving" to return false
