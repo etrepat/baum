@@ -13,10 +13,12 @@ class Builder extends BaseBuilder {
    * @param  string  $direction
    * @return \Illuminate\Database\Query\Builder|static
    */
-  public function reOrderBy($column, $direction = 'asc') {
-    $this->orders = null;
+  public function reOrderBy($column = null, $direction = 'asc') {
+    $this->{$this->unions ? 'unionOrders' : 'orders'} = null;
 
-    if ( !is_null($column) ) return $this->orderBy($column, $direction);
+    if (!is_null($column)) {
+      return parent::orderBy($column, $direction);
+    }
 
     return $this;
   }
@@ -30,10 +32,25 @@ class Builder extends BaseBuilder {
    */
   public function aggregate($function, $columns = array('*')) {
     // Postgres doesn't like ORDER BY when there's no GROUP BY clause
-    if ( !isset($this->groups) )
+    if (!isset($this->groups)) {
       $this->reOrderBy(null);
+    }
 
     return parent::aggregate($function, $columns);
   }
+
+    /**
+     * Determine if any rows exist for the current query.
+     *
+     * @return bool
+     */
+    public function exists()
+    {
+      if (!isset($this->groups)) {
+        $this->reOrderBy(null);
+      }
+
+      return parent::exists();
+    }
 
 }
