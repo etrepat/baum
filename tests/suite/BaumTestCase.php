@@ -1,6 +1,8 @@
 <?php
 
-class BaumTestCase extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class BaumTestCase extends TestCase {
 
   public function assertArraysAreEqual($expected, $actual, $message = '') {
     $ex = var_export($expected, true);

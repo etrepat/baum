@@ -5,8 +5,9 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Baum\Extensions\Query\Builder;
+use PHPUnit\Framework\TestCase;
 
-class QueryBuilderExtensionTest extends PHPUnit_Framework_TestCase {
+class QueryBuilderExtensionTest extends TestCase {
 
   public function tearDown() {
     m::close();

@@ -2,8 +2,9 @@
 
 use Mockery as m;
 use Illuminate\Database\Capsule\Manager as DB;
+use PHPUnit\Framework\TestCase;
 
-class NodeModelExtensionsTest extends PHPUnit_Framework_TestCase {
+class NodeModelExtensionsTest extends TestCase {
 
   public static function setUpBeforeClass() {
     with(new CategoryMigrator)->up();
