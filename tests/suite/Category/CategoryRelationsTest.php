@@ -17,9 +17,14 @@ class CategoryRelationsTest extends CategoryTestCase {
   public function testParentRelationRefersToCorrectField() {
     $category = new Category;
 
-    $this->assertEquals($category->getParentColumnName(), $category->parent()->getForeignKeyName());
-
-    $this->assertEquals($category->getQualifiedParentColumnName(), $category->parent()->getQualifiedForeignKeyName());
+    if (method_exists($category->parent(), 'getForeignKeyName')) {
+        // For Laravel 5.6+
+        $this->assertEquals($category->getParentColumnName(), $category->parent()->getForeignKeyName());
+        $this->assertEquals($category->getQualifiedParentColumnName(), $category->parent()->getQualifiedForeignKeyName());
+    } else {
+        $this->assertEquals($category->getParentColumnName(), $category->parent()->getForeignKey());
+        $this->assertEquals($category->getQualifiedParentColumnName(), $category->parent()->getQualifiedForeignKey());
+    }
   }
 
   public function testParentRelation() {

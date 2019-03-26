@@ -13,14 +13,16 @@
   ],
   "require": {
     "php": ">=7.0.0",
-    "illuminate/database": "~5.5.0|~5.6.0|~5.7.0|~5.8.0",
-    "illuminate/events": "~5.5.0|~5.6.0|~5.7.0|~5.8.0"
+    "illuminate/database": "~5.5.0|~5.6.0|~5.7.0|~5.8.0|~5.9.0",
+    "illuminate/events": "~5.5.0|~5.6.0|~5.7.0|~5.8.0|~5.9.0",
+    "illuminate/support": "~5.5.0|~5.6.0|~5.7.0|~5.8.0|~5.9.0"
   },
   "require-dev": {
+    "d11wtq/boris": "~1.0.10",
+    "doctrine/dbal": "*",
     "mockery/mockery": "^1.0",
     "phpunit/phpunit": "^7.0",
-    "d11wtq/boris": "~1.0.10",
-    "doctrine/dbal": "^2.9"
+    "squizlabs/php_codesniffer": "^3.4"
   },
   "autoload": {
     "psr-4": {
