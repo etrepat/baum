@@ -47,6 +47,15 @@ class InstallCommand extends Command {
     $this->migrator = $migrator;
     $this->modeler  = $modeler;
   }
+  
+  /**
+  * Fire method alias
+  *
+  * @return void
+  */
+  public function handle() {
+    $this->fire();
+  }
 
   /**
    * Execute the console command.
