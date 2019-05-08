@@ -2,6 +2,7 @@
 
 namespace Baum\Tests;
 
+use Baum\NestedSet\MoveNotPossibleException;
 use Baum\Tests\Support\Models\MultiScopedCategory;
 use Baum\Tests\Support\Models\OrderedScopedCategory;
 use Baum\Tests\Support\Models\ScopedCategory;
@@ -11,7 +12,7 @@ use Baum\Tests\Support\Seeders\ScopedCategorySeeder;
 
 class ScopingTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         with(new MultiScopedCategorySeeder)->run();
     }
@@ -275,33 +276,30 @@ class ScopingTest extends TestCase
         $this->assertEquals($expectedWhole2, hmap(OrderedScopedCategory::where('company_id', 2)->get()->toHierarchy()->toArray()));
     }
 
-    /**
-     * @expectedException Baum\NestedSet\MoveNotPossibleException
-     */
     public function testNodesCannotMoveBetweenScopes()
     {
+        $this->expectException(MoveNotPossibleException::class);
+
         $child4 = $this->categories('Child 4', ScopedCategory::class);
         $root1 = $this->categories('Root 1', ScopedCategory::class);
 
         $child4->makeChildOf($root1);
     }
 
-    /**
-     * @expectedException Baum\NestedSet\MoveNotPossibleException
-     */
     public function testNodesCannotMoveBetweenScopesMultiple()
     {
+        $this->expectException(MoveNotPossibleException::class);
+
         $root1 = $this->categories('Root 1', MultiScopedCategory::class);
         $child4 = $this->categories('Child 4', MultiScopedCategory::class);
 
         $child4->makeChildOf($root1);
     }
 
-    /**
-     * @expectedException Baum\NestedSet\MoveNotPossibleException
-     */
     public function testNodesCannotMoveBetweenScopesMultiple2()
     {
+        $this->expectException(MoveNotPossibleException::class);
+
         $root1 = $this->categories('Racine 1', MultiScopedCategory::class);
         $child2 = $this->categories('Hijo 2', MultiScopedCategory::class);
 

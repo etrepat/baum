@@ -10,7 +10,7 @@ use Baum\Tests\Support\Seeders\CategorySeeder;
 
 class TreeMapperTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         with(new CategoryMigrator)->up();
     }

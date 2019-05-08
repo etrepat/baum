@@ -8,7 +8,7 @@ use Baum\Tests\Support\Models\Category;
 
 class CustomEventsTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
