@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<ruleset name="PHP_CodeSniffer">
+    <description>The coding standard for Baum.</description>
+
+    <!-- Include the whole PSR2 standard -->
+    <rule ref="PSR2" />
+
+    <!-- Include some other sniffs -->
+    <rule ref="Generic.Arrays.ArrayIndent" />
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+</ruleset>

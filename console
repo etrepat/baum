@@ -1,0 +1,21 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Baum, an implementation of the [Nested Set](http://en.wikipedia.org/wiki/Nested_set_model)
+ * pattern for Laravel's Eloquent ORM.
+ *
+ * @package Baum
+ * @author  Estanislau Trepat <estanis@etrepat.com>
+ */
+
+ require __DIR__ . '/bootstrap.php';
+
+class Test extends Illuminate\Database\Eloquent\Model {
+    use Baum\NestedSet\Node;
+
+    protected $tableName = 'forest';
+}
+
+with(new \Baum\Tests\Support\Migrators\CategoryMigrator)->up();
+
+exit($status = Baum\Playground\Console::start());

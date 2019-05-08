@@ -1,38 +1,55 @@
 <?php
 
-/**
- * Register composer auto  loader
- */
+/*
+|--------------------------------------------------------------------------
+| Register The Auto Loader
+|--------------------------------------------------------------------------
+|
+| Composer provides a convenient, automatically generated class loader
+| for our library. We just need to utilize it!
+|
+*/
+
 require __DIR__.'/vendor/autoload.php';
 
-/**
- * Initialize Capsule
- */
-$capsule = new Illuminate\Database\Capsule\Manager;
+/*
+|--------------------------------------------------------------------------
+| Initialize the Collection extensions
+|--------------------------------------------------------------------------
+|
+| This would normally be under a service provider on a laravel application but
+| for testing we just initialize the mixin here.
+|
+*/
+
+\Illuminate\Database\Eloquent\Collection::mixin(new \Baum\Mixins\Collection);
+
+/*
+|--------------------------------------------------------------------------
+| Initialize the schema blueprint extensions
+|--------------------------------------------------------------------------
+|
+| This would normally be under a service provider on a laravel application but
+| for testing we just initialize the mixin here.
+|
+*/
+
+\Illuminate\Database\Schema\Blueprint::mixin(new \Baum\Mixins\Blueprint);
+
+/*
+|--------------------------------------------------------------------------
+| Initialize the Eloquent database manager
+|--------------------------------------------------------------------------
+|
+| Eloquent can run as a stand-alone library (outside of Laravel applications)
+| with all its functionality intact. We just need to bootstrap it correctly.
+|
+*/
+
+$capsule = new \Illuminate\Database\Capsule\Manager;
 
 $capsule->addConnection(require(__DIR__.'/tests/config/database.php'));
-
-$capsule->setEventDispatcher(new Illuminate\Events\Dispatcher(new Illuminate\Container\Container));
-
+$capsule->setEventDispatcher(new \Illuminate\Events\Dispatcher(new \Illuminate\Container\Container));
 $capsule->bootEloquent();
 
 $capsule->setAsGlobal();
-
-/**
- * Autoload required libraries
- */
-$__autoload_paths = array('models', 'migrators', 'seeders');
-
-foreach($__autoload_paths as $path) {
-  foreach(glob(__DIR__ . "/tests/$path/*.php") as $dep) {
-    require_once $dep;
-  }
-}
-
-/**
- * Require test helpers
- */
-require __DIR__ . '/tests/suite/support.php';
-require __DIR__ . '/tests/suite/BaumTestCase.php';
-require __DIR__ . '/tests/suite/CategoryTestCase.php';
-require __DIR__ . '/tests/suite/ClusterTestCase.php';
