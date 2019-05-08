@@ -2,8 +2,6 @@
 
 namespace Baum\NestedSet;
 
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-
 /**
  * Node
  *
@@ -227,22 +225,24 @@ trait Node
         $this->getConnection()->transaction(function () {
             $this->refresh();
 
-            $lftCol = $this->getLeftColumnName();
-            $rgtCol = $this->getRightColumnName();
-            $lft    = $this->getLeft();
-            $rgt    = $this->getRight();
+            $lftCol          = $this->getLeftColumnName();
+            $rgtCol          = $this->getRightColumnName();
+            $lft             = $this->getLeft();
+            $rgt             = $this->getRight();
+            $qualifiedLftCol = $this->getQualifiedLeftColumnName();
+            $qualifiedRgtCol = $this->getQualifiedRightColumnName();
 
             // Apply a lock to the rows which fall past the deletion point
-            $this->newQuery()->where($lftCol, '>=', $lft)->select($this->getKeyName())->lockForUpdate()->get();
+            $this->newQuery()->where($qualifiedLftCol, '>=', $lft)->select($this->getQualifiedKeyName())->lockForUpdate()->get();
 
             // Prune children
-            $this->newQuery()->where($lftCol, '>', $lft)->where($rgtCol, '<', $rgt)->delete();
+            $this->newQuery()->where($qualifiedLftCol, '>', $lft)->where($qualifiedRgtCol, '<', $rgt)->delete();
 
             // Update left and right indexes for the remaining nodes
             $diff = $rgt - $lft + 1;
 
-            $this->newQuery()->where($lftCol, '>', $rgt)->decrement($lftCol, $diff);
-            $this->newQuery()->where($rgtCol, '>', $rgt)->decrement($rgtCol, $diff);
+            $this->newQuery()->where($qualifiedLftCol, '>', $rgt)->decrement($lftCol, $diff);
+            $this->newQuery()->where($qualifiedRgtCol, '>', $rgt)->decrement($rgtCol, $diff);
         });
     }
 
