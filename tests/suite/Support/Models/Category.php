@@ -2,10 +2,13 @@
 
 namespace Baum\Tests\Support\Models;
 
-use Baum\Node;
+use Illuminate\Database\Eloquent\Model;
+use Baum\NestedSet\Node;
 
-class Category extends Node
+class Category extends Model
 {
+    use Node;
+
     protected $table = 'categories';
 
     protected $fillable = ['name'];

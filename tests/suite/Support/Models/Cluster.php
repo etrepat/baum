@@ -2,10 +2,13 @@
 
 namespace Baum\Tests\Support\Models;
 
-use Baum\Node;
+use Illuminate\Database\Eloquent\Model;
+use Baum\NestedSet\Node;
 
-class Cluster extends Node
+class Cluster extends Model
 {
+    use Node;
+
     protected $table = 'clusters';
 
     protected $fillable = ['name'];
