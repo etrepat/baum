@@ -4,7 +4,7 @@ namespace Baum\NestedSet;
 
 use Closure;
 use Illuminate\Support\Contracts\ArrayableInterface;
-use Baum\Node;
+use Illuminate\Support\Arr;
 
 class Mapper
 {
@@ -141,14 +141,14 @@ class Mapper
     {
         $searchable = [$this->node->getKeyName()];
 
-        return array_only($attributes, $searchable);
+        return Arr::only($attributes, $searchable);
     }
 
     protected function getDataAttributes($attributes)
     {
         $exceptions = [$this->node->getKeyName(), $this->getChildrenKeyName()];
 
-        return array_except($attributes, $exceptions);
+        return Arr::except($attributes, $exceptions);
     }
 
     protected function firstOrNew($attributes)

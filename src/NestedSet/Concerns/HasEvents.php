@@ -7,7 +7,7 @@ use Baum\NestedSet\NodeObserver;
 trait HasEvents
 {
     /**
-     * Boot the soft deleting trait for a model.
+     * Boot the HasEvents trait for a model.
      *
      * @return void
      */
@@ -17,7 +17,7 @@ trait HasEvents
     }
 
     /**
-     * Initialize the soft deleting trait for an instance.
+     * Initialize the HasEvents trait for an instance.
      *
      * @return void
      */

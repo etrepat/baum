@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Arr;
+
 if (!function_exists('hmap')) {
     /**
      * Simple function which aids in converting the tree hierarchy into something
@@ -18,7 +20,7 @@ if (!function_exists('hmap')) {
             } else {
                 $preserve = is_string($preserve) ? [$preserve] : $preserve;
 
-                $current = array_only($node, $preserve);
+                $current = Arr::only($node, $preserve);
                 if (array_key_exists('children', $node)) {
                     $children = $node['children'];
 
