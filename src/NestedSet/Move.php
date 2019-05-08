@@ -2,7 +2,7 @@
 
 namespace Baum\NestedSet;
 
-use \Illuminate\Events\Dispatcher;
+use Illuminate\Events\Dispatcher;
 
 /**
 * Move
@@ -189,11 +189,21 @@ class Move
      */
     protected function resolveNode($node)
     {
-        if ($node instanceof \Baum\Node) {
+        if (method_exists($node, 'refresh') && is_callable([$node, 'refresh'])) {
             return $node->refresh();
         }
 
-        return $this->node->newQuery()->find($node);
+        if ($node instanceof \Illuminate\Database\Eloquent\Model) {
+            return $node->newQuery()->find($node->getKey());
+        }
+
+        $key = (int) $node;
+
+        if ($key !== 0) {
+            return $this->node->newQuery()->find($node);
+        }
+
+        throw new MoveNotPossibleException('Could not resolve target node.');
     }
 
     /**
