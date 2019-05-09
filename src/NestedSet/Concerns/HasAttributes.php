@@ -21,7 +21,7 @@ trait HasAttributes
      */
     public function getLeft()
     {
-        return $this->getAttribute($this->getLeftColumnName());
+        return (int) $this->getAttribute($this->getLeftColumnName());
     }
 
     /**
@@ -31,7 +31,7 @@ trait HasAttributes
      */
     public function getRight()
     {
-        return $this->getAttribute($this->getRightColumnName());
+        return (int) $this->getAttribute($this->getRightColumnName());
     }
 
     /**
@@ -41,7 +41,7 @@ trait HasAttributes
      */
     public function getDepth()
     {
-        return $this->getAttribute($this->getDepthColumnName());
+        return (int) $this->getAttribute($this->getDepthColumnName());
     }
 
     /**

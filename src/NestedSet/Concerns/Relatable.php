@@ -74,7 +74,7 @@ trait Relatable
      */
     public function isLeaf()
     {
-        return $this->exists && ($this->getRight() - $this->getLeft() == 1);
+        return ($this->getRight() - $this->getLeft() === 1);
     }
 
     /**
