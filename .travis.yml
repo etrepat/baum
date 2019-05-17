@@ -5,7 +5,7 @@ sudo: false
 
 php:
   - '7.1'
-  - '7.2.18'
+  - '7.2'
   - '7.3'
 
 env:
@@ -24,7 +24,7 @@ before_install:
   - phpenv config-rm xdebug.ini || true
 
 install:
-  - travis_retry composer require "illuminate/contracts=${LARAVEL}" --dev --prefer-dist --no-interaction --no-suggest
+  - travis_retry composer require "illuminate/database=${LARAVEL}" --dev --prefer-dist --no-interaction --no-suggest
 
 script:
   - vendor/bin/phpunit --verbose
