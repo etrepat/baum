@@ -17,11 +17,7 @@ class ScopedByScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        if ($model->isScoped() && $model->exists) {
-            foreach ($model->getScopedColumnNames() as $fld) {
-                $builder->where($model->qualifyColumn($fld), '=', $model->getAttribute($fld));
-            }
-        }
+        $this->restrictByScope($builder, $model);
     }
 
     /**
@@ -59,16 +55,32 @@ class ScopedByScope implements Scope
     public function addScopedBy(Builder $builder)
     {
         $builder->macro('scopedBy', function (Builder $builder, $scopedBy = []) {
-            $model = $builder->getModel();
-
-            $scopeColumns = array_merge($scopedBy, $model->isScoped() ? $model->getScopedColumnNames() : []);
-
-            return array_reduce($scopeColumns, function ($builder, $column) use ($model) {
-                return $builder->where(
-                    $model->qualifyColumn($column),
-                    $model->getAttribute($column)
-                );
-            }, $builder->unscoped());
+            return  $this->restrictByScope($builder, $builder->getModel(), $scopedBy);
         });
+    }
+
+    /**
+     * Restricts current query builder object by its associated model scope
+     * columns.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param array $extra
+     * @return void
+     */
+    protected function restrictByScope(Builder $builder, Model $model = null, array $extra = [])
+    {
+        $model = $model ?: $builder->getModel();
+
+        $attributes = $model->getAttributes();
+
+        $scopeColumns = array_merge($extra, $model->isScoped() ? $model->getScopedColumnNames() : []);
+
+        return array_reduce($scopeColumns, function ($builder, $column) use ($model, $attributes) {
+            return array_key_exists($column, $attributes) ? $builder->where(
+                $model->qualifyColumn($column),
+                $model->getAttribute($column)
+            ) : $builder;
+        }, $builder->unscoped());
     }
 }
