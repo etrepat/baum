@@ -144,17 +144,7 @@ trait Node
      */
     public function setDefaultLeftAndRight()
     {
-        $withHighestRight = $this->newQuery()
-            ->scopedBy()
-            ->reOrderBy($this->getRightColumnName(), 'desc')
-            ->take(1)
-            ->sharedLock()
-            ->first();
-
-        $maxRgt = 0;
-        if (!is_null($withHighestRight)) {
-            $maxRgt = $withHighestRight->getRight();
-        }
+        $maxRgt = (int) $this->newQuery()->max($this->getQualifiedRightColumnName());
 
         $this->setAttribute($this->getLeftColumnName(), $maxRgt + 1);
         $this->setAttribute($this->getRightColumnName(), $maxRgt + 2);
