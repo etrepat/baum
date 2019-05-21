@@ -595,9 +595,7 @@ trait Node
         return $this->siblings()
                 ->where($this->getLeftColumnName(), '<', $this->getLeft())
                 ->orderBy($this->getOrderColumnName(), 'desc')
-                ->get()
                 ->first();
-                // ->last();
     }
 
     /**

@@ -7,7 +7,7 @@ trait HasAttributes
     /**
     * Get the value of the model's "parent_id" field.
     *
-    * @return int
+    * @return mixed
     */
     public function getParentKey()
     {
