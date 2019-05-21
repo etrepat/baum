@@ -22,19 +22,19 @@ require __DIR__.'/vendor/autoload.php';
 |
 */
 
-$container = new \Illuminate\Container\Container;
+use Illuminate\Container\Container;
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Events\Dispatcher;
 
-$dispatcher = new \Illuminate\Events\Dispatcher($container);
-
-$capsule = new \Illuminate\Database\Capsule\Manager($container);
-
-$capsule->setEventDispatcher($dispatcher);
+$capsule = new Capsule;
 
 $capsule->addConnection(require(__DIR__.'/tests/config/database.php'));
 
-$capsule->bootEloquent();
+$capsule->setEventDispatcher(new Dispatcher(new Container));
 
 $capsule->setAsGlobal();
+
+$capsule->bootEloquent();
 
 /*
 |--------------------------------------------------------------------------
