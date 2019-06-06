@@ -16,17 +16,14 @@ class TestCase extends BaseTestCase
     use Concerns\MigratesDatabase;
     use Concerns\SeedsDatabase;
 
-    public static function setUpBeforeClass(): void
-    {
-        $instance = new static;
-
-        $instance->migrate(CategoryMigrator::class);
-        $instance->migrate(ClusterMigrator::class);
-    }
-
     public function setUp(): void
     {
+        $this->migrate(CategoryMigrator::class);
+
+        $this->migrate(ClusterMigrator::class);
+
         $this->seed(CategorySeeder::class);
+
         $this->seed(ClusterSeeder::class);
     }
 
