@@ -2,6 +2,7 @@
 
 namespace Baum\NestedSet;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Events\Dispatcher;
 
 /**
@@ -10,47 +11,47 @@ use Illuminate\Events\Dispatcher;
 class Move
 {
 
-  /**
-  * Node on which the move operation will be performed
-  *
-  * @var \Baum\Node
-  */
-    protected $node = null;
+    /**
+    * Node on which the move operation will be performed
+    *
+    * @var \Baum\Node
+    */
+    protected $node;
 
     /**
     * Destination node
     *
     * @var \Baum\Node | int
     */
-    protected $target = null;
+    protected $target;
 
     /**
-    * Move target position, one of: child, left, right, root
+    * Move target position, one of: child, left, right or root
     *
     * @var string
     */
-    protected $position = null;
+    protected $position;
 
     /**
     * Memoized 1st boundary.
     *
     * @var int
     */
-    protected $_bound1 = null;
+    protected $_bound1;
 
     /**
     * Memoized 2nd boundary.
     *
     * @var int
     */
-    protected $_bound2 = null;
+    protected $_bound2;
 
     /**
     * Memoized boundaries array.
     *
     * @var array
     */
-    protected $_boundaries = null;
+    protected $_boundaries;
 
     /**
      * The event dispatcher instance.
@@ -73,7 +74,7 @@ class Move
         $this->target   = $this->resolveNode($target);
         $this->position = $position;
 
-        $this->setEventDispatcher($dispatcher ?? $node->getEventDispatcher());
+        $this->setEventDispatcher($dispatcher ?? $this->node->getEventDispatcher());
     }
 
     /**
@@ -139,13 +140,13 @@ class Move
 
         $currentId      = $this->quoteIdentifier($this->node->getKey());
         $parentId       = $this->quoteIdentifier($this->parentId());
-        $leftColumn     = $this->node->getLeftColumnName();
-        $rightColumn    = $this->node->getRightColumnName();
-        $parentColumn   = $this->node->getParentColumnName();
+        $leftColumn     = $this->node->getQualifiedLeftColumnName();
+        $rightColumn    = $this->node->getQualifiedRightColumnName();
+        $parentColumn   = $this->node->getQualifiedParentColumnName();
         $wrappedLeft    = $grammar->wrap($leftColumn);
         $wrappedRight   = $grammar->wrap($rightColumn);
         $wrappedParent  = $grammar->wrap($parentColumn);
-        $wrappedId      = $grammar->wrap($this->node->getKeyName());
+        $wrappedId      = $grammar->wrap($this->node->getQualifiedKeyName());
 
         $lftSql = "CASE
       WHEN $wrappedLeft BETWEEN $a AND $b THEN $wrappedLeft + $d - $b
@@ -172,11 +173,11 @@ class Move
         }
 
         return $this->node
-                ->newQuery()
-                ->where(function ($query) use ($leftColumn, $rightColumn, $a, $d) {
-                    $query->whereBetween($leftColumn, [$a, $d])->orWhereBetween($rightColumn, [$a, $d]);
-                })
-                ->update($updateConditions);
+            ->newQuery()
+            ->where(function ($query) use ($leftColumn, $rightColumn, $a, $d) {
+                $query->whereBetween($leftColumn, [$a, $d])->orWhereBetween($rightColumn, [$a, $d]);
+            })
+            ->update($updateConditions);
     }
 
     /**
@@ -189,18 +190,16 @@ class Move
      */
     protected function resolveNode($node)
     {
-        if (method_exists($node, 'refresh') && is_callable([$node, 'refresh'])) {
-            return $node->refresh();
+        if ($node instanceof Model) {
+            if (method_exists($node, 'refresh') && is_callable([$node, 'refresh'])) {
+                return $node->refresh();
+            }
+
+            return $this->node->newQuery()->find($node->getKey());
         }
 
-        if ($node instanceof \Illuminate\Database\Eloquent\Model) {
-            return $node->newQuery()->find($node->getKey());
-        }
-
-        $key = (int) $node;
-
-        if ($key !== 0) {
-            return $this->node->newQuery()->find($node);
+        if ($resolved = $this->node->newQuery()->find($node)) {
+            return $resolved;
         }
 
         throw new MoveNotPossibleException('Could not resolve target node.');
@@ -251,29 +250,27 @@ class Move
      */
     protected function bound1()
     {
-        if (!is_null($this->_bound1)) {
-            return $this->_bound1;
+        if (is_null($this->_bound1)) {
+            switch ($this->position) {
+                case 'child':
+                    $this->_bound1 = $this->target->getRight();
+                    break;
+
+                case 'left':
+                    $this->_bound1 = $this->target->getLeft();
+                    break;
+
+                case 'right':
+                    $this->_bound1 = $this->target->getRight() + 1;
+                    break;
+
+                case 'root':
+                    $this->_bound1 = $this->node->newQuery()->max($this->node->getRightColumnName()) + 1;
+                    break;
+            }
+
+            $this->_bound1 = (($this->_bound1 > $this->node->getRight()) ? $this->_bound1 - 1 : $this->_bound1);
         }
-
-        switch ($this->position) {
-            case 'child':
-                $this->_bound1 = $this->target->getRight();
-                break;
-
-            case 'left':
-                $this->_bound1 = $this->target->getLeft();
-                break;
-
-            case 'right':
-                $this->_bound1 = $this->target->getRight() + 1;
-                break;
-
-            case 'root':
-                $this->_bound1 = $this->node->newQuery()->max($this->node->getRightColumnName()) + 1;
-                break;
-        }
-
-        $this->_bound1 = (($this->_bound1 > $this->node->getRight()) ? $this->_bound1 - 1 : $this->_bound1);
 
         return $this->_bound1;
     }
@@ -286,11 +283,10 @@ class Move
      */
     protected function bound2()
     {
-        if (!is_null($this->_bound2)) {
-            return $this->_bound2;
+        if (is_null($this->_bound2)) {
+            $this->_bound2 = (($this->bound1() > $this->node->getRight()) ? $this->node->getRight() + 1 : $this->node->getLeft() - 1);
         }
 
-        $this->_bound2 = (($this->bound1() > $this->node->getRight()) ? $this->node->getRight() + 1 : $this->node->getLeft() - 1);
         return $this->_bound2;
     }
 
@@ -301,19 +297,17 @@ class Move
      */
     protected function boundaries()
     {
-        if (!is_null($this->_boundaries)) {
-            return $this->_boundaries;
+        if (is_null($this->_boundaries)) {
+            // we have defined the boundaries of two non-overlapping intervals,
+            // so sorting puts both the intervals and their boundaries in order
+            $this->_boundaries = [
+                $this->node->getLeft(),
+                $this->node->getRight(),
+                $this->bound1(),
+                $this->bound2()
+            ];
+            sort($this->_boundaries);
         }
-
-        // we have defined the boundaries of two non-overlapping intervals,
-        // so sorting puts both the intervals and their boundaries in order
-        $this->_boundaries = [
-            $this->node->getLeft(),
-            $this->node->getRight(),
-            $this->bound1(),
-            $this->bound2()
-        ];
-        sort($this->_boundaries);
 
         return $this->_boundaries;
     }
@@ -354,7 +348,7 @@ class Move
      */
     protected function promotingToRoot()
     {
-        return ($this->position == 'root');
+        return $this->position === 'root';
     }
 
     /**
@@ -429,9 +423,9 @@ class Move
     protected function applyLockBetween($lft, $rgt)
     {
         $this->node->newQuery()
-            ->where($this->node->getLeftColumnName(), '>=', $lft)
-            ->where($this->node->getRightColumnName(), '<=', $rgt)
-            ->select($this->node->getKeyName())
+            ->where($this->node->getQualifiedLeftColumnName(), '>=', $lft)
+            ->where($this->node->getQualifiedRightColumnName(), '<=', $rgt)
+            ->select($this->node->getQualifiedKeyName())
             ->lockForUpdate()
             ->get();
     }
