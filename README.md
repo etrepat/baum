@@ -67,8 +67,8 @@ look like this:
      3 |         2 |    3 |    4 |     2 | Child 1.1
      4 |         2 |    5 |    6 |     2 | Child 1.2
      5 |         1 |    8 |   13 |     1 | Child 2
-     6 |         5 |    9 |   10 |     2 | Child 2.1
-     7 |         5 |   11 |   12 |     2 | Child 2.2
+     6 |         8 |    9 |   10 |     2 | Child 2.1
+     7 |         8 |   11 |   12 |     2 | Child 2.2
 
 To get all children of a _parent_ node, you
 
