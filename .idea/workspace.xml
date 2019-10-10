@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7268cb3a-9e79-489d-bcf1-4818b7974b23" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/Baum/Move.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Baum/Move.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/baum.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/baum.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -25,8 +27,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Baum/Move.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="640">
-              <caret line="358" column="5" lean-forward="true" selection-start-line="358" selection-start-column="5" selection-end-line="358" selection-end-column="5" />
+            <state relative-caret-position="190">
+              <caret line="337" column="38" selection-start-line="337" selection-start-column="38" selection-end-line="337" selection-end-column="38" />
             </state>
           </provider>
         </entry>
@@ -43,11 +45,59 @@
       </list>
     </option>
   </component>
+  <component name="PhpWorkspaceProjectConfiguration">
+    <include_path>
+      <path value="$PROJECT_DIR$/vendor/composer" />
+      <path value="$PROJECT_DIR$/vendor/illuminate/events" />
+      <path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-docblock" />
+      <path value="$PROJECT_DIR$/vendor/phpdocumentor/type-resolver" />
+      <path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-common" />
+      <path value="$PROJECT_DIR$/vendor/illuminate/database" />
+      <path value="$PROJECT_DIR$/vendor/illuminate/contracts" />
+      <path value="$PROJECT_DIR$/vendor/illuminate/support" />
+      <path value="$PROJECT_DIR$/vendor/illuminate/filesystem" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/version" />
+      <path value="$PROJECT_DIR$/vendor/webmozart/assert" />
+      <path value="$PROJECT_DIR$/vendor/illuminate/container" />
+      <path value="$PROJECT_DIR$/vendor/illuminate/console" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/environment" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/exporter" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/recursion-context" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/diff" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/inflector" />
+      <path value="$PROJECT_DIR$/vendor/hamcrest/hamcrest-php" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/global-state" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/comparator" />
+      <path value="$PROJECT_DIR$/vendor/symfony/translation-contracts" />
+      <path value="$PROJECT_DIR$/vendor/symfony/finder" />
+      <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/instantiator" />
+      <path value="$PROJECT_DIR$/vendor/symfony/service-contracts" />
+      <path value="$PROJECT_DIR$/vendor/symfony/translation" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php73" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/phpunit" />
+      <path value="$PROJECT_DIR$/vendor/symfony/console" />
+      <path value="$PROJECT_DIR$/vendor/symfony/process" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-text-template" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-token-stream" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/phpunit-mock-objects" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-code-coverage" />
+      <path value="$PROJECT_DIR$/vendor/mockery/mockery" />
+      <path value="$PROJECT_DIR$/vendor/phpspec/prophecy" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-timer" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-file-iterator" />
+      <path value="$PROJECT_DIR$/vendor/psr/container" />
+      <path value="$PROJECT_DIR$/vendor/psr/simple-cache" />
+      <path value="$PROJECT_DIR$/vendor/d11wtq/boris" />
+      <path value="$PROJECT_DIR$/vendor/nesbot/carbon" />
+    </include_path>
+  </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="3840" />
-    <option name="y" value="233" />
-    <option name="width" value="957" />
-    <option name="height" value="1717" />
+    <option name="width" value="1080" />
+    <option name="height" value="1920" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -111,12 +161,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1565909055116</updated>
-      <workItem from="1565909056692" duration="331000" />
+      <workItem from="1565909056692" duration="942000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="331000" />
+    <option name="totallyTimeSpent" value="942000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="3840" y="233" width="1080" height="1920" extended-state="6" />
@@ -150,8 +200,8 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/Baum/Move.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="640">
-          <caret line="358" column="5" lean-forward="true" selection-start-line="358" selection-start-column="5" selection-end-line="358" selection-end-column="5" />
+        <state relative-caret-position="190">
+          <caret line="337" column="38" selection-start-line="337" selection-start-column="38" selection-end-line="337" selection-end-column="38" />
         </state>
       </provider>
     </entry>
