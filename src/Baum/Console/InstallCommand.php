@@ -58,7 +58,7 @@ class InstallCommand extends Command {
    *
    * @return void
    */
-  public function fire() {
+  public function handle() {
     $name = $this->input->getArgument('name');
 
     $this->writeMigration($name);
