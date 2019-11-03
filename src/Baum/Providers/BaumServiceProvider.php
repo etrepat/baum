@@ -14,7 +14,7 @@ class BaumServiceProvider extends ServiceProvider {
    *
    * @var string
    */
-  const VERSION = '1.1.1';
+  const VERSION = '1.1.2';
 
   /**
    * Register the service provider.
