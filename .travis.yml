@@ -1,4 +1,5 @@
-dist: xenial
+dist: bionic
+
 language: php
 
 sudo: false
