@@ -1,2 +1,4 @@
 /vendor
 composer.lock
+.vscode
+.phpunit.result.cache
