@@ -2,10 +2,23 @@
 
 namespace Baum\Console;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\MigrationCreator as BaseMigrationCreator;
 
 class MigrationCreator extends BaseMigrationCreator
 {
+    /**
+     * Create a new migration creator instance.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param  string|null  $customStubPath
+     * @return void
+     */
+    public function __construct(Filesystem $files, $customStubPath = null)
+    {
+        parent::__construct($files, $customStubPath);
+    }
+
     /**
      * Get the migration stub file.
      *

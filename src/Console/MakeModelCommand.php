@@ -62,7 +62,7 @@ class MakeModelCommand extends GeneratorCommand
      */
     protected function createMigration()
     {
-        $table = Str::snake(Str::pluralStudly(class_basename($this->argument('name'))));
+        $table = $this->getMigrationTableName();
 
         $this->call('baum:make-migration', ['name' => "create_{$table}_table", '--create' => $table]);
     }
@@ -79,5 +79,19 @@ class MakeModelCommand extends GeneratorCommand
 
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model'],
         ];
+    }
+
+    /**
+     * Get the migration table name.
+     *
+     * @return string
+     */
+    public function getMigrationTableName()
+    {
+        if (method_exists(Str::class, 'pluralStudly')) {
+            return Str::snake(Str::pluralStudly(class_basename($this->argument('name'))));
+        }
+
+        return Str::plural(Str::snake(class_basename($this->argument('name'))));
     }
 }
