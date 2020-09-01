@@ -14,7 +14,7 @@ class DummyClass extends Migration
     public function up()
     {
         Schema::create('DummyTable', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
 
             // We declare here the nested set structure columns/fields
             $table->nestedSet();
@@ -22,11 +22,11 @@ class DummyClass extends Migration
             // The previous `nestedSet` blueprint helper is equivalent to
             // the following column/field declarations:
             //
-            // $table->integer('parent_id')->unsigned()->nullable()->index();
-            // $table->foreign('parent_id')->references('id')->on($table->getTable());
-            // $table->integer('left')->unsigned()->nullable()->index();
-            // $table->integer('right')->unsgined()->nullable()->index();
-            // $table->integer('depth')->unsigned()->nullable()->index();
+            // $table->unsignedBigInteger('parent_id')->nullable()->index();
+            // $table->foreign('parent_id')->references('id')->on('DummyTable');
+            // $table->unsignedBigInteger('left')->nullable()->index();
+            // $table->unsignedBigInteger('right')->nullable()->index();
+            // $table->unsignedInteger('depth')->nullable()->index();
             //
             // Feel free to modify at your own will but note that all columns
             // *must be present* and initialized on the model accordingly.

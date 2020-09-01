@@ -13,11 +13,11 @@ class Blueprint
     public function nestedSet()
     {
         return function () {
-            $this->integer('parent_id')->unsigned()->nullable()->index();
+            $this->unsignedBigInteger('parent_id')->nullable()->index();
             $this->foreign('parent_id')->references('id')->on($this->getTable());
-            $this->integer('left')->unsigned()->nullable()->index();
-            $this->integer('right')->unsgined()->nullable()->index();
-            $this->integer('depth')->unsigned()->nullable()->index();
+            $this->unsignedBigInteger('left')->nullable()->index();
+            $this->unsignedBigInteger('right')->nullable()->index();
+            $this->unsignedInteger('depth')->nullable()->index();
         };
     }
 }
