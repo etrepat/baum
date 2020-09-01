@@ -38,6 +38,11 @@ trait Node
         static::addGlobalScope(new Scopes\ScopedByScope);
     }
 
+    /**
+     * Return a new query object *without* the nested set global scopes applied.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function newQueryWithoutNestedSetScopes()
     {
         return $this->newQuery()
@@ -51,17 +56,6 @@ trait Node
      * @var int
      */
     protected static $moveToNewParentId = null;
-
-    /**
-     * Equals?
-     *
-     * @param \Baum\NestedSet\Node
-     * @return boolean
-     */
-    public function equals($node)
-    {
-        return ($this == $node);
-    }
 
     /**
      * Returns the first root node.
@@ -324,16 +318,6 @@ trait Node
     }
 
     /**
-     * Returns true if this is a trunk node (not root or leaf).
-     *
-     * @return boolean
-     */
-    public function isTrunk()
-    {
-        return !$this->isRoot() && !$this->isLeaf();
-    }
-
-    /**
      * Returns the root node starting at the current node.
      *
      * @return NestedSet
@@ -351,263 +335,6 @@ trait Node
                 return $this;
             }
         }
-    }
-
-    /**
-     * Instance scope which targes all the ancestor chain nodes including
-     * the current one.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function ancestorsAndSelf()
-    {
-        return $this->newQuery()
-                ->where($this->getLeftColumnName(), '<=', $this->getLeft())
-                ->where($this->getRightColumnName(), '>=', $this->getRight());
-    }
-
-    /**
-     * Get all the ancestor chain from the database including the current node.
-     *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getAncestorsAndSelf($columns = ['*'])
-    {
-        return $this->ancestorsAndSelf()->get($columns);
-    }
-
-    /**
-     * Get all the ancestor chain from the database including the current node
-     * but without the root node.
-     *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getAncestorsAndSelfWithoutRoot($columns = ['*'])
-    {
-        return $this->ancestorsAndSelf()->withoutRoot()->get($columns);
-    }
-
-    /**
-     * Instance scope which targets all the ancestor chain nodes excluding
-     * the current one.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function ancestors()
-    {
-        return $this->ancestorsAndSelf()->withoutSelf();
-    }
-
-    /**
-     * Get all the ancestor chain from the database excluding the current node.
-     *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getAncestors($columns = ['*'])
-    {
-        return $this->ancestors()->get($columns);
-    }
-
-    /**
-     * Get all the ancestor chain from the database excluding the current node
-     * and the root node (from the current node's perspective).
-     *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getAncestorsWithoutRoot($columns = ['*'])
-    {
-        return $this->ancestors()->withoutRoot()->get($columns);
-    }
-
-    /**
-     * Instance scope which targets all children of the parent, including self.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function siblingsAndSelf()
-    {
-        return $this->newQuery()
-                ->where($this->getParentColumnName(), $this->getParentKey());
-    }
-
-    /**
-     * Get all children of the parent, including self.
-     *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getSiblingsAndSelf($columns = ['*'])
-    {
-        return $this->siblingsAndSelf()->get($columns);
-    }
-
-    /**
-     * Instance scope targeting all children of the parent, except self.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function siblings()
-    {
-        return $this->siblingsAndSelf()->withoutSelf();
-    }
-
-    /**
-     * Return all children of the parent, except self.
-     *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getSiblings($columns = ['*'])
-    {
-        return $this->siblings()->get($columns);
-    }
-
-    /**
-     * Instance scope targeting all of its nested children which do not have
-     * children.
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public function leaves()
-    {
-        $grammar = $this->getConnection()->getQueryGrammar();
-
-        $rgtCol = $grammar->wrap($this->getQualifiedRightColumnName());
-        $lftCol = $grammar->wrap($this->getQualifiedLeftColumnName());
-
-        return $this->descendants()
-                ->whereRaw($rgtCol . ' - ' . $lftCol . ' = 1');
-    }
-
-    /**
-     * Return all of its nested children which do not have children.
-     *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getLeaves($columns = ['*'])
-    {
-        return $this->leaves()->get($columns);
-    }
-
-    /**
-     * Instance scope targeting all of its nested children which are between the
-     * root and the leaf nodes (middle branch).
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public function trunks()
-    {
-        $grammar = $this->getConnection()->getQueryGrammar();
-
-        $rgtCol = $grammar->wrap($this->getQualifiedRightColumnName());
-        $lftCol = $grammar->wrap($this->getQualifiedLeftColumnName());
-
-        return $this->descendants()
-                ->whereNotNull($this->getQualifiedParentColumnName())
-                ->whereRaw($rgtCol . ' - ' . $lftCol . ' != 1');
-    }
-
-    /**
-     * Return all of its nested children which are trunks.
-     *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getTrunks($columns = ['*'])
-    {
-        return $this->trunks()->get($columns);
-    }
-
-    /**
-     * Scope targeting itself and all of its nested children.
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public function descendantsAndSelf()
-    {
-        return $this->newQuery()
-                ->where($this->getLeftColumnName(), '>=', $this->getLeft())
-                ->where($this->getLeftColumnName(), '<', $this->getRight());
-    }
-
-    /**
-     * Retrieve all nested children an self.
-     *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getDescendantsAndSelf($columns = ['*'])
-    {
-        if (is_array($columns)) {
-            return $this->descendantsAndSelf()->get($columns);
-        }
-
-        $arguments = func_get_args();
-
-        $limit    = intval(array_shift($arguments));
-        $columns  = array_shift($arguments) ?: ['*'];
-
-        return $this->descendantsAndSelf()->limitDepth($limit)->get($columns);
-    }
-
-    /**
-     * Set of all children & nested children.
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public function descendants()
-    {
-        return $this->descendantsAndSelf()->withoutSelf();
-    }
-
-    /**
-     * Retrieve all of its children & nested children.
-     *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getDescendants($columns = ['*'])
-    {
-        if (is_array($columns)) {
-            return $this->descendants()->get($columns);
-        }
-
-        $arguments = func_get_args();
-
-        $limit    = intval(array_shift($arguments));
-        $columns  = array_shift($arguments) ?: ['*'];
-
-        return $this->descendants()->limitDepth($limit)->get($columns);
-    }
-
-    /**
-     * Returns the first sibling to the left.
-     *
-     * @return NestedSet
-     */
-    public function getLeftSibling()
-    {
-        return $this->siblings()
-                ->where($this->getLeftColumnName(), '<', $this->getLeft())
-                ->orderBy($this->getOrderColumnName(), 'desc')
-                ->first();
-    }
-
-    /**
-     * Returns the first sibling to the right.
-     *
-     * @return NestedSet
-     */
-    public function getRightSibling()
-    {
-        return $this->siblings()
-                ->where($this->getLeftColumnName(), '>', $this->getLeft())
-                ->first();
     }
 
     /**
