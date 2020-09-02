@@ -7,6 +7,13 @@ use Baum\NestedSet\Move;
 trait Movable
 {
     /**
+     * Indicates whether we should move to a new parent.
+     *
+     * @var int
+     */
+    protected static $moveToNewParentId = null;
+
+    /**
      * Main move method. Here we handle all node movements with the corresponding
      * lft/rgt index updates.
      *
@@ -131,5 +138,36 @@ trait Movable
     public function makeRoot()
     {
         return $this->moveTo($this, 'root');
+    }
+
+    /**
+     * Store the parent_id if the attribute is modified so as we are able to move
+     * the node to this new parent after saving.
+     *
+     * @return void
+     */
+    public function storeNewParent()
+    {
+        if ($this->isDirty($this->getParentColumnName()) && ($this->exists || !$this->isRoot())) {
+            static::$moveToNewParentId = $this->getParentKey();
+        } else {
+            static::$moveToNewParentId = false;
+        }
+    }
+
+    /**
+     * Move to the new parent if appropiate.
+     *
+     * @return void
+     */
+    public function moveToNewParent()
+    {
+        $pid = static::$moveToNewParentId;
+
+        if (is_null($pid)) {
+            $this->makeRoot();
+        } elseif ($pid !== false) {
+            $this->makeChildOf($pid);
+        }
     }
 }
