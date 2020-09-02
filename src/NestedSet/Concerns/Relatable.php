@@ -24,25 +24,15 @@ trait Relatable
         return $this->hasMany(get_class($this), $this->getParentColumnName());
     }
 
-    // /**
-    //  * Inmmediate descendants relation. Alias for "children".
-    //  *
-    //  * @return \Illuminate\Database\Eloquent\Relations\HasMany
-    //  */
-    // public function immediateDescendants()
-    // {
-    //     return $this->children();
-    // }
-
-    // /**
-    //  * Attribute alias so as to eager-load the proper relationship.
-    //  *
-    //  * @return mixed
-    //  */
-    // public function getImmediateDescendantsAttribute()
-    // {
-    //     return $this->getRelationValue('children');
-    // }
+    /**
+     * Inmmediate descendants relation. Alias for "children".
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function immediateDescendants()
+    {
+        return $this->children();
+    }
 
     /**
      * Retrive all of its "immediate" descendants.
@@ -52,7 +42,6 @@ trait Relatable
      */
     public function getImmediateDescendants($columns = ['*'])
     {
-        // return $this->children()->get($columns);
         return $this->getRelationValue('children');
     }
 
