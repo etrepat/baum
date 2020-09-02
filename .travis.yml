@@ -16,7 +16,7 @@ env:
     - LARAVEL=5.8.*
     - LARAVEL=^6.0
     - LARAVEL=^7.0
-    - LARAVEL=dev-develop
+    - LARAVEL=^8.0
 
 matrix:
   fast_finish: true
@@ -26,11 +26,11 @@ matrix:
     - php: '7.1'
       env: LARAVEL=^7.0
     - php: '7.1'
-      env: LARAVEL=dev-develop
+      env: LARAVEL=^8.0
     - php: '7.2'
-      env: LARAVEL=dev-develop
+      env: LARAVEL=^8.0
   allow_failures:
-    - env: LARAVEL=dev-develop
+    - env: LARAVEL=^8.0
 
 before_install:
   - phpenv config-rm xdebug.ini || true
