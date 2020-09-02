@@ -52,13 +52,6 @@ trait Node
     }
 
     /**
-     * Indicates whether we should move to a new parent.
-     *
-     * @var int
-     */
-    protected static $moveToNewParentId = null;
-
-    /**
      * Returns the first root node.
      *
      * @return \Baum\NestedSet\Node
@@ -80,7 +73,6 @@ trait Node
         return $instance->newQuery()->whereNull($instance->getParentColumnName());
     }
 
-
     /**
      * Sets default values for left and right fields.
      *
@@ -92,71 +84,6 @@ trait Node
 
         $this->setAttribute($this->getLeftColumnName(), $maxRgt + 1);
         $this->setAttribute($this->getRightColumnName(), $maxRgt + 2);
-    }
-
-    /**
-     * Store the parent_id if the attribute is modified so as we are able to move
-     * the node to this new parent after saving.
-     *
-     * @return void
-     */
-    public function storeNewParent()
-    {
-        if ($this->isDirty($this->getParentColumnName()) && ($this->exists || !$this->isRoot())) {
-            static::$moveToNewParentId = $this->getParentKey();
-        } else {
-            static::$moveToNewParentId = false;
-        }
-    }
-
-    /**
-     * Move to the new parent if appropiate.
-     *
-     * @return void
-     */
-    public function moveToNewParent()
-    {
-        $pid = static::$moveToNewParentId;
-
-        if (is_null($pid)) {
-            $this->makeRoot();
-        } elseif ($pid !== false) {
-            $this->makeChildOf($pid);
-        }
-    }
-
-    /**
-     * Prunes a branch off the tree, shifting all the elements on the right
-     * back to the left so the counts work.
-     *
-     * @return void;
-     */
-    public function destroyDescendants()
-    {
-        if (is_null($this->getRight()) || is_null($this->getLeft())) {
-            return;
-        }
-
-        $this->getConnection()->transaction(function () {
-            $this->refresh();
-
-            $lftCol = $this->getQualifiedLeftColumnName();
-            $rgtCol = $this->getQualifiedRightColumnName();
-            $lft    = $this->getLeft();
-            $rgt    = $this->getRight();
-
-            // Apply a lock to the rows which fall past the deletion point
-            $this->newQuery()->where($lftCol, '>=', $lft)->select($this->getQualifiedKeyName())->lockForUpdate()->get();
-
-            // Prune children
-            $this->newQuery()->where($lftCol, '>', $lft)->where($rgtCol, '<', $rgt)->delete();
-
-            // Update left and right indexes for the remaining nodes
-            $diff = $rgt - $lft + 1;
-
-            $this->newQuery()->where($lftCol, '>', $rgt)->decrement($lftCol, $diff);
-            $this->newQuery()->where($rgtCol, '>', $rgt)->decrement($rgtCol, $diff);
-        });
     }
 
     /**
