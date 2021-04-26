@@ -2,6 +2,7 @@
 namespace Baum;
 
 use \Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Baum\Node;
 
@@ -128,13 +129,13 @@ class SetMapper {
   protected function getSearchAttributes($attributes) {
     $searchable = array($this->node->getKeyName());
 
-    return array_only($attributes, $searchable);
+    return Arr::only($attributes, $searchable);
   }
 
   protected function getDataAttributes($attributes) {
     $exceptions = array($this->node->getKeyName(), $this->getChildrenKeyName());
 
-    return array_except($attributes, $exceptions);
+    return Arr::except($attributes, $exceptions);
   }
 
   protected function firstOrNew($attributes) {

@@ -352,7 +352,11 @@ class Move {
     // but we relay the event into the node instance.
     $event = "eloquent.{$event}: ".get_class($this->node);
 
-    $method = $halt ? 'until' : 'fire';
+    if (version_compare(app()->version(), '5.8.0', '>=')) {
+      $method = $halt ? 'until' : 'dispatch';
+    } else {
+      $method = $halt ? 'until' : 'fire';
+    }
 
     return static::$dispatcher->$method($event, $this->node);
   }

@@ -18,7 +18,7 @@ if ( !function_exists('hmap') ) {
       } else {
         $preserve = is_string($preserve) ? array($preserve) : $preserve;
 
-        $current = array_only($node, $preserve);
+        $current = \Illuminate\Support\Arr::only($node, $preserve);
         if ( array_key_exists('children', $node) ) {
           $children = $node['children'];
 
