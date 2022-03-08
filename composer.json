@@ -13,11 +13,11 @@
   ],
   "require": {
     "php": ">=5.4.0",
-    "illuminate/console": "5.*",
-    "illuminate/database": "5.*",
-    "illuminate/events": "5.*",
-    "illuminate/filesystem": "5.*",
-    "illuminate/support": "5.*"
+    "illuminate/console": "*",
+    "illuminate/database": "*",
+    "illuminate/events": "*",
+    "illuminate/filesystem": "*",
+    "illuminate/support": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.0",
