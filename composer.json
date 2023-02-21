@@ -12,19 +12,19 @@
     }
   ],
   "require": {
-    "php": "^7.3|^8.0",
-    "illuminate/contracts": "^8.0|^9.0",
-    "illuminate/database": "^8.0|^9.0",
-    "illuminate/events": "^8.0|^9.0",
-    "illuminate/support": "^8.0|^9.0"
+    "php": "^7.3|^8.0|^8.1",
+    "illuminate/contracts": "^8.0|^9.0|^10.0",
+    "illuminate/database": "^8.0|^9.0|^10.0",
+    "illuminate/events": "^8.0|^9.0|^10.0",
+    "illuminate/support": "^8.0|^9.0|^10.0"
   },
   "require-dev": {
     "mockery/mockery": "^1.4.4",
     "phpunit/phpunit": "^8.5.19|^9.5.8",
     "psy/psysh": "@stable",
     "squizlabs/php_codesniffer": "*",
-    "illuminate/console": "^8.0|^9.0",
-    "illuminate/filesystem": "^8.0|^9.0"
+    "illuminate/console": "^8.0|^9.0|^10.0",
+    "illuminate/filesystem": "^8.0|^9.0|^10.0"
   },
   "autoload": {
     "psr-4": {
