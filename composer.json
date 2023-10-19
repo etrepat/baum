@@ -1,8 +1,8 @@
 {
-  "name": "baum/baum",
+  "name": "storkontheroof/baum",
   "type": "library",
   "description": "Baum is an implementation of the Nested Set pattern for Eloquent models.",
-  "keywords": ["nested set", "laravel", "laravel 4", "laravel 5", "eloquent", "database"],
+  "keywords": ["nested set", "laravel", "eloquent", "database"],
   "license": "MIT",
   "authors": [
     {
@@ -12,12 +12,12 @@
     }
   ],
   "require": {
-    "php": ">=5.4.0",
-    "illuminate/console": "5.*",
-    "illuminate/database": "5.*",
-    "illuminate/events": "5.*",
-    "illuminate/filesystem": "5.*",
-    "illuminate/support": "5.*"
+    "php": ">=7.2.0",
+    "illuminate/console": "6.* | 7.* | 8.* | 9.* | 10.*",
+    "illuminate/database": "6.* | 7.* | 8.* | 9.* | 10.*",
+    "illuminate/events": "6.* | 7.* | 8.* | 9.* | 10.*",
+    "illuminate/filesystem": "6.* | 7.* | 8.* | 9.* | 10.*",
+    "illuminate/support": "6.* | 7.* | 8.* | 9.* | 10.*"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.0",
