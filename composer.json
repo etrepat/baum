@@ -2,31 +2,53 @@
   "name": "baum/baum",
   "type": "library",
   "description": "Baum is an implementation of the Nested Set pattern for Eloquent models.",
-  "keywords": ["nested set", "laravel", "laravel 4", "laravel 5", "eloquent", "database"],
+  "keywords": ["nested set", "laravel", "eloquent", "database", "tree", "hierarchy"],
   "license": "MIT",
   "authors": [
     {
       "name": "Estanislau Trepat",
       "email": "estanis@etrepat.com",
-      "homepage": "http://etrepat.com"
+      "homepage": "https://etrepat.com"
     }
   ],
   "require": {
-    "php": ">=5.4.0",
-    "illuminate/console": "5.*",
-    "illuminate/database": "5.*",
-    "illuminate/events": "5.*",
-    "illuminate/filesystem": "5.*",
-    "illuminate/support": "5.*"
+    "php": "^7.3|^8.0|^8.1|^8.2",
+    "illuminate/contracts": "^8.0|^9.0|^10.0|^11.0|^12.0",
+    "illuminate/database": "^8.0|^9.0|^10.0|^11.0|^12.0",
+    "illuminate/events": "^8.0|^9.0|^10.0|^11.0|^12.0",
+    "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "~4.0",
-    "mockery/mockery": "~0.9",
-    "d11wtq/boris": "~1.0.10"
+    "mockery/mockery": "^1.4",
+    "phpunit/phpunit": "^8.5.19|^9.5.8|^11.0.1|^11.5.3",
+    "psy/psysh": "@stable",
+    "squizlabs/php_codesniffer": "*",
+    "illuminate/console": "^8.0|^9.0|^10.0|^11.0|^12.0",
+    "illuminate/filesystem": "^8.0|^9.0|^10.0|^11.0|^12.0"
   },
   "autoload": {
-    "psr-0": {
-      "Baum": "src/"
+    "psr-4": {
+      "Baum\\": "src/"
     }
-  }
+  },
+  "autoload-dev": {
+      "files": [
+        "tests/suite/Support/helpers.php"
+      ],
+      "psr-4": {
+          "Baum\\Tests\\": "tests/suite/"
+      }
+  },
+  "extra": {
+    "laravel": {
+        "providers": [
+          "Baum\\BaumServiceProvider"
+        ]
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }

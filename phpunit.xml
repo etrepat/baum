@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false"
-         backupStaticAttributes="false"
-         bootstrap="bootstrap.php"
-         colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         processIsolation="false"
-         stopOnFailure="false"
-         syntaxCheck="false">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.2/phpunit.xsd"
+    backupGlobals="false"
+    beStrictAboutTestsThatDoNotTestAnything="false"
+    bootstrap="./bootstrap.php"
+    colors="true"
+    failOnRisky="true"
+    failOnWarning="true"
+    processIsolation="false"
+    stopOnError="false"
+    stopOnFailure="false"
+    cacheDirectory=".phpunit.cache"
+    backupStaticProperties="false">
   <testsuites>
     <testsuite name="Baum Test Suite">
-      <file>tests/suite/QueryBuilderExtensionTest.php</file>
-      <file>tests/suite/NodeModelExtensionsTest.php</file>
-      <directory>tests/suite/Category</directory>
-      <directory>tests/suite/Cluster</directory>
+      <directory suffix="Test.php">./tests/suite</directory>
     </testsuite>
   </testsuites>
 </phpunit>
